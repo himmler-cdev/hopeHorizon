@@ -29,7 +29,13 @@ pip install -r requirements.txt
 
 ### 4. Apply migrations
 ```sh
+python manage.py makemigrations
 python manage.py migrate
+```
+#### 4.1 Clear existing migration
+If neccessary, you can clear existing migrations with this:
+```sh
+rm db.sqlite3
 ```
 
 ### 5. Run the development server
