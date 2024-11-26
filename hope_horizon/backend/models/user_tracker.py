@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class UserTracker(models.Model):
     is_enabled = models.BooleanField(default=False)
     track_mood = models.BooleanField(default=False)

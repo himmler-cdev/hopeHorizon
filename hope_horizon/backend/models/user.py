@@ -6,3 +6,4 @@ from .user_role import UserRole
 class User(AbstractUser):
     user_role = models.ForeignKey(UserRole, on_delete=models.CASCADE, null=True)
     user_tracker = models.OneToOneField(UserTracker, on_delete=models.CASCADE, null=True)
+    birthdate = models.DateField()
