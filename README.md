@@ -32,8 +32,8 @@ pip install -r requirements.txt
 python manage.py makemigrations
 python manage.py migrate
 ```
-#### 4.1 Clear existing migration
-If neccessary, you can clear existing migrations with this:
+#### 4.1 Clear existing database
+If neccessary, you can clear the existing database with this:
 ```sh
 rm db.sqlite3
 ```
@@ -49,5 +49,5 @@ Open your web browser and go to `http://localhost:8000/` to access the applicati
 ## Running Tests
 To run the tests, use the following command:
 ```sh
-python manage.py test
+python manage.py test backend
 ```

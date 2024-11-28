@@ -26,7 +26,7 @@ from rest_framework_simplejwt.views import (
 )
 
 router = DefaultRouter()
-router.register(r"user-status", UserStatusViewSet, basename="user-status")
+router.register(r"user_status", UserStatusViewSet, basename="user_status")
 
 
 urlpatterns = [

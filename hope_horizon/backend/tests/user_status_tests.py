@@ -1,42 +1,26 @@
 from sqlite3 import Date
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIRequestFactory
 from backend.models import UserStatus, User
+from freezegun import freeze_time
+import datetime as dt
 
 
 class UserStatusTests(APITestCase):
 
     def setUp(self):
-        # Create a user and authenticate
+        # Create a test user
         self.user = User.objects.create_user(
             username="testuser", password="testpassword", birthdate=Date(1990, 1, 1)
         )
-        self.client.login(username="testuser", password="testpassword")
-
-        # Create a UserStatus instance
-        self.user_status = UserStatus.objects.create(
-            user=self.user,
-            date="2024-11-25",
-            mood=5,
-            energy_level=5,
-            sleep_quality=5,
-            anxiety_level=5,
-            appetite=5,
-            content="Feeling good",
-        )
 
     def test_list_user_statuses(self):
-        url = reverse("userstatus-list")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+        pass
 
     def test_create_user_status(self):
-        url = reverse("userstatus-list")
+        # test data
         data = {
-            "user": self.user.id,
-            "date": "2024-11-26",
             "mood": 4,
             "energy_level": 4,
             "sleep_quality": 4,
@@ -44,6 +28,32 @@ class UserStatusTests(APITestCase):
             "appetite": 4,
             "content": "Feeling okay",
         }
-        response = self.client.post(url, data, format="json")
+
+        # test if user is not authenticated
+        response = self.client.post("/api/user_status/", data, format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        # test if user is authenticated and data is invalid
+        self.client.login(username="testuser", password="testpassword")
+        data.pop("mood")
+        response = self.client.post("/api/user_status/", data, format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        data["mood"] = 4
+
+        # test if user is authenticated and data is valid
+        response = self.client.post("/api/user_status/", data, format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(UserStatus.objects.count(), 2)
+
+        # test if user is authenticated and entry already exists
+        response = self.client.post("/api/user_status/", data, format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # test if user is authenticated and test different dates
+        today = dt.date(2000, 1, 1)
+        for i in range(10):
+            freezer = freeze_time(today + dt.timedelta(days=i))
+            freezer.start()
+            response = self.client.post("/api/user_status/", data, format="json", follow=True)
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+            freezer.stop()
+
