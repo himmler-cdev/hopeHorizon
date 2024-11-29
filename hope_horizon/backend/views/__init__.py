@@ -1,1 +1,2 @@
 from .user_status_view_set import UserStatusViewSet
+from .blog_post_type_view_set import BlogPostTypeViewSet
