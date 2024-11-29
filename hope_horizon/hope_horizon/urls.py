@@ -29,6 +29,7 @@ router = DefaultRouter()
 router.register(r"user", UserViewSet, basename="user")
 router.register(r"user_status", UserStatusViewSet, basename="user_status")
 router.register(r"user_tracker", UserTrackerViewSet, basename="user_tracker")
+router.register(r"blog_post_type", BlogPostTypeViewSet, basename="blog_post_type")
 
 
 urlpatterns = [

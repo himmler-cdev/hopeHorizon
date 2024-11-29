@@ -45,6 +45,22 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
+            name='BlogPost',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('title', models.CharField(max_length=250)),
+                ('date', models.DateField()),
+                ('content', models.TextField()),
+            ],
+        ),
+        migrations.CreateModel(
+            name='BlogPostType',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('type', models.CharField(default='Private', max_length=50)),
+            ],
+        ),
+        migrations.CreateModel(
             name='UserRole',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
