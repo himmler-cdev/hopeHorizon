@@ -18,7 +18,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from backend.views.user_status_view_set import UserStatusViewSet
+from backend.views import *
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -27,6 +27,7 @@ from rest_framework_simplejwt.views import (
 
 router = DefaultRouter()
 router.register(r"user_status", UserStatusViewSet, basename="user_status")
+router.register(r"user_tracker", UserTrackerViewSet, basename="user_tracker")
 
 
 urlpatterns = [
