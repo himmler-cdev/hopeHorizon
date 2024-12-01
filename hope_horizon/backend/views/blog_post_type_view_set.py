@@ -6,9 +6,9 @@ from backend.models import BlogPostType
 
 
 class BlogPostTypeViewSet(viewsets.ModelViewSet):
+    queryset = BlogPostType.objects.all()
     permission_classes = [IsAuthenticated]
     serializer_class = BlogPostTypeSerializer
-    queryset = BlogPostType.objects.all()
 
     def list(self, request):
         serializer = BlogPostTypeSerializer(self.queryset, many=True)
