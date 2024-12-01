@@ -20,6 +20,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from backend.views.user_status_view_set import UserStatusViewSet
 from backend.views.blog_post_type_view_set import BlogPostTypeViewSet
+from backend.views.blog_post_view_set import BlogPostViewSet
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -29,6 +30,7 @@ from rest_framework_simplejwt.views import (
 router = DefaultRouter()
 router.register(r"user_status", UserStatusViewSet, basename="user_status")
 router.register(r"blog_post_type", BlogPostTypeViewSet, basename="blog_post_type")
+router.register(r"blog_post", BlogPostViewSet, basename="blog_post")
 
 
 urlpatterns = [

@@ -11,13 +11,13 @@ class BlogPostTypeTests(APITestCase):
             username="testuser", password="testpassword", birthdate=Date(1990, 1, 1)
         )
 
-    def test_is_authenticated(self):
-        # Test if user is not authenticated
+    # Test if user is not authenticated
+    def test_is_not_authenticated(self):
         response = self.client.get("/api/blog_post_type/", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    # Test if user is authenticated and all types are listed
     def test_list_blog_post_types(self):
-        # Test if user is authenticated and all types are listed
         self.client.login(username="testuser", password="testpassword")
 
         response = self.client.get("/api/blog_post_type/", format="json", follow=True)
