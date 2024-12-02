@@ -28,7 +28,16 @@ class BlogPostSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Invalid type ID")
         return value
 
-# TODO: Write this
-class BlogPostListSerializer(serializers.ModelSerializer):
+class BlogPostListSerializer(serializers.Serializer):
+    pageInformation = serializers.SerializerMethodField()
+    blog_posts = BlogPostSerializer(many=True)
+
+    def get_pageInformation(self, obj):
+        return {
+            "page": obj.get('page', 1),
+            "pageSize": obj.get('pageSize', 10),
+            "actualSize": len(obj.get('blog_posts', []))
+        }
+
     class Meta:
-        model = BlogPost
+        fields = ["pageInformation", "blog_posts"]
