@@ -51,3 +51,15 @@ To run the tests, use the following command:
 ```sh
 python manage.py test backend
 ```
+
+### Running Tests with Code Coverage
+To run the tests with code coverage, use the following command:
+```sh
+coverage run manage.py test backend
+```
+
+### Genrating Code Coverage report
+To generate the code coverage report, use the following command:
+```sh
+coverage report -m
+```

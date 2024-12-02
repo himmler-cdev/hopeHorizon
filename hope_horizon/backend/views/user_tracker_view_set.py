@@ -23,8 +23,7 @@ class UserTrackerViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         if not self._custom_validation(request):
             return Response("Invalid request data", status=status.HTTP_400_BAD_REQUEST)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid()
         instance = self.queryset.filter(user_id=request.user).all()
         if len(instance) > 0:
             return Response("User tracker entry already exits", status=status.HTTP_400_BAD_REQUEST)
@@ -41,8 +40,7 @@ class UserTrackerViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance, data=request.data)
         if not self._custom_validation(request):
             return Response("Invalid request data", status=status.HTTP_400_BAD_REQUEST)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid()
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
