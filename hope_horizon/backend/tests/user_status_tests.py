@@ -15,11 +15,11 @@ class UserStatusTests(APITestCase):
             username="testuser",
             password="testpassword",
             birthdate=Date(1990, 1, 1),
-            user_role_id=UserRole.objects.get(role="User")
-         )
+            user_role_id=UserRole.objects.get(role="User"),
+        )
 
         # Create a test user status json
-        self.user_status_json = {
+        self.test_user_status_dict = {
             "mood": 4,
             "energy_level": 4,
             "sleep_quality": 4,
@@ -31,14 +31,16 @@ class UserStatusTests(APITestCase):
         # Login the test user
         self.client.login(username="testuser", password="testpassword")
 
-    """
-        Test cases for UserStatus "GET" method
-    """
+    ###########################################################################################################
+    #                                  UserStatus "GET(list)" method tests                                    #
+    ###########################################################################################################
 
     # test if user is not authenticated
     def test_list_user_statuses_unauthenticated(self):
         self.client.logout()
-        response = self.client.get("/api/user_status/", {"from": "2000-01-01"}, follow=True)
+        response = self.client.get(
+            "/api/user_status/", {"from": "2000-01-01"}, follow=True
+        )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     # test if user is authenticated and query parameters are invalid
@@ -48,88 +50,117 @@ class UserStatusTests(APITestCase):
 
     # test if user is authenticated and query parameters are valid
     def test_list_user_statuses_valid_parameters(self):
-        response = self.client.post("/api/user_status/", self.user_status_json, format="json", follow=True)
+        response = self.client.post(
+            "/api/user_status/", self.test_user_status_dict, format="json", follow=True
+        )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        response = self.client.get("/api/user_status/", {"from": "1990-01-01"}, follow=True)
+        response = self.client.get(
+            "/api/user_status/", {"from": "1990-01-01"}, follow=True
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["user_statuses"]), 1)
         self._validate_data(response.data["user_statuses"][0], dt.date.today())
 
     # test if user is authenticated, query parameters are valid, range test with 100 entries
     def test_list_user_statuses_valid_date_from_range(self):
         start_date = dt.date(2000, 1, 1)
         self._add_and_test_user_statuses(100, start_date)
-        response = self.client.get("/api/user_status/", {"from": "2000-01-01"}, follow=True)
+        response = self.client.get(
+            "/api/user_status/", {"from": "2000-01-01"}, follow=True
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["user_statuses"]), 100)
         for i in range(100):
-            self._validate_data(response.data["user_statuses"][i], start_date + dt.timedelta(days=i))
+            self._validate_data(
+                response.data["user_statuses"][i], start_date + dt.timedelta(days=i)
+            )
 
     # test if user is authenticated, query parameters are valid, range test with from and to date
     def test_list_user_statuses_valid_date_from_and_to_range(self):
         start_date = dt.date(2000, 1, 1)
         self._add_and_test_user_statuses(100, start_date)
-        response = self.client.get("/api/user_status/", {"from": "2000-01-01", "to": "2000-01-20"}, follow=True)
+        response = self.client.get(
+            "/api/user_status/", {"from": "2000-01-01", "to": "2000-01-20"}, follow=True
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["user_statuses"]), 20)
         for i in range(20):
-            self._validate_data(response.data["user_statuses"][i], start_date + dt.timedelta(days=i))
+            self._validate_data(
+                response.data["user_statuses"][i], start_date + dt.timedelta(days=i)
+            )
 
     # test if user is authenticated, query parameters are valid, range test with from and to date, from date greater than to date
     def test_list_user_statuses_from_date_greater_than_to_date(self):
         start_date = dt.date(2000, 1, 1)
         self._add_and_test_user_statuses(100, start_date)
-        response = self.client.get("/api/user_status/", {"from": "2000-01-20", "to": "2000-01-10"}, follow=True)
+        response = self.client.get(
+            "/api/user_status/", {"from": "2000-01-20", "to": "2000-01-10"}, follow=True
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["user_statuses"]), 0)
 
-    """
-        Test cases for UserStatus "POST" method
-    """
+    ###########################################################################################################
+    #                                  UserStatus "POST" method tests                                         #
+    ###########################################################################################################
 
     # test if user is not authenticated
     def test_create_user_status_unauthenticated(self):
         self.client.logout()
-        response = self.client.post("/api/user_status/", self.user_status_json, format="json", follow=True)
+        response = self.client.post(
+            "/api/user_status/", self.test_user_status_dict, format="json", follow=True
+        )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     # test if user is authenticated and data is invalid
     def test_create_user_status_invalid_data(self):
-        self.user_status_json.pop("mood")
-        response = self.client.post("/api/user_status/", self.user_status_json, format="json", follow=True)
+        self.test_user_status_dict.pop("mood")
+        response = self.client.post(
+            "/api/user_status/", self.test_user_status_dict, format="json", follow=True
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     # test if user is authenticated and data is valid
     def test_create_user_status_valid_data(self):
-        response = self.client.post("/api/user_status/", self.user_status_json, format="json", follow=True)
+        response = self.client.post(
+            "/api/user_status/", self.test_user_status_dict, format="json", follow=True
+        )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self._validate_data(response.data, dt.date.today())
 
     # test if user is authenticated, data is valid and entry already exists
     def test_create_user_status_entry_exists(self):
-        response = self.client.post("/api/user_status/", self.user_status_json, format="json", follow=True)
+        response = self.client.post(
+            "/api/user_status/", self.test_user_status_dict, format="json", follow=True
+        )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        response = self.client.post("/api/user_status/", self.user_status_json, format="json", follow=True)
+        response = self.client.post(
+            "/api/user_status/", self.test_user_status_dict, format="json", follow=True
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     # test if user is authenticated and data is valid with different dates
     def test_create_user_status_different_dates(self):
         self._add_and_test_user_statuses(100, dt.date(2000, 1, 1))
 
-
-
-
-
-
+    ###########################################################################################################
+    #                                            Helper Functions                                             #
+    ###########################################################################################################
 
     def _validate_data(self, response_data, date):
         self.assertGreaterEqual(response_data["id"], 1)
-        self.assertEqual(response_data["date"], date.strftime('%Y-%m-%d'))
-        self.assertEqual(response_data["mood"], self.user_status_json["mood"])
-        self.assertEqual(response_data["energy_level"], self.user_status_json["energy_level"])
-        self.assertEqual(response_data["sleep_quality"], self.user_status_json["sleep_quality"])
-        self.assertEqual(response_data["anxiety_level"], self.user_status_json["anxiety_level"])
-        self.assertEqual(response_data["appetite"], self.user_status_json["appetite"])
-        self.assertEqual(response_data["content"], self.user_status_json["content"])
+        self.assertEqual(response_data["date"], date.strftime("%Y-%m-%d"))
+        self.assertEqual(response_data["mood"], self.test_user_status_dict["mood"])
+        self.assertEqual(
+            response_data["energy_level"], self.test_user_status_dict["energy_level"]
+        )
+        self.assertEqual(
+            response_data["sleep_quality"], self.test_user_status_dict["sleep_quality"]
+        )
+        self.assertEqual(
+            response_data["anxiety_level"], self.test_user_status_dict["anxiety_level"]
+        )
+        self.assertEqual(response_data["appetite"], self.test_user_status_dict["appetite"])
+        self.assertEqual(response_data["content"], self.test_user_status_dict["content"])
 
     def _add_and_test_user_statuses(self, num_entries, start_date):
         self.client.logout()
@@ -137,18 +168,23 @@ class UserStatusTests(APITestCase):
         freezer.start()
         self.client.login(username="testuser", password="testpassword")
         for i in range(num_entries):
-            response = self.client.post("/api/user_status/", self.user_status_json, format="json", follow=True)
+            response = self.client.post(
+                "/api/user_status/", self.test_user_status_dict, format="json", follow=True
+            )
             if response.status_code == status.HTTP_401_UNAUTHORIZED:
                 self.client.login(username="testuser", password="testpassword")
-                response = self.client.post("/api/user_status/", self.user_status_json, format="json", follow=True)
+                response = self.client.post(
+                    "/api/user_status/",
+                    self.test_user_status_dict,
+                    format="json",
+                    follow=True,
+                )
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
             self._validate_data(response.data, start_date + dt.timedelta(days=i))
             freezer.stop()
-            freezer = freeze_time(start_date + dt.timedelta(days=i+1))
+            freezer = freeze_time(start_date + dt.timedelta(days=i + 1))
             freezer.start()
 
         self.client.logout()
         freezer.stop()
         self.client.login(username="testuser", password="testpassword")
-
-        

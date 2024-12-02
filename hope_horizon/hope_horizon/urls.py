@@ -26,6 +26,7 @@ from rest_framework_simplejwt.views import (
 )
 
 router = DefaultRouter()
+router.register(r"user", UserViewSet, basename="user")
 router.register(r"user_status", UserStatusViewSet, basename="user_status")
 router.register(r"user_tracker", UserTrackerViewSet, basename="user_tracker")
 

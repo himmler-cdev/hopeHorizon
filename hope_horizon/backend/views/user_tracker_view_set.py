@@ -25,7 +25,7 @@ class UserTrackerViewSet(viewsets.ModelViewSet):
             return Response("Invalid request data", status=status.HTTP_400_BAD_REQUEST)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        instance = self.queryset.filter(user=request.user).all()
+        instance = self.queryset.filter(user_id=request.user).all()
         if len(instance) > 0:
             return Response("User tracker entry already exits", status=status.HTTP_400_BAD_REQUEST)
         serializer.save(user_id=request.user)
@@ -34,6 +34,8 @@ class UserTrackerViewSet(viewsets.ModelViewSet):
     def update(self, request, pk):
         try:
             instance = self.queryset.get(id=pk)
+            if instance.user_id != request.user:
+                return Response("User does not have permission to update this entry", status=status.HTTP_403_FORBIDDEN)
         except UserTracker.DoesNotExist:
             return Response("User tracker entry does not exist", status=status.HTTP_404_NOT_FOUND)
         serializer = self.get_serializer(instance, data=request.data)
