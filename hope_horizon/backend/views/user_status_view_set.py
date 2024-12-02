@@ -18,20 +18,20 @@ class UserStatusViewSet(viewsets.ModelViewSet):
         to_date = request.query_params.get('to', None)
         if from_date is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        instance = self.queryset.filter(user=request.user)
+        instance = self.queryset.filter(user_id=request.user).all()
         instance = instance.filter(Q(date__gte=from_date))
         if to_date is not None:
             instance = instance.filter(Q(date__lte=to_date))
         serializer = self.serializer_class(instance, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'user_statuses': serializer.data}, status=status.HTTP_200_OK)
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        instance = self.queryset.filter(Q(user=request.user) & Q(date=date.today())).all()
+        instance = self.queryset.filter(Q(user_id=request.user) & Q(date=date.today())).all()
         if len(instance) > 0:
             return Response("User status entry already exits", status=status.HTTP_400_BAD_REQUEST)
-        serializer.save(user=request.user)
+        serializer.save(user_id=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
         
