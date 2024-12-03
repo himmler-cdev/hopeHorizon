@@ -42,12 +42,12 @@ class UserStatusTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    # test if user is authenticated and query parameters are invalid
+    # query parameters are invalid
     def test_list_user_statuses_invalid_parameters(self):
         response = self.client.get("/api/user_status/", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # test if user is authenticated and query parameters are valid
+    # query parameters are valid
     def test_list_user_statuses_valid_parameters(self):
         response = self.client.post(
             "/api/user_status/", self.test_user_status_dict, format="json", follow=True
@@ -60,7 +60,7 @@ class UserStatusTests(APITestCase):
         self.assertEqual(len(response.data["user_statuses"]), 1)
         self._validate_data(response.data["user_statuses"][0], dt.date.today())
 
-    # test if user is authenticated, query parameters are valid, range test with 100 entries
+    # query parameters are valid, range test with 100 entries
     def test_list_user_statuses_valid_date_from_range(self):
         start_date = dt.date(2000, 1, 1)
         self._add_and_test_user_statuses(100, start_date)
@@ -74,7 +74,7 @@ class UserStatusTests(APITestCase):
                 response.data["user_statuses"][i], start_date + dt.timedelta(days=i)
             )
 
-    # test if user is authenticated, query parameters are valid, range test with from and to date
+    # query parameters are valid, range test with from and to date
     def test_list_user_statuses_valid_date_from_and_to_range(self):
         start_date = dt.date(2000, 1, 1)
         self._add_and_test_user_statuses(100, start_date)
@@ -88,7 +88,7 @@ class UserStatusTests(APITestCase):
                 response.data["user_statuses"][i], start_date + dt.timedelta(days=i)
             )
 
-    # test if user is authenticated, query parameters are valid, range test with from and to date, from date greater than to date
+    # query parameters are valid, range test with from and to date, from date greater than to date
     def test_list_user_statuses_from_date_greater_than_to_date(self):
         start_date = dt.date(2000, 1, 1)
         self._add_and_test_user_statuses(100, start_date)
@@ -110,7 +110,7 @@ class UserStatusTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    # test if user is authenticated and data is invalid
+    # data is invalid
     def test_create_user_status_invalid_data(self):
         self.test_user_status_dict.pop("mood")
         response = self.client.post(
@@ -118,7 +118,7 @@ class UserStatusTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # test if user is authenticated and data is valid
+    # data is valid
     def test_create_user_status_valid_data(self):
         response = self.client.post(
             "/api/user_status/", self.test_user_status_dict, format="json", follow=True
@@ -126,7 +126,7 @@ class UserStatusTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self._validate_data(response.data, dt.date.today())
 
-    # test if user is authenticated, data is valid and entry already exists
+    # data is valid and entry already exists
     def test_create_user_status_entry_exists(self):
         response = self.client.post(
             "/api/user_status/", self.test_user_status_dict, format="json", follow=True
@@ -137,7 +137,7 @@ class UserStatusTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # test if user is authenticated and data is valid with different dates
+    # data is valid with different dates
     def test_create_user_status_different_dates(self):
         self._add_and_test_user_statuses(100, dt.date(2000, 1, 1))
 

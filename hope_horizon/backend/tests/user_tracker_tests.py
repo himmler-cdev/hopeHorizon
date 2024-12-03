@@ -46,12 +46,12 @@ class UserTrackerTests(APITestCase):
         response = self.client.get("/api/user_tracker/", follow=True)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    # test if user is authenticated and the logged in user has no user tracker entry
+    # logged in user has no user tracker entry
     def test_list_user_tracker_no_entry(self):
         response = self.client.get("/api/user_tracker/", follow=True)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-    # test if user is authenticated and the logged in user has a user tracker entry
+    # logged in user has a user tracker entry
     def test_list_user_tracker__with_entry(self):
         response = self.client.post(
             "/api/user_tracker/", data=self.test_user_tracker_dict, follow=True
@@ -73,7 +73,7 @@ class UserTrackerTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    # test if user is authenticated and the data is invalid, missing is_enabled
+    # data is invalid, missing is_enabled
     def test_create_user_tracker_invalid_data_is_enabled(self):
         self.test_user_tracker_dict.pop("is_enabled")
         response = self.client.post(
@@ -81,7 +81,7 @@ class UserTrackerTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # test if user is authenticated and the data is invalid, missing track_mood
+    # data is invalid, missing track_mood
     def test_create_user_tracker_invalid_data_track_mood(self):
         self.test_user_tracker_dict.pop("track_mood")
         response = self.client.post(
@@ -89,7 +89,7 @@ class UserTrackerTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # test if user is authenticated and the data is invalid, missing track_energy_level
+    # data is invalid, missing track_energy_level
     def test_create_user_tracker_invalid_data_track_energy_level(self):
         self.test_user_tracker_dict.pop("track_energy_level")
         response = self.client.post(
@@ -97,7 +97,7 @@ class UserTrackerTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # test if user is authenticated and the data is invalid, missing track_sleep_quality
+    # data is invalid, missing track_sleep_quality
     def test_create_user_tracker_invalid_data_track_sleep_quality(self):
         self.test_user_tracker_dict.pop("track_sleep_quality")
         response = self.client.post(
@@ -105,7 +105,7 @@ class UserTrackerTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # test if user is authenticated and the data is invalid, missing track_anxiety_level
+    # data is invalid, missing track_anxiety_level
     def test_create_user_tracker_invalid_data_track_anxiety_level(self):
         self.test_user_tracker_dict.pop("track_anxiety_level")
         response = self.client.post(
@@ -113,7 +113,7 @@ class UserTrackerTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # test if user is authenticated and the data is invalid, missing track_appetite
+    # data is invalid, missing track_appetite
     def test_create_user_tracker_invalid_data_track_appetite(self):
         self.test_user_tracker_dict.pop("track_appetite")
         response = self.client.post(
@@ -121,7 +121,7 @@ class UserTrackerTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # test if user is authenticated and the data is invalid, missing track_content
+    # data is invalid, missing track_content
     def test_create_user_tracker_invalid_data_track_content(self):
         self.test_user_tracker_dict.pop("track_content")
         response = self.client.post(
@@ -129,7 +129,7 @@ class UserTrackerTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # test if user is authenticated, data is valid and the user has no user tracker entry
+    # data is valid and the user has no user tracker entry
     def test_create_user_tracker_valid_data(self):
         response = self.client.post(
             "/api/user_tracker/", data=self.test_user_tracker_dict, follow=True
@@ -139,7 +139,7 @@ class UserTrackerTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._validate_user_tracker(response.data)
 
-    # test if user is authenticated, data is valid and the user has already a user tracker entry
+    # data is valid and the user has already a user tracker entry
     def test_create_user_tracker_valid_data_with_existing_entry(self):
         response = self.client.post(
             "/api/user_tracker/", data=self.test_user_tracker_dict, follow=True
@@ -162,7 +162,7 @@ class UserTrackerTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    # test if user is authenticated and the data is invalid
+    # data is invalid
     def test_update_user_tracker_invalid_data(self):
         response = self.client.post(
             "/api/user_tracker/", data=self.test_user_tracker_dict, follow=True
@@ -174,14 +174,14 @@ class UserTrackerTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # test if user is authenticated and the user tracker entry does not exist
+    #  the user tracker entry does not exist
     def test_update_user_tracker_not_exist(self):
         response = self.client.put(
             "/api/user_tracker/1/", data=self.test_user_tracker_dict, follow=True
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    # test if user is authenticated, data is valid but the user tracker entry is not owned by the user
+    # data is valid but the user tracker entry is not owned by the user
     def test_update_user_tracker_exists_not_owned(self):
         response = self.client.post(
             "/api/user_tracker/", data=self.test_user_tracker_dict, follow=True
@@ -195,6 +195,7 @@ class UserTrackerTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.client.logout()
 
+    # data is valid and the user tracker entry is owned by the user
     def test_update_user_tracker_exists_owned(self):
         response = self.client.post(
             "/api/user_tracker/", data=self.test_user_tracker_dict, follow=True
