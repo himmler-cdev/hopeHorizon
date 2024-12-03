@@ -1,8 +1,7 @@
 from sqlite3 import Date
 from rest_framework import status
-from rest_framework.test import APITestCase, APIRequestFactory
-from backend.models import User, UserTracker, UserRole
-from freezegun import freeze_time
+from rest_framework.test import APITestCase
+from backend.models import User, UserRole
 
 
 class UserTrackerTests(APITestCase):

@@ -3,8 +3,6 @@ from rest_framework.response import Response
 from backend.serializers import UserTrackerSerializer
 from backend.models import UserTracker
 from rest_framework.permissions import IsAuthenticated
-from django.db.models import Q
-from datetime import date
 
 
 class UserTrackerViewSet(viewsets.ModelViewSet):

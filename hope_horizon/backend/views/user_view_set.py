@@ -5,10 +5,8 @@ from backend.serializers import (
     UserListSerializer,
     UserDetailsSerializer,
 )
-from backend.models import User, UserRole
-from rest_framework.permissions import IsAuthenticated
+from backend.models import User
 from django.db.models import Q
-from datetime import date
 
 
 class UserViewSet(viewsets.ModelViewSet):

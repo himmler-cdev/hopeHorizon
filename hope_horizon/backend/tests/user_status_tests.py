@@ -1,8 +1,7 @@
 from sqlite3 import Date
-from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase, APIRequestFactory
-from backend.models import UserStatus, User, UserRole
+from rest_framework.test import APITestCase
+from backend.models import User, UserRole
 from freezegun import freeze_time
 import datetime as dt
 
