@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from backend.models import BlogPost, BlogPostType
+from backend.models import BlogPost, BlogPostType, UserRole
 from backend.serializers import BlogPostSerializer, BlogPostListSerializer
 
 
@@ -19,7 +19,8 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         pageSize = int(request.GET.get('pageSize', 10))
         search = request.GET.get('search', '')
         blog_post_type_id = request.GET.get('blog_post_type_id', None)
-        owned = request.GET.get('owned', "true")
+        owned = request.GET.get('owned', None)
+        workspace = request.GET.get('workspace', None)
 
         # Pagination
         if page < 1:
@@ -37,22 +38,33 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         else:
             blogPosts = BlogPost.objects.filter(title__icontains=search)
 
-        # Owned filtering   
-        if owned is not None:
-            if owned.lower() == 'true':
-                blogPosts = blogPosts.filter(user_id=request.user.id)
-            elif owned.lower() == 'false':
-                public_blog_post_type = BlogPostType.objects.get(type="Public")
-                blogPosts = blogPosts.exclude(user_id=request.user.id).filter(blog_post_type_id=public_blog_post_type.id)
+        # Owned, therapist and workspace filtering
+        if workspace is not None and workspace.lower() not in ['true', 'false']:
+            return Response({"errors": ["Invalid value for workspace parameter"]}, status=status.HTTP_400_BAD_REQUEST)
+
+        if request.user.user_role_id == UserRole.objects.get(role="Therapist") and workspace is not None and workspace.lower() == 'true':
+            protected_blog_post_type = BlogPostType.objects.get(type="Protected")
+            public_blog_post_type = BlogPostType.objects.get(type="Public")
+            blogPosts = blogPosts.filter(blog_post_type_id__in=[protected_blog_post_type.id, public_blog_post_type.id])
+            blogPosts = blogPosts.order_by('-blog_post_type_id', 'date')
+        else:
+            if owned is not None:
+                if owned.lower() == 'true':
+                    blogPosts = blogPosts.filter(user_id=request.user.id)
+                elif owned.lower() == 'false':
+                    public_blog_post_type = BlogPostType.objects.get(type="Public")
+                    blogPosts = blogPosts.exclude(user_id=request.user.id).filter(blog_post_type_id=public_blog_post_type.id)
+                else:
+                    return Response({"errors": ["Invalid value for owned parameter"]}, status=status.HTTP_400_BAD_REQUEST)
             else:
-                return Response({"errors": ["Invalid value for owned parameter"]}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"errors": ["Owned parameter is required"]}, status=status.HTTP_400_BAD_REQUEST)
+            blogPosts = blogPosts.order_by('-date')
 
         offset = (page - 1) * pageSize
         blogPosts = blogPosts[offset:offset + pageSize]
         totalPosts = blogPosts.count()
 
         # TODO: Add group_name filtering and groups in general
-        # TODO: Add worspace filtering for therapist (only on commentend blog posts)
 
         data = {
             "page": page,
@@ -66,7 +78,7 @@ class BlogPostViewSet(viewsets.ModelViewSet):
     
     def retrieve(self, request, pk):
         try:
-            blog_post = self.get_object()
+            blog_post = self.queryset.get(id=pk)
         except BlogPost.DoesNotExist:
             return Response({"errors": ["Blog post not found"]}, status=status.HTTP_404_NOT_FOUND)
         
@@ -86,7 +98,7 @@ class BlogPostViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk):
         try: 
-            blog_post = self.get_object()
+            blog_post = self.queryset.get(id=pk)
         except BlogPost.DoesNotExist:
             return Response({"errors": ["Blog post not found"]}, status=status.HTTP_404_NOT_FOUND)
         
@@ -100,10 +112,14 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-    # TODO: Add role based permissions for delete when post is public
     def destroy(self, request, pk):
-        blog_post = self.get_object()
-        if blog_post.user_id != request.user:
+        try:
+            blog_post = self.queryset.get(id=pk)
+        except BlogPost.DoesNotExist:
+            return Response({"errors": ["Blog post not found"]}, status=status.HTTP_404_NOT_FOUND)
+        
+        if blog_post.user_id != request.user and request.user.user_role_id != UserRole.objects.get(role="Moderator"):
             return Response({"errors": ["You are not allowed to delete this blog post"]}, status=status.HTTP_403_FORBIDDEN)
+        
         self.perform_destroy(blog_post)
         return Response(status=status.HTTP_204_NO_CONTENT)

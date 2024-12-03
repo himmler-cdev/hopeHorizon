@@ -1,6 +1,6 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
-from backend.models import User
+from backend.models import User, UserRole
 from sqlite3 import Date
 
 class BlogPostTypeTests(APITestCase):
@@ -8,7 +8,10 @@ class BlogPostTypeTests(APITestCase):
     def setUp(self):
         # Create a test user
         self.user = User.objects.create_user(
-            username="testuser", password="testpassword", birthdate=Date(1990, 1, 1)
+            username="testuser",
+            password="testpassword",
+            birthdate=Date(1990, 1, 1),
+            user_role_id=UserRole.objects.get(role="User"),
         )
 
     # Test if user is not authenticated
