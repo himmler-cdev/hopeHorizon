@@ -3,6 +3,7 @@ from rest_framework import status
 from backend.models import User, UserRole
 from sqlite3 import Date
 
+
 class BlogPostTypeTests(APITestCase):
 
     def setUp(self):

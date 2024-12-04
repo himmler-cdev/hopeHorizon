@@ -23,7 +23,7 @@ class UserStatusViewSet(viewsets.ModelViewSet):
         if to_date is not None:
             instance = instance.filter(Q(date__lte=to_date))
         serializer = self.serializer_class(instance, many=True)
-        return Response({'user_statuses': serializer.data}, status=status.HTTP_200_OK)
+        return Response({"user_statuses": serializer.data}, status=status.HTTP_200_OK)
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data)

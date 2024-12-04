@@ -24,23 +24,23 @@ class BlogPostViewSet(viewsets.ModelViewSet):
 
         # Pagination
         if page < 1:
-            return Response({"errors": ["Page must be >= 1"]}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Page must be >= 1"}, status=status.HTTP_400_BAD_REQUEST)
         if pageSize < 1:
-            return Response({"errors": ["PageSize must be >= 1"]}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "PageSize must be >= 1"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Filtering
         if blog_post_type_id:
             try:
                 BlogPostType.objects.get(id=blog_post_type_id)
             except BlogPostType.DoesNotExist:
-                return Response({"errors": ["Invalid blog post type id"]}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"detail": "Invalid blog post type id"}, status=status.HTTP_400_BAD_REQUEST)
             blogPosts = BlogPost.objects.filter(title__icontains=search, blog_post_type_id=blog_post_type_id)
         else:
             blogPosts = BlogPost.objects.filter(title__icontains=search)
 
         # Owned, therapist and workspace filtering
         if workspace is not None and workspace.lower() not in ['true', 'false']:
-            return Response({"errors": ["Invalid value for workspace parameter"]}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Invalid value for workspace parameter"}, status=status.HTTP_400_BAD_REQUEST)
 
         if request.user.user_role_id == UserRole.objects.get(role="Therapist") and workspace is not None and workspace.lower() == 'true':
             protected_blog_post_type = BlogPostType.objects.get(type="Protected")
@@ -55,9 +55,9 @@ class BlogPostViewSet(viewsets.ModelViewSet):
                     public_blog_post_type = BlogPostType.objects.get(type="Public")
                     blogPosts = blogPosts.exclude(user_id=request.user.id).filter(blog_post_type_id=public_blog_post_type.id)
                 else:
-                    return Response({"errors": ["Invalid value for owned parameter"]}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({"detail": "Invalid value for owned parameter"}, status=status.HTTP_400_BAD_REQUEST)
             else:
-                return Response({"errors": ["Owned parameter is required"]}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"detail": "Owned parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
             blogPosts = blogPosts.order_by('-date')
 
         offset = (page - 1) * pageSize
@@ -80,19 +80,19 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         try:
             blog_post = self.queryset.get(id=pk)
         except BlogPost.DoesNotExist:
-            return Response({"errors": ["Blog post not found"]}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Blog post not found"}, status=status.HTTP_404_NOT_FOUND)
         
         # TODO: Check if user is in group of the blog_post
         if (blog_post.user_id == request.user or blog_post.blog_post_type_id == BlogPostType.objects.get(type="Public")):
             serializer = self.serializers["default"](blog_post)
             return Response(serializer.data, status=status.HTTP_200_OK)
     
-        return Response({"errors": ["You are not allowed to view this blog post"]}, status=status.HTTP_403_FORBIDDEN)
+        return Response({"detail": "You are not allowed to view this blog post"}, status=status.HTTP_403_FORBIDDEN)
 
     def create(self, request):
         serializer = self.serializers["default"](data=request.data)
         if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         serializer.save(user_id=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -100,14 +100,14 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         try: 
             blog_post = self.queryset.get(id=pk)
         except BlogPost.DoesNotExist:
-            return Response({"errors": ["Blog post not found"]}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Blog post not found"}, status=status.HTTP_404_NOT_FOUND)
         
         if blog_post.user_id != request.user:
-            return Response({"errors": ["You are not allowed to update this blog post"]}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "You are not allowed to update this blog post"}, status=status.HTTP_403_FORBIDDEN)
         
         serializer = self.serializers["default"](blog_post, data=request.data)
         if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -116,10 +116,10 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         try:
             blog_post = self.queryset.get(id=pk)
         except BlogPost.DoesNotExist:
-            return Response({"errors": ["Blog post not found"]}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Blog post not found"}, status=status.HTTP_404_NOT_FOUND)
         
         if blog_post.user_id != request.user and request.user.user_role_id != UserRole.objects.get(role="Moderator"):
-            return Response({"errors": ["You are not allowed to delete this blog post"]}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "You are not allowed to delete this blog post"}, status=status.HTTP_403_FORBIDDEN)
         
         self.perform_destroy(blog_post)
         return Response(status=status.HTTP_204_NO_CONTENT)

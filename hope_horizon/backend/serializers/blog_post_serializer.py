@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from backend.models import BlogPost, BlogPostType
+from backend.models import BlogPost
 
 
 class BlogPostSerializer(serializers.ModelSerializer):
@@ -14,10 +14,10 @@ class BlogPostSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "date"]
 
 class BlogPostListSerializer(serializers.Serializer):
-    pageInformation = serializers.SerializerMethodField()
+    page_information = serializers.SerializerMethodField()
     blog_posts = BlogPostSerializer(many=True)
 
-    def get_pageInformation(self, obj):
+    def get_page_information(self, obj):
         return {
             "page": obj.get('page', 1),
             "pageSize": obj.get('pageSize', 10),
@@ -25,4 +25,4 @@ class BlogPostListSerializer(serializers.Serializer):
         }
 
     class Meta:
-        fields = ["pageInformation", "blog_posts"]
+        fields = ["page_information", "blog_posts"]
