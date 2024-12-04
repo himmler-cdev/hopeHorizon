@@ -120,4 +120,17 @@ class Migration(migrations.Migration):
             name='user_role_id',
             field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='backend.userrole'),
         ),
+        migrations.CreateModel(
+            name='GroupUser',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('is_owner', models.BooleanField(default=False)),
+                ('is_active', models.BooleanField(default=True)),
+                ('group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='group_users', to='backend.customgroup')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='group_users', to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'unique_together': {('group', 'user')},
+            },
+        ),
     ]
