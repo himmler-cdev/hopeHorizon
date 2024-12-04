@@ -148,6 +148,18 @@ class BlogPostTests(APITestCase):
         response = self.client.get(f"/api/blog_post/{blog_post_id}/", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    # Test if therapist is allowed to view blog post of type "Protected"
+    def test_get_blog_post_allowed_by_type_protected(self):
+        self.blog_post_obj["blog_post_type_id"] = BlogPostType.objects.get(type="Protected").id
+        response = self.client.post("/api/blog_post/", self.blog_post_obj, format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        blog_post_id = response.data["id"]
+
+        self.client.logout()
+        self.client.login(username="testtherapist", password="testpassword")
+        response = self.client.get(f"/api/blog_post/{blog_post_id}/", format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     # Test if user is not allowed to view blog post by group
     def test_get_blog_post_not_allowed_by_group(self):
         pass
@@ -275,14 +287,14 @@ class BlogPostTests(APITestCase):
     # Test if user is not authenticated
     def test_list_blog_post_not_authenticated(self):
         self.client.logout()
-        response = self.client.get("/api/blog_post?owned=true", format="json", follow=True)
+        response = self.client.get("/api/blog_post?owned=true&page=1", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
     
     # Test if blog post list is retrieved
     def test_list_blog_post(self):
         data = []
         self._push_data_list(data)
-        response = self.client.get("/api/blog_post?owned=true", format="json", follow=True)
+        response = self.client.get("/api/blog_post?owned=true&page=1", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), response.data["page_information"]["pageSize"])
         self._validate_data_list_pagination(response.data)
@@ -335,13 +347,28 @@ class BlogPostTests(APITestCase):
         response = self.client.get("/api/blog_post?page=1&pageSize=-10&owned=true", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    # Test if page parameter is required
+    def test_list_blog_post_pagination_no_page(self):
+        response = self.client.get("/api/blog_post?owned=true", format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    # Test if page parameter is a string
+    def test_list_blog_post_pagination_page_string(self):
+        response = self.client.get("/api/blog_post?page=invalid&pageSize=10&owned=true", format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    # Test if page size parameter is a string
+    def test_list_blog_post_pagination_page_size_string(self):
+        response = self.client.get("/api/blog_post?page=1&pageSize=invalid&owned=true", format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     ### Search Tests ###  
 
     # Test if blog post list is retrieved with search
     def test_list_blog_post_search(self):
         data = []
         self._push_data_list(data)
-        response = self.client.get("/api/blog_post?search=Test Blog Post 19&owned=true", format="json", follow=True)
+        response = self.client.get("/api/blog_post?search=Test Blog Post 19&owned=true&page=1", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 1)
         self.assertEqual(response.data["blog_posts"][0]["title"], "Test Blog Post 19")
@@ -350,7 +377,7 @@ class BlogPostTests(APITestCase):
     def test_list_blog_post_search_no_results(self):
         data = []
         self._push_data_list(data)
-        response = self.client.get("/api/blog_post?search=Test Blog Post 100&owned=true", format="json", follow=True)
+        response = self.client.get("/api/blog_post?search=Test Blog Post 100&owned=true&page=1", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 0)
 
@@ -360,7 +387,7 @@ class BlogPostTests(APITestCase):
     def test_list_blog_post_blog_post_type(self):
         data = []
         self._push_data_list(data)
-        response = self.client.get("/api/blog_post?blog_post_type_id=2&owned=true", format="json", follow=True)
+        response = self.client.get("/api/blog_post?blog_post_type_id=2&owned=true&page=1", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 5)
         for item in response.data["blog_posts"]:
@@ -370,13 +397,13 @@ class BlogPostTests(APITestCase):
     def test_list_blog_post_blog_post_type_no_results(self):
         data = []
         self._push_data_list(data)
-        response = self.client.get("/api/blog_post?blog_post_type_id=4&owned=true", format="json", follow=True)
+        response = self.client.get("/api/blog_post?blog_post_type_id=4&owned=true&page=1", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 0)
 
     # Test if blog post error is returned with invalid blog post type
     def test_list_blog_post_blog_post_type_invalid(self):
-        response = self.client.get("/api/blog_post?blog_post_type_id=-1&owned=true", format="json", follow=True)
+        response = self.client.get("/api/blog_post?blog_post_type_id=-1&owned=true&page=1", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
     
     ### Owned Tests ###
@@ -385,7 +412,7 @@ class BlogPostTests(APITestCase):
     def test_list_blog_post_owned(self):
         data = []
         self._push_data_list(data)
-        response = self.client.get("/api/blog_post?owned=true", format="json", follow=True)
+        response = self.client.get("/api/blog_post?owned=true&page=1", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 10)
 
@@ -396,7 +423,7 @@ class BlogPostTests(APITestCase):
         self.client.logout()
         self.client.login(username="testuser2", password="testpassword")
 
-        response = self.client.get("/api/blog_post?owned=false", format="json", follow=True)
+        response = self.client.get("/api/blog_post?owned=false&page=1", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 10)
         for item in response.data["blog_posts"]:
@@ -404,7 +431,7 @@ class BlogPostTests(APITestCase):
 
     # Test if blog post list is retrieved with invalid owned
     def test_list_blog_post_owned_invalid(self):
-        response = self.client.get("/api/blog_post?owned=invalid", format="json", follow=True)
+        response = self.client.get("/api/blog_post?owned=invalid&page=1", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
     
     # Test if blog post can be retrieved by not owned and blog post type "Private"
@@ -415,13 +442,13 @@ class BlogPostTests(APITestCase):
 
         self.client.logout()
         self.client.login(username="testuser2", password="testpassword")
-        response = self.client.get("/api/blog_post?owned=false", format="json", follow=True)
+        response = self.client.get("/api/blog_post?owned=false&page=1", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 0)
 
     # Test without owned parameter
     def test_list_blog_post_no_owned(self):
-        response = self.client.get("/api/blog_post", format="json", follow=True)
+        response = self.client.get("/api/blog_post?page=1", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     ### Workspace/Therapist Tests ###
@@ -438,13 +465,13 @@ class BlogPostTests(APITestCase):
 
         self.client.logout()
         self.client.login(username="testtherapist", password="testpassword")
-        response = self.client.get("/api/blog_post?workspace=true&owned=false", format="json", follow=True)
+        response = self.client.get("/api/blog_post?workspace=true&owned=false&page=1", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 2)
 
     # Test if blog post list is retrieved with invalid workspace
     def test_list_blog_post_workspace_invalid(self):
-        response = self.client.get("/api/blog_post?workspace=invalid&owned=false", format="json", follow=True)
+        response = self.client.get("/api/blog_post?workspace=invalid&owned=false&page=1", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     # Test if blog post list is retrieved without workspace (should return all public blog posts)
@@ -459,7 +486,7 @@ class BlogPostTests(APITestCase):
 
         self.client.logout()
         self.client.login(username="testtherapist", password="testpassword")
-        response = self.client.get("/api/blog_post?owned=false", format="json", follow=True)
+        response = self.client.get("/api/blog_post?owned=false&page=1", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 1)
 
@@ -469,7 +496,7 @@ class BlogPostTests(APITestCase):
     def test_list_blog_post_search_blog_post_type(self):
         data = []
         self._push_data_list(data)
-        response = self.client.get("/api/blog_post?search=Test Blog Post 19&blog_post_type_id=1&owned=true", format="json", follow=True)
+        response = self.client.get("/api/blog_post?search=Test Blog Post 19&blog_post_type_id=1&owned=true&page=1", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 1)
         self.assertEqual(response.data["blog_posts"][0]["title"], "Test Blog Post 19")

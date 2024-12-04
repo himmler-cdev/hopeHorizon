@@ -15,8 +15,15 @@ class BlogPostViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         # Query parameters
-        page = int(request.GET.get('page', 1))
-        pageSize = int(request.GET.get('pageSize', 10))
+        try: 
+            page = request.GET.get('page', None)
+            pageSize = int(request.GET.get('pageSize', 10))
+            if page is None:
+                return Response({"detail": "Page parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+            page = int(page)
+        except ValueError:
+            return Response({"detail": "PageSize must be an integer"}, status=status.HTTP_400_BAD_REQUEST)
+                       
         search = request.GET.get('search', '')
         blog_post_type_id = request.GET.get('blog_post_type_id', None)
         owned = request.GET.get('owned', None)
@@ -42,11 +49,14 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         if workspace is not None and workspace.lower() not in ['true', 'false']:
             return Response({"detail": "Invalid value for workspace parameter"}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Therapist and workspace filtering
         if request.user.user_role_id == UserRole.objects.get(role="Therapist") and workspace is not None and workspace.lower() == 'true':
+            # Therapist handling
             protected_blog_post_type = BlogPostType.objects.get(type="Protected")
             public_blog_post_type = BlogPostType.objects.get(type="Public")
             blogPosts = blogPosts.filter(blog_post_type_id__in=[protected_blog_post_type.id, public_blog_post_type.id])
             blogPosts = blogPosts.order_by('-blog_post_type_id', 'date')
+        # If user is not a therapist
         else:
             if owned is not None:
                 if owned.lower() == 'true':
@@ -58,7 +68,7 @@ class BlogPostViewSet(viewsets.ModelViewSet):
                     return Response({"detail": "Invalid value for owned parameter"}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response({"detail": "Owned parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
-            blogPosts = blogPosts.order_by('-date')
+            # TODO: Order by most commented
 
         offset = (page - 1) * pageSize
         blogPosts = blogPosts[offset:offset + pageSize]
@@ -83,7 +93,8 @@ class BlogPostViewSet(viewsets.ModelViewSet):
             return Response({"detail": "Blog post not found"}, status=status.HTTP_404_NOT_FOUND)
         
         # TODO: Check if user is in group of the blog_post
-        if (blog_post.user_id == request.user or blog_post.blog_post_type_id == BlogPostType.objects.get(type="Public")):
+        if (blog_post.user_id == request.user or blog_post.blog_post_type_id == BlogPostType.objects.get(type="Public") or \
+            request.user.user_role_id == UserRole.objects.get(role="Therapist") and blog_post.blog_post_type_id == BlogPostType.objects.get(type="Protected")):
             serializer = self.serializers["default"](blog_post)
             return Response(serializer.data, status=status.HTTP_200_OK)
     
