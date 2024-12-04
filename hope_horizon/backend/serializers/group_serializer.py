@@ -7,3 +7,7 @@ class GroupSerializer(serializers.ModelSerializer):
         model = CustomGroup
         fields = ["id", "name", "description"]
         read_only_fields = ["id"]
+        extra_kwargs = {
+            "name": {"required": True},
+            "description": {"required": True},
+        }

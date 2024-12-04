@@ -29,6 +29,8 @@ router = DefaultRouter()
 router.register(r"user", UserViewSet, basename="user")
 router.register(r"user_status", UserStatusViewSet, basename="user_status")
 router.register(r"user_tracker", UserTrackerViewSet, basename="user_tracker")
+router.register(r"group", GroupViewSet, basename="group")
+router.register(r"group_user", GroupUserViewSet, basename="group_user")
 
 
 urlpatterns = [
