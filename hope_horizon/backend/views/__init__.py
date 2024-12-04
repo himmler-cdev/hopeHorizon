@@ -1,3 +1,5 @@
 from .user_view_set import UserViewSet
 from .user_status_view_set import UserStatusViewSet
 from .user_tracker_view_set import UserTrackerViewSet
+from .blog_post_type_view_set import BlogPostTypeViewSet
+from .blog_post_view_set import BlogPostViewSet

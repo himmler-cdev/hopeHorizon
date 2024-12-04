@@ -21,7 +21,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def list(self, request):
         search = request.query_params.get("search", None)
         if not request.user.is_authenticated:
-            return Response("User not authenticated", status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"detail": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
         instance = self.queryset.filter(is_active=True)
         if search:
             instance = instance.filter(Q(username__icontains=search))
@@ -31,7 +31,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def create(self, request):
         serializer = self.serializers["create"](data=request.data)
         if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         user = serializer.save()
         user.set_password(serializer.data["password"])
         user.save()
@@ -40,28 +40,28 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, pk):
         if not request.user.is_authenticated:
-            return Response("User not authenticated", status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"detail": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
         try:
             user = User.objects.get(username=pk)
             serializer = self.serializers['details'](user)
             if user != request.user:
-                return Response("User does not have permission to view this entry", status=status.HTTP_403_FORBIDDEN)
+                return Response({"detail": "User does not have permission to view this entry"}, status=status.HTTP_403_FORBIDDEN)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except User.DoesNotExist:
-            return Response("User not found", status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
     def update(self, request, pk):
         if not request.user.is_authenticated:
-            return Response("User not authenticated", status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"detail": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
         try:
             instance = self.queryset.get(id=pk)
             if instance != request.user:
-                return Response("User does not have permission to update this entry", status=status.HTTP_403_FORBIDDEN)
+                return Response({"detail": "User does not have permission to update this entry"}, status=status.HTTP_403_FORBIDDEN)
         except User.DoesNotExist:
-            return Response("User not found", status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         serializer = self.serializers["update"](instance, data=request.data)
         if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         user = serializer.save()
         user.set_password(serializer.data["password"])
         user.save()
@@ -74,9 +74,9 @@ class UserViewSet(viewsets.ModelViewSet):
         try:
             instance = self.queryset.get(id=pk)
             if instance != request.user:
-                return Response("User does not have permission to delete this entry", status=status.HTTP_403_FORBIDDEN)
+                return Response({"detail": "User does not have permission to update this entry"}, status=status.HTTP_403_FORBIDDEN)
             instance.is_active = False
             instance.save()
             return Response("User deleted", status=status.HTTP_204_NO_CONTENT)
         except User.DoesNotExist:
-            return Response("User not found", status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
