@@ -4,19 +4,20 @@ from rest_framework import status
 from freezegun import freeze_time
 from backend.models import CustomGroup, GroupUser, UserRole
 from backend.models.user import User
+from backend.serializers.group_serializer import GroupSerializer
 
 class GroupTests(APITestCase):
 
     def setUp(self):
         # Create test user
-        self.user = User.objects.create_user(
+        self.user1 = User.objects.create_user(
             username="testuser1",
             password="testpassword",
             birthdate=Date(1990, 1, 1),
             user_role_id=UserRole.objects.get(role="User"),
         )
 
-        self.user = User.objects.create_user(
+        self.user2 = User.objects.create_user(
             username="testuser2",
             password="testpassword",
             birthdate=Date(1990, 1, 1),
@@ -24,26 +25,26 @@ class GroupTests(APITestCase):
         )
 
         # Create test group
-        self.test_group_dict = {
-            "name": "testgroup",
-            "description": "testdescription",
-        }
+        self.test_group = CustomGroup.objects.create(
+            name="testgroup",
+            description="testdescription"
+        )
         
         # Create test group user owner
-        self.test_group_user_dict_owner = {
-            "user_id": 1,
-            "group_id": 1,
-            "owner": True,
-            "is_active": True,
-        }
+        self.test_group_user_owner = GroupUser.objects.create(
+            user=self.user1,
+            group=self.test_group,
+            is_owner=True,
+            is_active=True,
+        )
 
         # Create test group user not owner
-        self.test_group_user_dict_not_owner = {
-            "user_id": 2,
-            "group_id": 1,
-            "owner": False,
-            "is_active": True,
-        }
+        self.test_group_user_not_owner = GroupUser.objects.create(
+            user=self.user2,
+            group=self.test_group,
+            is_owner=False,
+            is_active=True,
+        )
 
         # Login the test users
         self.client.login(username="testuser1", password="testpassword")
@@ -56,7 +57,7 @@ class GroupTests(APITestCase):
     # test if user is not authenticated
     def test_group_list_not_authenticated(self):
         self.client.logout()
-        response = self.client.get("/api/group/&owned=True", follow=True)
+        response = self.client.get("/api/group/", data={"owned": "True"}, follow=True)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     #test when owned not given
@@ -64,20 +65,51 @@ class GroupTests(APITestCase):
         response = self.client.get("/api/group/", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    #test when owned is not true
-    def test_group_list_owned_false(self):
-        response = self.client.post("/api/group/", self.test_group_dict, follow=True)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        response = self.client.get("/api/group/&owned=True", follow=True)
+    #test when owned is true
+    def test_group_list_owned_True(self):
+        self.client.logout()
+        self.client.login(username="testuser1", password="testpassword")
+        #response = self.client.post("/api/group/", self.test_group2_dict, format="json", follow=True)
+        #self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        response = self.client.get("/api/group/", data={"owned": "True"}, follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self._validate_group(response.data)
+        self._validate_groups(response.data["groups"])
+
+    #test when owned is false
+    def test_group_list_owned_False(self):
+        self.client.logout()
+        self.client.login(username="testuser2", password="testpassword")
+        #response = self.client.post("/api/group/", self.test_group2_dict, format="json", follow=True)
+        #self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        response = self.client.get("/api/group/", data={"owned": "False"}, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self._validate_groups(response.data["groups"])
+
+    ###########################################################################################################
+    #                                Group "GET(retrieve)" method tests                                     #
+    ###########################################################################################################
+
+    # test if user is not authenticated
+    def test_group_retrieve_not_authenticated(self):
+        self.client.logout()
+        response = self.client.get("/api/group/1", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    # test when group does not exist
+    def test_group_retrieve_group_not_exist(self):
+        response = self.client.get("/api/group/10", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
     
 
     ###########################################################################################################
     #                                            Helper Functions                                             #
     ###########################################################################################################
 
-    def _validate_group(self, response_data):
-        self.assertGreaterEqual(response_data["id"], 1)
-        self.assertEqual(response_data["name"], self.test_group_dict["name"])
-        self.assertEqual(response_data["description"], self.test_group_dict["description"])
+    def _validate_groups(self, groups):
+        for group in groups:
+            self.assertGreaterEqual(group["id"], 1)
+            self.assertEqual(group["name"], self.test_group.name)
+            self.assertEqual(group["description"], self.test_group.description)
+
+
+    
