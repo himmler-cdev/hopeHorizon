@@ -1,10 +1,8 @@
 from sqlite3 import Date
 from rest_framework.test import APITestCase
 from rest_framework import status
-from freezegun import freeze_time
 from backend.models import CustomGroup, GroupUser, UserRole
 from backend.models.user import User
-from backend.serializers.group_serializer import GroupSerializer
 
 class GroupTests(APITestCase):
 
@@ -71,12 +69,12 @@ class GroupTests(APITestCase):
         response = self.client.get("/api/group/", data={"owned": "True"}, follow=True)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    #test when owned not given
+    # test when owned not given
     def test_group_list_empty_owned(self):
         response = self.client.get("/api/group/", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    #test when owned is true
+    # test when owned is true
     def test_group_list_owned_True(self):
         self.client.logout()
         self.client.login(username="testuser1", password="testpassword")
@@ -86,7 +84,7 @@ class GroupTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._validate_groups(response.data["groups"])
 
-    #test when owned is false
+    # test when owned is false
     def test_group_list_owned_False(self):
         self.client.logout()
         self.client.login(username="testuser2", password="testpassword")
