@@ -1,6 +1,3 @@
-import {Routes} from '@angular/router';
-import {BlogListComponent} from './feature-blog/blog-list/blog-list.component';
+import { Routes } from '@angular/router';
 
-export const routes: Routes = [
-  {path: 'blog-list', component: BlogListComponent}
-];
+export const routes: Routes = [];
