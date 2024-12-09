@@ -5,3 +5,5 @@ from .user_role import UserRole
 from .blog_post_type import BlogPostType
 from .comment import Comment
 from .blog_post import BlogPost
+from .group import CustomGroup
+from .group_user import GroupUser
