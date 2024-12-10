@@ -42,16 +42,16 @@ class GroupTests(APITestCase):
         
         # Create test group user owner
         self.test_group_user_owner = GroupUser.objects.create(
-            user=self.user1,
-            group=self.test_group,
+            user_id=self.user1,
+            group_id=self.test_group,
             is_owner=True,
             is_active=True,
         )
 
         # Create test group user not owner
         self.test_group_user_not_owner = GroupUser.objects.create(
-            user=self.user2,
-            group=self.test_group,
+            user_id=self.user2,
+            group_id=self.test_group,
             is_owner=False,
             is_active=True,
         )
@@ -78,8 +78,6 @@ class GroupTests(APITestCase):
     def test_group_list_owned_True(self):
         self.client.logout()
         self.client.login(username="testuser1", password="testpassword")
-        #response = self.client.post("/api/group/", self.test_group2_dict, format="json", follow=True)
-        #self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         response = self.client.get("/api/group/", data={"owned": "True"}, follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._validate_groups(response.data["groups"])
@@ -88,8 +86,6 @@ class GroupTests(APITestCase):
     def test_group_list_owned_False(self):
         self.client.logout()
         self.client.login(username="testuser2", password="testpassword")
-        #response = self.client.post("/api/group/", self.test_group2_dict, format="json", follow=True)
-        #self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         response = self.client.get("/api/group/", data={"owned": "False"}, follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._validate_groups(response.data["groups"])
@@ -152,7 +148,13 @@ class GroupTests(APITestCase):
         response = self.client.post("/api/group/", {"name": "testgroup", "description": "testdescription"}, follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # test when group is created successfully
+    # test when serializer is not valid
+    def test_group_create_invalid_data(self):
+        response = self.client.post("/api/group/", {"name": ""}, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    
+    # test when everything is correct
     def test_group_create_success(self):
         response = self.client.post("/api/group/", {"name": "testgroup3", "description": "testdescription"}, follow=True)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -202,7 +204,7 @@ class GroupTests(APITestCase):
         self._validate_group(response.data, expected_name="testgroup3", expected_description="testdescription")
 
     ###########################################################################################################
-    #                                Group "PUT(update)" method tests                                     #
+    #                                Group "DELETE(destroy)" method tests                                     #
     ###########################################################################################################
 
     # test if user is not authenticated
@@ -238,12 +240,6 @@ class GroupTests(APITestCase):
     #                                            Helper Functions                                             #
     ###########################################################################################################
 
-    def _validate_groups(self, groups):
-        for group in groups:
-            self.assertGreaterEqual(group["id"], 1)
-            self.assertEqual(group["name"], self.test_group.name)
-            self.assertEqual(group["description"], self.test_group.description)
-
     def _validate_group(self, response, expected_name=None, expected_description=None):
         self.assertGreaterEqual(response["id"], 1)
         if expected_name:
@@ -254,3 +250,7 @@ class GroupTests(APITestCase):
             self.assertEqual(response["description"], expected_description)
         else:
             self.assertEqual(response["description"], self.test_group.description)
+
+    def _validate_groups(self, groups, expected_name=None, expected_description=None):
+        for group in groups:
+            self._validate_group(group, expected_name, expected_description)

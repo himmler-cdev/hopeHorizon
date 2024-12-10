@@ -5,6 +5,4 @@ class CustomGroup(models.Model):
     description = models.TextField()
     is_active = models.BooleanField(default=True)
 
-    def __str__(self):
-        return self.name
     

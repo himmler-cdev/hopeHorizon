@@ -42,16 +42,16 @@ class GroupUserTests(APITestCase):
         
         # Create test group user owner
         self.test_group_user_owner = GroupUser.objects.create(
-            user=self.user1,
-            group=self.test_group,
+            user_id=self.user1,
+            group_id=self.test_group,
             is_owner=True,
             is_active=True,
         )
 
         # Create test group user not owner
         self.test_group_user_not_owner = GroupUser.objects.create(
-            user=self.user2,
-            group=self.test_group,
+            user_id=self.user2,
+            group_id=self.test_group,
             is_owner=False,
             is_active=True,
         )
@@ -92,6 +92,14 @@ class GroupUserTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._validate_group_user_list(response, [self.test_group_user_not_owner])
 
+    # test that a user can get a list of all group users when the user is the owner
+    def test_group_user_list_user_not_member(self):
+        self.client.logout()
+        self.client.login(username="testuser3", password="testpassword")
+        response = self.client.get("/api/group_user/", data={"group_id": "1"}, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
     ###########################################################################################################
     #                                Group "POST(create)" method tests                                     #
     ###########################################################################################################
@@ -120,5 +128,5 @@ class GroupUserTests(APITestCase):
         
         for response_group_user, group_user in zip(response_group_users, group_user_list):
             self.assertEqual(response_group_user["id"], group_user.id)
-            self.assertEqual(response_group_user["user_id"], group_user.user.id)
-            self.assertEqual(response_group_user["username"], group_user.user.username)
+            self.assertEqual(response_group_user["user_id"], group_user.user_id.id)
+            self.assertEqual(response_group_user["username"], group_user.user_id.username)

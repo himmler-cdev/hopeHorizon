@@ -7,7 +7,7 @@ from django.db.models import Q
 
 class GroupUserViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
-    serializer_class_group_user = GroupUserSerializer
+    serializer_class = GroupUserSerializer
 
     def list(self, request):
         user = request.user
@@ -15,18 +15,18 @@ class GroupUserViewSet(viewsets.ModelViewSet):
         try:
             group = CustomGroup.objects.get(pk=id)
         except CustomGroup.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "The group does not exist"}, status=status.HTTP_404_NOT_FOUND)
         if not group.is_active:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "The group does not exist"}, status=status.HTTP_404_NOT_FOUND)
         try:
-            group_user = GroupUser.objects.filter(group=group).filter(user=user).get()
+            group_user = GroupUser.objects.filter(group_id=group, user_id=user).get()
             if not group_user.is_owner:
-                return Response(status=status.HTTP_403_FORBIDDEN)
+                return Response({"detail": "You are not the owner of the group"}, status=status.HTTP_403_FORBIDDEN)
         except GroupUser.DoesNotExist:
-            return Response(status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "You are not a member of the group"}, status=status.HTTP_403_FORBIDDEN)
         
-        group_user_list = GroupUser.objects.filter(group=group).filter(is_active=True).filter(is_owner=False)
-        serializer = self.serializer_class_group_user(group_user_list, many=True)
+        group_user_list = GroupUser.objects.filter(group_id=group, is_active=True, is_owner=False)
+        serializer = self.serializer_class(group_user_list, many=True)
         return Response({"group_users": serializer.data}, status=status.HTTP_200_OK)
 
     def create(self, request, pk=None):
