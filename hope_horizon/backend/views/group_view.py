@@ -21,7 +21,7 @@ class GroupViewSet(viewsets.ModelViewSet):
             group_user_member = GroupUser.objects.filter(user_id=user, is_owner=False, is_active=True)
             groups = CustomGroup.objects.filter(id__in=group_user_member.values_list("group_id", flat=True))
         serializer = self.serializer_class(groups, many=True)
-        return Response({"groups": serializer.data}, status=status.HTTP_200_OK)
+        return Response({"custom_groups": serializer.data}, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
         user = request.user
@@ -39,15 +39,11 @@ class GroupViewSet(viewsets.ModelViewSet):
     def create(self, request):
         name = request.data.get("name")
         description = request.data.get("description")
-        if name is None or description is None:
-            return Response({"detail": "Invalid request data"}, status=status.HTTP_400_BAD_REQUEST)
-        if CustomGroup.objects.filter(name=name).exists():
-            return Response({"detail": "Group name already exists"}, status=status.HTTP_400_BAD_REQUEST)
-        if not GroupSerializer(data=request.data).is_valid():
+        serializer = GroupSerializer(data=request.data)
+
+        if not serializer.is_valid():
             return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-            # TODO: Not tested correctly
-        else:
-            serializer = GroupSerializer(data=request.data)
+        
         group = CustomGroup.objects.create(name=name, description=description)
         GroupUser.objects.create(user_id=request.user, group_id=group, is_owner=True, is_active=True)
         serializer = self.get_serializer(group)
@@ -55,8 +51,10 @@ class GroupViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk=None):
         user = request.user
-        if request.data.get("name") is None or request.data.get("description") is None:
-            return Response({"detail": "Invalid request data"}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = GroupSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         try:
             group = CustomGroup.objects.get(pk=pk)
         except CustomGroup.DoesNotExist:
@@ -66,6 +64,7 @@ class GroupViewSet(viewsets.ModelViewSet):
         group_user = GroupUser.objects.filter(user_id=user, group_id=group, is_active=True, is_owner=True)
         if not group_user.exists():
             return Response({"detail": "User not authorized"}, status=status.HTTP_403_FORBIDDEN)
+        
         group.name = request.data.get("name")
         group.description = request.data.get("description")
         group.save()

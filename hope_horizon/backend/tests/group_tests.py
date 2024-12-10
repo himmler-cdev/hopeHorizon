@@ -80,7 +80,7 @@ class GroupTests(APITestCase):
         self.client.login(username="testuser1", password="testpassword")
         response = self.client.get("/api/group/", data={"owned": "True"}, follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self._validate_groups(response.data["groups"])
+        self._validate_groups(response.data["custom_groups"])
 
     # test when owned is false
     def test_group_list_owned_False(self):
@@ -88,7 +88,7 @@ class GroupTests(APITestCase):
         self.client.login(username="testuser2", password="testpassword")
         response = self.client.get("/api/group/", data={"owned": "False"}, follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self._validate_groups(response.data["groups"])
+        self._validate_groups(response.data["custom_groups"])
 
     ###########################################################################################################
     #                                Group "GET(retrieve)" method tests                                     #
