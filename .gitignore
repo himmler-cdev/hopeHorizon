@@ -22,3 +22,8 @@ __pycache__/
 .vscode/
 .DS_Store
 .env
+
+# Node
+/hope_horizon_frontend/node_modules
+npm-debug.log
+yarn-error.log
