@@ -104,18 +104,81 @@ class GroupUserTests(APITestCase):
     #                                Group "POST(create)" method tests                                     #
     ###########################################################################################################
 
+    # test when everything is correct
     def test_group_user_create(self):
-        #TODO: Notifications
-        pass
+        response = self.client.post("/api/group_user/", data={"group_id": "1", "users": [self.user3.id]}, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertTrue(GroupUser.objects.filter(group_id=self.test_group.id, user_id=self.user3.id).exists())
+
+    # test when group does not exist
+    def test_group_user_create_group_not_found(self):
+        response = self.client.post("/api/group_user/", data={"group_id": "999", "users": [self.user3.id]}, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    # test when group is not active
+    def test_group_user_create_group_not_active(self):
+        self.test_group.is_active = False
+        self.test_group.save()
+        response = self.client.post("/api/group_user/", data={"group_id": "1", "users": [self.user3.id]}, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    # test when user is not authorized to add group users
+    def test_group_user_create_not_authorized(self):
+        self.client.logout()
+        self.client.login(username="testuser2", password="testpassword")
+        response = self.client.post("/api/group_user/", data={"group_id": "1", "users": [self.user3.id]}, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    # test when no users provided
+    def test_group_user_create_no_users_provided(self):
+        response = self.client.post("/api/group_user/", data={"group_id": "1", "users": []}, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    # test when user does not exist
+    def test_group_user_create_user_not_found(self):
+        response = self.client.post("/api/group_user/", data={"group_id": "1", "users": [10]}, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    # test when user is not active
+    def test_group_user_create_user_not_active(self):
+        self.user3.is_active = False
+        self.user3.save()
+        response = self.client.post("/api/group_user/", data={"group_id": "1", "users": [self.user3.id]}, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    # test when user already exists in the group
+    def test_group_user_create_user_already_exists(self):
+        response = self.client.post("/api/group_user/", data={"group_id": "1", "users": [self.user2.id]}, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
 
     ###########################################################################################################
     #                                Group "DELETE(destroy)" method tests                                     #
     ###########################################################################################################
 
+    # test when everything is correct
     def test_group_user_destroy(self):
         response = self.client.delete(f"/api/group_user/{self.test_group_user_not_owner.id}/", follow=True)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(GroupUser.objects.get(pk=self.test_group_user_not_owner.id).is_active)
+
+    # test when not authenticated
+    def test_group_user_destroy_not_authenticated(self):
+        self.client.logout()
+        response = self.client.delete(f"/api/group_user/{self.test_group_user_not_owner.id}/", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    # test when the group user does not exist
+    def test_group_user_destroy_not_exist(self):
+        response = self.client.delete(f"/api/group_user/10/", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    # test when the user is not the owner of the group
+    def test_group_user_destroy_not_owner(self):
+        self.client.logout()
+        self.client.login(username="testuser2", password="testpassword")
+        response = self.client.delete(f"/api/group_user/{self.test_group_user_not_owner.id}/", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
     
 
     ###########################################################################################################
