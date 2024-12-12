@@ -5,3 +5,4 @@ from .group_tests import GroupTests
 from .group_user_tests import GroupUserTests
 from .blog_post_tests import BlogPostTests
 from .blog_post_type_tests import BlogPostTypeTests
+from .comment_tests import CommentTests
