@@ -11,6 +11,20 @@ class CommentViewSet(viewsets.ViewSet):
         blog_id = request.query_params.get('blog')
         page = int(request.query_params.get('page', 0))
 
+        if not request.user.is_authenticated:
+            return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        #TODO: why 403, if not logged in 401 is enough?
+
+        try:
+            # Validate that blog_id is an integer
+            blog_id = int(blog_id)
+        except (TypeError, ValueError):
+            return Response(
+                {"error": "Invalid 'blog' parameter. It must be an integer."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         if not blog_id:
             return Response({"error": "Blog ID is required"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -44,6 +58,18 @@ class CommentViewSet(viewsets.ViewSet):
         })
 
     def retrieve(self, request, pk=None):
+
+        #TODO: can not logged in users see blog posts?
+        if not request.user.is_authenticated:
+            return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        #TODO: why 403, if not logged in 401 is enough?
+
+        try:
+            pk_int = int(pk)
+        except ValueError:
+            return Response({"error": "ID parameter must be an integer"}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             comment = Comment.objects.get(id=pk)
         except Comment.DoesNotExist:
@@ -56,8 +82,15 @@ class CommentViewSet(viewsets.ViewSet):
         blog_post_id = request.data.get('blog_post_id')
         content = request.data.get('content')
 
+        if not request.user.is_authenticated:
+            return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+
         if not blog_post_id or not content:
             return Response({"error": "Both blog_post_id and content are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        #TODO: why 403, if not logged in 401 is enough?
+
+        #TODO: create notification here once implemented
 
         try:
             blog_post = BlogPost.objects.get(id=blog_post_id)
@@ -75,26 +108,26 @@ class CommentViewSet(viewsets.ViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
+        if not request.user.is_authenticated:
+            return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+
         try:
             pk_int = int(pk)
         except ValueError:
             return Response({"error": "ID parameter must be an integer"}, status=status.HTTP_400_BAD_REQUEST)
-
-        if not request.user.is_authenticated:
-            return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        content = request.data.get('content')
+        if not content:
+            return Response({"error": "Content is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             comment = Comment.objects.get(id=pk)
         except Comment.DoesNotExist:
             return Response({"error": "Comment not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Darf moderator updaten?
+        # TODO: can moderator update?
         if comment.user_id != request.user and not request.user.user_role_id.role == "Moderator":
             return Response({"error": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
-
-        content = request.data.get('content')
-        if not content:
-            return Response({"error": "Content is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         comment.content = content
         comment.save()
@@ -103,25 +136,21 @@ class CommentViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def destroy(self, request, pk=None):
-     # Check if the 'pk' is a valid integer
+        if not request.user.is_authenticated:
+            return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+
         try:
             pk_int = int(pk)
         except ValueError:
             return Response({"error": "ID parameter must be an integer"}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Check if user is authenticated
-        if not request.user.is_authenticated:
-            return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
 
         try:
             comment = Comment.objects.get(id=pk)
         except Comment.DoesNotExist:
             return Response({"error": "Comment not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # Check if the user is the owner of the comment or a Moderator
         if comment.user_id != request.user and not request.user.user_role_id.role == "Moderator":
             return Response({"error": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
 
-        # Delete the comment
         comment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
