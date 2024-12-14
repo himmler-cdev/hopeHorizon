@@ -1,38 +1,37 @@
-import datetime
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from django.core.paginator import Paginator
 from backend.models import Comment
 from backend.models import BlogPost
 from backend.serializers import CommentSerializer
+from rest_framework.permissions import IsAuthenticated
 
-class CommentViewSet(viewsets.ViewSet):
+
+class CommentViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = CommentSerializer
+
     def list(self, request):
         blog_id = request.query_params.get('blog')
         page = int(request.query_params.get('page', 0))
 
-        if not request.user.is_authenticated:
-            return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
-        
-        #TODO: why 403, if not logged in 401 is enough?
-
-        try:
-            # Validate that blog_id is an integer
-            blog_id = int(blog_id)
-        except (TypeError, ValueError):
-            return Response(
-                {"error": "Invalid 'blog' parameter. It must be an integer."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
         if not blog_id:
-            return Response({"error": "Blog ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Blog ID required"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             blog_post = BlogPost.objects.get(id=blog_id)
+        except ValueError:
+            return Response({"detail": "Invalid ID"}, status=status.HTTP_400_BAD_REQUEST)
         except BlogPost.DoesNotExist:
-            return Response({"error": "Blog post not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Blog post not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        if blog_post.blog_post_type_id.type == "Protected" and (blog_post.user_id != request.user and (request.user.user_role_id.role != "Therapist" and request.user.user_role_id.role != "Moderator")
+            ):
+            return Response({"detail": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
 
+        if blog_post.blog_post_type_id.type == "Private" and blog_post.user_id != request.user and request.user.user_role_id.role != "Moderator":
+            return Response({"detail": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
+        
         comments = blog_post.comment_set.all().order_by('-date')
         paginator = Paginator(comments, 10)
         if page >= paginator.num_pages:
@@ -58,99 +57,84 @@ class CommentViewSet(viewsets.ViewSet):
         })
 
     def retrieve(self, request, pk=None):
-
-        #TODO: can not logged in users see blog posts?
-        if not request.user.is_authenticated:
-            return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
-
-        #TODO: why 403, if not logged in 401 is enough?
-
-        try:
-            pk_int = int(pk)
-        except ValueError:
-            return Response({"error": "ID parameter must be an integer"}, status=status.HTTP_400_BAD_REQUEST)
-
         try:
             comment = Comment.objects.get(id=pk)
         except Comment.DoesNotExist:
-            return Response({"error": "Comment not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Comment not found"}, status=status.HTTP_404_NOT_FOUND)
+        except ValueError:
+            return Response({"detail": "Invalid ID"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if (
+            (comment.blog_post_id.blog_post_type_id.type == "Protected" and (comment.blog_post_id.user_id != request.user and (request.user.user_role_id.role != "Therapist" and request.user.user_role_id.role != "Moderator"))) or
+            (comment.blog_post_id.blog_post_type_id.type == "Private" and (comment.blog_post_id.user_id != request.user and request.user.user_role_id.role != "Moderator"))
+                ):
+            return Response({"detail": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
 
         serializer = CommentSerializer(comment)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request):
+        serializer = self.get_serializer(data=request.data)
         blog_post_id = request.data.get('blog_post_id')
-        content = request.data.get('content')
 
-        if not request.user.is_authenticated:
-            return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
-
-        if not blog_post_id or not content:
-            return Response({"error": "Both blog_post_id and content are required"}, status=status.HTTP_400_BAD_REQUEST)
-
-        #TODO: why 403, if not logged in 401 is enough?
-
-        #TODO: create notification here once implemented
+        if not serializer.is_valid():
+            return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             blog_post = BlogPost.objects.get(id=blog_post_id)
         except BlogPost.DoesNotExist:
-            return Response({"error": "Blog post not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Blog post not found"}, status=status.HTTP_404_NOT_FOUND)
+        except (ValueError, TypeError):
+            return Response({"detail": "Invalid blog post ID format"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if (
+            (blog_post.blog_post_type_id.type == "Protected" and (blog_post.user_id != request.user and request.user.user_role_id.role != "Therapist")) or
+            (blog_post.blog_post_type_id.type == "Private" and blog_post.user_id != request.user)
+                ):
+            return Response({"detail": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
 
-        comment = Comment.objects.create(
-            blog_post_id=blog_post,
-            user_id=request.user,
-            content=content,
-            date=datetime.date.today()
-        )
+        #TODO: create notification here once implemented
+        #TODO: can only comment on group post if in group (not implemented yet)
 
-        serializer = CommentSerializer(comment)
+        serializer.save(user_id=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
-        if not request.user.is_authenticated:
-            return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
-
         try:
-            pk_int = int(pk)
+            pk = int(pk)
         except ValueError:
-            return Response({"error": "ID parameter must be an integer"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        content = request.data.get('content')
-        if not content:
-            return Response({"error": "Content is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Invalid ID format"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             comment = Comment.objects.get(id=pk)
         except Comment.DoesNotExist:
-            return Response({"error": "Comment not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Comment not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        if 'content' not in request.data or not request.data.get('content', '').strip():
+            return Response({"detail": "Content field is required and cannot be empty."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # TODO: can moderator update?
+        serializer = self.get_serializer(comment, data=request.data, partial=True)
+
+        
+        if not serializer.is_valid():
+            return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
         if comment.user_id != request.user and not request.user.user_role_id.role == "Moderator":
-            return Response({"error": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
 
-        comment.content = content
-        comment.save()
-
-        serializer = CommentSerializer(comment)
-        return Response(serializer.data)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def destroy(self, request, pk=None):
-        if not request.user.is_authenticated:
-            return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
-
-        try:
-            pk_int = int(pk)
-        except ValueError:
-            return Response({"error": "ID parameter must be an integer"}, status=status.HTTP_400_BAD_REQUEST)
-
         try:
             comment = Comment.objects.get(id=pk)
         except Comment.DoesNotExist:
-            return Response({"error": "Comment not found"}, status=status.HTTP_404_NOT_FOUND)
-
+            return Response({"detail": "Comment not found"}, status=status.HTTP_404_NOT_FOUND)
+        except ValueError:
+            return Response({"detail": "Invalid ID"}, status=status.HTTP_400_BAD_REQUEST)
+       
         if comment.user_id != request.user and not request.user.user_role_id.role == "Moderator":
-            return Response({"error": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
 
         comment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
