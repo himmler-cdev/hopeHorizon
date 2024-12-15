@@ -1,6 +1,6 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
-from backend.models import User, BlogPostType, UserRole
+from backend.models import User, BlogPostType, UserRole, CustomGroup, GroupUser
 from sqlite3 import Date
 
 
@@ -11,7 +11,7 @@ class BlogPostTests(APITestCase):
 
     # Setup for tests
     def setUp(self):
-        # Create a test user
+        # Create a test users
         self.user = User.objects.create_user(
             username="testuser",
             password="testpassword",
@@ -40,12 +40,31 @@ class BlogPostTests(APITestCase):
             user_role_id=UserRole.objects.get(role="Moderator"),
         )
 
+        # Create blog post type
         self.blog_post_obj = {
             "title": "Test Blog Post",
             "content": "This is a test blog post",
             "blog_post_type_id": 1
         }
 
+        # Create group
+        self.test_group = CustomGroup.objects.create(
+            name="Test Group",
+            description="This is a test group"
+        )
+
+        # Create group user
+        self.group_user = GroupUser.objects.create(
+            group_id=self.test_group,
+            user_id=self.user
+        )
+
+        self.group_user2 = GroupUser.objects.create(
+            group_id=self.test_group,
+            user_id=self.user2
+        )
+
+        # Login user
         self.client.login(username="testuser", password="testpassword")
 
     ###########################################################################################################
@@ -79,6 +98,13 @@ class BlogPostTests(APITestCase):
     # Test if blog post type ID is invalid
     def test_create_blog_post_invalid_blog_post_type_id(self):
         self.blog_post_obj["blog_post_type_id"] = -1
+        response = self.client.post("/api/blog_post/", self.blog_post_obj, format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    # Test if blog post type is "Group" and group ID is invalid
+    def test_create_blog_post_invalid_group_id(self):
+        self.blog_post_obj["blog_post_type_id"] = BlogPostType.objects.get(type="Group").id
+        self.blog_post_obj["group_id"] = -1
         response = self.client.post("/api/blog_post/", self.blog_post_obj, format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -116,8 +142,16 @@ class BlogPostTests(APITestCase):
 
     # Test if user is allowed to view blog post by group
     def test_get_blog_post_allowed_by_group(self):
-        pass
-        # TODO: Implement this test case
+        self.blog_post_obj["blog_post_type_id"] = BlogPostType.objects.get(type="Group").id
+        self.blog_post_obj["group_id"] = self.test_group.id
+        response = self.client.post("/api/blog_post/", self.blog_post_obj, format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        blog_post_id = response.data["id"]
+
+        self.client.logout()
+        self.client.login(username="testuser2", password="testpassword")
+        response = self.client.get(f"/api/blog_post/{blog_post_id}/", format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     # Test if blog post does not exist
     def test_get_blog_post_does_not_exist(self):
@@ -159,11 +193,7 @@ class BlogPostTests(APITestCase):
         self.client.login(username="testtherapist", password="testpassword")
         response = self.client.get(f"/api/blog_post/{blog_post_id}/", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    # Test if user is not allowed to view blog post by group
-    def test_get_blog_post_not_allowed_by_group(self):
-        pass
-        # TODO: Implement this test case
+        
     
     ###########################################################################################################
     #                                     Blog post "PUT" method tests                                        #
@@ -233,6 +263,53 @@ class BlogPostTests(APITestCase):
         response = self.client.put(f"/api/blog_post/{blog_post_id}/", self.blog_post_obj, format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)    
 
+    # Test if blog post changes blog post type from "Public" to "Group" and second user can view it
+    def test_update_blog_post_change_type_to_group(self):
+        self.blog_post_obj["blog_post_type_id"] = BlogPostType.objects.get(type="Public").id
+        response = self.client.post("/api/blog_post/", self.blog_post_obj, format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        blog_post_id = response.data["id"]
+
+        self.blog_post_obj["blog_post_type_id"] = BlogPostType.objects.get(type="Group").id
+        self.blog_post_obj["group_id"] = self.test_group.id
+        response = self.client.put(f"/api/blog_post/{blog_post_id}/", self.blog_post_obj, format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.client.logout()
+        self.client.login(username="testuser2", password="testpassword")
+        response = self.client.get(f"/api/blog_post/{blog_post_id}/", format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    # Test if blog post changes blog post type from "Group" to "Private" and second user can't view it
+    def test_update_blog_post_change_type_to_private(self):
+        self.blog_post_obj["blog_post_type_id"] = BlogPostType.objects.get(type="Group").id
+        self.blog_post_obj["group_id"] = self.test_group.id
+        response = self.client.post("/api/blog_post/", self.blog_post_obj, format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        blog_post_id = response.data["id"]
+
+        self.blog_post_obj["blog_post_type_id"] = BlogPostType.objects.get(type="Private").id
+        response = self.client.put(f"/api/blog_post/{blog_post_id}/", self.blog_post_obj, format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.client.logout()
+        self.client.login(username="testuser2", password="testpassword")
+        response = self.client.get(f"/api/blog_post/{blog_post_id}/", format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    # Test if blog post type is "Group" and group ID is invalid
+    def test_update_blog_post_invalid_group_id(self):
+        self.blog_post_obj["blog_post_type_id"] = BlogPostType.objects.get(type="Group").id
+        self.blog_post_obj["group_id"] = self.test_group.id
+        response = self.client.post("/api/blog_post/", self.blog_post_obj, format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        blog_post_id = response.data["id"]
+
+        self.blog_post_obj["group_id"] = -1
+        response = self.client.put(f"/api/blog_post/{blog_post_id}/", self.blog_post_obj, format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+     
+
     ###########################################################################################################
     #                                     Blog post "DELETE" method tests                                     #
     ###########################################################################################################
@@ -296,7 +373,7 @@ class BlogPostTests(APITestCase):
         self._push_data_list(data)
         response = self.client.get("/api/blog_post?owned=true&page=1", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data["blog_posts"]), response.data["page_information"]["pageSize"])
+        self.assertEqual(len(response.data["blog_posts"]), response.data["page_information"]["page_size"])
         self._validate_data_list_pagination(response.data)
 
     ### Pagination Tests ###     
@@ -305,7 +382,7 @@ class BlogPostTests(APITestCase):
     def test_list_blog_post_pagination(self):
         data = []
         self._push_data_list(data)
-        response = self.client.get("/api/blog_post?page=2&pageSize=10&owned=true", format="json", follow=True)
+        response = self.client.get("/api/blog_post?page=2&page_size=10&owned=true", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 10)
         self._validate_data_list_pagination(response.data, 2)
@@ -314,7 +391,7 @@ class BlogPostTests(APITestCase):
     def test_list_blog_post_pagination_last_page(self):
         data = []
         self._push_data_list(data)
-        response = self.client.get("/api/blog_post?page=3&pageSize=10&owned=true", format="json", follow=True)
+        response = self.client.get("/api/blog_post?page=3&page_size=10&owned=true", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 2)
         self._validate_data_list_pagination(response.data, 3)
@@ -323,7 +400,7 @@ class BlogPostTests(APITestCase):
     def test_list_blog_post_pagination_page_size_greater_than_total_posts(self):
         data = []
         self._push_data_list(data)
-        response = self.client.get("/api/blog_post?page=1&pageSize=100&owned=true", format="json", follow=True)
+        response = self.client.get("/api/blog_post?page=1&page_size=100&owned=true", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 22)
         self._validate_data_list_pagination(response.data, 1, 100)
@@ -332,19 +409,19 @@ class BlogPostTests(APITestCase):
     def test_list_blog_post_pagination_page_number_greater_than_total_pages(self):
         data = []
         self._push_data_list(data)
-        response = self.client.get("/api/blog_post?page=40&pageSize=10&owned=true", format="json", follow=True)
+        response = self.client.get("/api/blog_post?page=40&page_size=10&owned=true", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 0)
         self.assertEqual(response.data["page_information"]["actualSize"], 0)
     
     # Test if blog post list is retrived with page number smaller than 1
     def test_list_blog_post_pagination_negative_page_number(self):
-        response = self.client.get("/api/blog_post?page=-1&pageSize=10&owned=true", format="json", follow=True)
+        response = self.client.get("/api/blog_post?page=-1&page_size=10&owned=true", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     # Test if blog post list is retrived with page size smaller than 1
     def test_list_blog_post_pagination_negative_page_size(self):
-        response = self.client.get("/api/blog_post?page=1&pageSize=-10&owned=true", format="json", follow=True)
+        response = self.client.get("/api/blog_post?page=1&page_size=-10&owned=true", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     # Test if page parameter is required
@@ -354,12 +431,12 @@ class BlogPostTests(APITestCase):
 
     # Test if page parameter is a string
     def test_list_blog_post_pagination_page_string(self):
-        response = self.client.get("/api/blog_post?page=invalid&pageSize=10&owned=true", format="json", follow=True)
+        response = self.client.get("/api/blog_post?page=invalid&page_size=10&owned=true", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     # Test if page size parameter is a string
     def test_list_blog_post_pagination_page_size_string(self):
-        response = self.client.get("/api/blog_post?page=1&pageSize=invalid&owned=true", format="json", follow=True)
+        response = self.client.get("/api/blog_post?page=1&page_size=invalid&owned=true", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     ### Search Tests ###  
@@ -397,13 +474,18 @@ class BlogPostTests(APITestCase):
     def test_list_blog_post_blog_post_type_no_results(self):
         data = []
         self._push_data_list(data)
-        response = self.client.get("/api/blog_post?blog_post_type_id=4&owned=true&page=1", format="json", follow=True)
+        response = self.client.get("/api/blog_post?blog_post_type_id=3&owned=true&page=1", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 0)
 
     # Test if blog post error is returned with invalid blog post type
     def test_list_blog_post_blog_post_type_invalid(self):
         response = self.client.get("/api/blog_post?blog_post_type_id=-1&owned=true&page=1", format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    # Test if blog post type is not a number
+    def test_list_blog_post_blog_post_type_string(self):
+        response = self.client.get("/api/blog_post?blog_post_type_id=invalid&owned=true&page=1", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
     
     ### Owned Tests ###
@@ -490,6 +572,82 @@ class BlogPostTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 1)
 
+    ### Group Tests ###
+
+    # Test if blog post list is retrieved with group name
+    def test_list_blog_post_group_name(self):
+        self.blog_post_obj["blog_post_type_id"] = BlogPostType.objects.get(type="Group").id
+        self.blog_post_obj["group_id"] = self.test_group.id
+        response = self.client.post("/api/blog_post/", self.blog_post_obj, format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        response = self.client.get(f"/api/blog_post?group_name={self.test_group.name}&owned=true&page=1&blog_post_type_id=3", format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["blog_posts"]), 1)
+        self.assertEqual(response.data["blog_posts"][0]["group_id"], self.test_group.id)
+
+    # Test if second user can view blog post by group name
+    def test_list_blog_post_group_name_not_owned(self):
+        self.blog_post_obj["blog_post_type_id"] = BlogPostType.objects.get(type="Group").id
+        self.blog_post_obj["group_id"] = self.test_group.id
+        response = self.client.post("/api/blog_post/", self.blog_post_obj, format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.client.logout()
+        self.client.login(username="testuser2", password="testpassword")
+        response = self.client.get(f"/api/blog_post?group_name={self.test_group.name}&owned=false&page=1&blog_post_type_id=3", format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["blog_posts"]), 1)
+
+    # Test if user can view blog post by group name not authorized
+    def test_list_blog_post_group_name_not_authorized(self):
+        self.blog_post_obj["blog_post_type_id"] = BlogPostType.objects.get(type="Group").id
+        self.blog_post_obj["group_id"] = self.test_group.id
+        response = self.client.post("/api/blog_post/", self.blog_post_obj, format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.client.logout()
+        self.client.login(username="testtherapist", password="testpassword")
+        response = self.client.get(f"/api/blog_post?group_name={self.test_group.name}&owned=true&page=1&blog_post_type_id=3", format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+  
+    # Test if all group blog posts are retrieved when no group name is provided
+    def test_list_blog_post_group_name_no_group_name(self):
+        self.blog_post_obj["blog_post_type_id"] = BlogPostType.objects.get(type="Group").id
+        self.blog_post_obj["group_id"] = self.test_group.id
+        response = self.client.post("/api/blog_post/", self.blog_post_obj, format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        response = self.client.get("/api/blog_post?owned=true&page=1&blog_post_type_id=3", format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["blog_posts"]), 1)
+
+    # Test if all group blog posts are retrieved when group name is provides but not owned
+    def test_list_blog_post_group_name_no_group_name_not_owned(self):
+        self.blog_post_obj["blog_post_type_id"] = BlogPostType.objects.get(type="Group").id
+        self.blog_post_obj["group_id"] = self.test_group.id
+        response = self.client.post("/api/blog_post/", self.blog_post_obj, format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.client.logout()
+        self.client.login(username="testuser2", password="testpassword")
+        response = self.client.get("/api/blog_post?owned=false&page=1&blog_post_type_id=3", format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["blog_posts"]), 1)
+
+    # Test if no blog psot is retrieved when not in any group
+    def test_list_blog_post_group_name_no_group(self):
+        self.blog_post_obj["blog_post_type_id"] = BlogPostType.objects.get(type="Group").id
+        self.blog_post_obj["group_id"] = self.test_group.id
+        response = self.client.post("/api/blog_post/", self.blog_post_obj, format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.client.logout()
+        self.client.login(username="testtherapist", password="testpassword")
+        response = self.client.get("/api/blog_post?owned=true&page=1&blog_post_type_id=3", format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["blog_posts"]), 0)
+
     ### Combined Tests ###
 
     # Test if blog post list is retrieved with search and blog post type
@@ -518,7 +676,7 @@ class BlogPostTests(APITestCase):
     def _validate_data_list_pagination(self, data, page=1, page_size=10):
         # Validate page information
         self.assertEqual(data["page_information"]["page"], page)
-        self.assertEqual(data["page_information"]["pageSize"], page_size)
+        self.assertEqual(data["page_information"]["page_size"], page_size)
         self.assertEqual(data["page_information"]["actualSize"], len(data["blog_posts"]))
 
         # Validate blog posts
@@ -529,7 +687,7 @@ class BlogPostTests(APITestCase):
             self.assertEqual(item["date"], Date.today().strftime("%Y-%m-%d"))
             self.assertGreaterEqual(item["id"], 1)
             if i + start_index < 5:
-                self.assertEqual(item["blog_post_type_id"], 3)
+                self.assertEqual(item["blog_post_type_id"], 4)
             elif i + start_index < 10:
                 self.assertEqual(item["blog_post_type_id"], 2)
             else:
@@ -546,7 +704,7 @@ class BlogPostTests(APITestCase):
                 "blog_post_type_id": 1
             }
             if i < 5:
-                blog_post_obj["blog_post_type_id"] = 3
+                blog_post_obj["blog_post_type_id"] = 4
             elif i < 10:
                 blog_post_obj["blog_post_type_id"] = 2
 
