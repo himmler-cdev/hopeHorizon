@@ -47,6 +47,16 @@ class UserStatusTests(APITestCase):
         response = self.client.get("/api/user_status/", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    # query parameters from date is invalid
+    def test_list_user_statuses_invalid_from_date(self):
+        response = self.client.get("/api/user_status/", {"from": "thisIsNotADate"}, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    # query parameters to date is invalid
+    def test_list_user_statuses_invalid_to_date(self):
+        response = self.client.get("/api/user_status/", {"from": "1990-01-01", "to": "thisIsNotADate"}, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     # query parameters are valid
     def test_list_user_statuses_valid_parameters(self):
         response = self.client.post(

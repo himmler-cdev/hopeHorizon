@@ -174,7 +174,18 @@ class UserTrackerTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    #  the user tracker entry does not exist
+    # data is invalid
+    def test_update_user_tracker_invalid_id(self):
+        response = self.client.post(
+            "/api/user_tracker/", data=self.test_user_tracker_dict, follow=True
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        response = self.client.put(
+            "/api/user_tracker/thisIsNotANumber/", data=self.test_user_tracker_dict, follow=True
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    # the user tracker entry does not exist
     def test_update_user_tracker_not_exist(self):
         response = self.client.put(
             "/api/user_tracker/1/", data=self.test_user_tracker_dict, follow=True
