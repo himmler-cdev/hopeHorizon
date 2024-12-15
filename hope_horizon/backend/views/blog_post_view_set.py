@@ -2,13 +2,13 @@ from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from backend.models import BlogPost, BlogPostType, UserRole, GroupUser, CustomGroup
-from backend.serializers import BlogPostserializer, BlogPostListSerializer
+from backend.serializers import BlogPostSerializer, BlogPostListSerializer
 
 
 class BlogPostViewSet(viewsets.ModelViewSet):
     queryset = BlogPost.objects.all()
     serializers = {
-        "default": BlogPostserializer,
+        "default": BlogPostSerializer,
         "list": BlogPostListSerializer
     }
     permission_classes = [IsAuthenticated]

@@ -2,7 +2,7 @@ from rest_framework import serializers
 from backend.models import BlogPost
 
 
-class BlogPostserializer(serializers.ModelSerializer):
+class BlogPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlogPost
         fields = ["id", "date", "title", "content", "blog_post_type_id", "group_id"]
@@ -15,7 +15,7 @@ class BlogPostserializer(serializers.ModelSerializer):
 
 class BlogPostListSerializer(serializers.Serializer):
     page_information = serializers.SerializerMethodField()
-    blog_posts = BlogPostserializer(many=True)
+    blog_posts = BlogPostSerializer(many=True)
 
     def get_page_information(self, obj):
         return {
