@@ -59,6 +59,8 @@ class UserViewSet(viewsets.ModelViewSet):
                 return Response({"detail": "User does not have permission to update this entry"}, status=status.HTTP_403_FORBIDDEN)
         except User.DoesNotExist:
             return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        except ValueError:
+            return Response({"detail": "Invalid user id"}, status=status.HTTP_400_BAD_REQUEST)
         serializer = self.serializers["update"](instance, data=request.data)
         if not serializer.is_valid():
             return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
@@ -80,3 +82,5 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response("User deleted", status=status.HTTP_204_NO_CONTENT)
         except User.DoesNotExist:
             return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        except ValueError:
+            return Response({"detail": "Invalid user id"}, status=status.HTTP_400_BAD_REQUEST)

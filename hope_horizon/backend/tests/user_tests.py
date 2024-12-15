@@ -211,6 +211,14 @@ class UserTests(APITestCase):
         response = self.client.put(f"/api/user/{id}/", self.test_user_dict, format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    # test user update with invalid data, invalid id
+    def test_update_user_invalid_id(self):
+        response = self.client.post("/api/user/", self.test_user_dict, format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.client.login(username=self.test_user_dict["username"], password=self.test_user_dict["password"])
+        response = self.client.put("/api/user/thisIsNotANumber/", self.test_user_dict, format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     # test user update with valid data, user has permission
     def test_update_user(self):
         response = self.client.post("/api/user/", self.test_user_dict, format="json", follow=True)
@@ -254,6 +262,14 @@ class UserTests(APITestCase):
         self.client.login(username=self.test_user_dict["username"], password=self.test_user_dict["password"])
         response = self.client.delete(f"/api/user/{id}/", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    # test user deletion with invalid data, invalid id
+    def test_delete_user_invalid_id(self):
+        response = self.client.post("/api/user/", self.test_user_dict, format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.client.login(username=self.test_user_dict["username"], password=self.test_user_dict["password"])
+        response = self.client.delete(f"/api/user/thisIsNotANumber/", format="json", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     # test user deletion, user has permission
     def test_delete_user(self):
