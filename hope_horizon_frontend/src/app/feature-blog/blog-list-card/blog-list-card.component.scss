@@ -1,0 +1,19 @@
+.blogList__card {
+  margin-block: 16px;
+  padding-block: 8px;
+  background-color: #e0e0e0;
+  display: flex;
+  flex-direction: column;
+}
+
+.blogList__card-content p {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mat-card-header, .mat-card-content {
+  flex-grow: 1;
+}
