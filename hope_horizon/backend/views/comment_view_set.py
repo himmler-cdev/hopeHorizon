@@ -19,9 +19,12 @@ class CommentViewSet(viewsets.ModelViewSet):
             return Response({"detail": "Blog ID required"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
+            blog_id = int(blog_id)  # Ensure the ID is a valid integer
+        except (ValueError, TypeError):
+            return Response({"detail": "Invalid blog ID format"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
             blog_post = BlogPost.objects.get(id=blog_id)
-        except ValueError:
-            return Response({"detail": "Invalid ID"}, status=status.HTTP_400_BAD_REQUEST)
         except BlogPost.DoesNotExist:
             return Response({"detail": "Blog post not found"}, status=status.HTTP_404_NOT_FOUND)
         
@@ -34,16 +37,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         
         comments = blog_post.comment_set.all().order_by('-date')
         paginator = Paginator(comments, 10)
-        if page >= paginator.num_pages:
-            return Response({
-                "pageInformation": {
-                    "page": page,
-                    "pageSize": 10,
-                    "actualSize": 0
-                },
-                "comments": []
-            }, status=status.HTTP_200_OK)
-
+                
         page_obj = paginator.get_page(page + 1)
         serializer = CommentSerializer(page_obj.object_list, many=True)
 
@@ -55,6 +49,7 @@ class CommentViewSet(viewsets.ModelViewSet):
             },
             "comments": serializer.data
         })
+
 
     def retrieve(self, request, pk=None):
         try:
@@ -80,12 +75,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         if not serializer.is_valid():
             return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            blog_post = BlogPost.objects.get(id=blog_post_id)
-        except BlogPost.DoesNotExist:
-            return Response({"detail": "Blog post not found"}, status=status.HTTP_404_NOT_FOUND)
-        except (ValueError, TypeError):
-            return Response({"detail": "Invalid blog post ID format"}, status=status.HTTP_400_BAD_REQUEST)
+        blog_post = BlogPost.objects.get(id=blog_post_id)
         
         if (
             (blog_post.blog_post_type_id.type == "Protected" and (blog_post.user_id != request.user and request.user.user_role_id.role != "Therapist")) or
@@ -113,17 +103,12 @@ class CommentViewSet(viewsets.ModelViewSet):
         if 'content' not in request.data or not request.data.get('content', '').strip():
             return Response({"detail": "Content field is required and cannot be empty."}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = self.get_serializer(comment, data=request.data, partial=True)
-
-        
-        if not serializer.is_valid():
-            return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
         if comment.user_id != request.user and not request.user.user_role_id.role == "Moderator":
             return Response({"detail": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
 
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        comment.content = request.data.get("content")
+        comment.save()
+        return Response({"content": comment.content},status=status.HTTP_200_OK)
 
     def destroy(self, request, pk=None):
         try:

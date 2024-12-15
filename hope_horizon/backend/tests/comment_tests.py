@@ -258,7 +258,19 @@ class CommentTests(TestCase):
     
     def test_get_comments_list_not_found(self):
         # Test retrieving comments for a non existant blog post
-        response = self.client.get("/api/comment?blog=99999999999999999999999999999&page=1", follow=True)
+        response = self.client.get("/api/comment?blog=9999&page=1", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_comments_list_pagination_beyond_available_pages(self):
+        # Create 15 comments, but only 10 will fit on one page
+        for i in range(15):
+            Comment.objects.create(
+                content=f"Test Comment {i}",
+                date=date.today(),
+                blog_post_id=self.blog_post,
+                user_id=self.user
+            )
+        response = self.client.get(f"/comments/?blog={self.blog_post.id}&page=9999")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     ###########################################################################################################
