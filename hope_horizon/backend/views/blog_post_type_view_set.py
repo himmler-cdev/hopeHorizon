@@ -7,7 +7,7 @@ from backend.models import BlogPostType
 
 class BlogPostTypeViewSet(viewsets.ModelViewSet):
     queryset = BlogPostType.objects.all()
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
     serializer_class = BlogPostTypeSerializer
 
     def list(self, request):
