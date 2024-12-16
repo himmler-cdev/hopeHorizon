@@ -6,26 +6,29 @@
                 <div class="login-text">Already have an account?</div>
                 <div class="login-action" [routerLink]="['/login']" role="button">Login here</div>
             </div>
-            <form>
+            <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
                 <mat-form-field class="form-group" appearance="fill">
                     <mat-label>Username</mat-label>
-                    <input matInput type="text" id="username" name="username" required
+                    <input matInput type="text" formControlName="username" name="username" required
                         placeholder="Enter your username">
                 </mat-form-field>
                 <mat-form-field class="form-group" appearance="fill">
                     <mat-label>Email</mat-label>
-                    <input matInput type="email" id="email" name="email" required placeholder="Enter your email">
+                    <input matInput type="email" formControlName="email" name="email" required placeholder="Enter your email">
                 </mat-form-field>
                 <mat-form-field class="form-group" appearance="fill">
                     <mat-label>Password</mat-label>
-                    <input matInput type="password" id="password" name="password" required
+                    <input matInput type="password" formControlName="password" name="password" required
                         placeholder="Enter your password">
                 </mat-form-field>
-                <mat-form-field class="form-group" appearance="fill">
+                <mat-form-field class="form-group-last" appearance="fill">
                     <mat-label>Re-enter Password</mat-label>
-                    <input matInput type="password" id="reenter-password" name="reenter-password" required
+                    <input matInput type="password" formControlName="password2" name="password2" required
                         placeholder="Re-enter your password">
                 </mat-form-field>
+                @if (errorMessage.length > 0) {
+                    <div class="error-message">{{ errorMessage }}</div>
+                }
                 <div class="form-button">
                     <button mat-raised-button color="primary" type="submit" title="Click to register">REGISTER</button>
                 </div>

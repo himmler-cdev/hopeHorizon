@@ -55,9 +55,9 @@
 }
 
 .form-group {
-    margin-bottom: 15px;
     text-align: left;
     width: 100%; // Ensure the form group takes full width
+    margin-bottom: 15px;
 }
 
 .form-button {
@@ -92,4 +92,11 @@ button:hover {
     background-position: center;
     width: 50%; // Adjust the width as needed
     height: 65%; // Ensure it takes the full height of the container
+}
+
+.error-message {
+    color: #ba1a1a;
+    /* Red color for error */
+    text-align: left;
+    font-size: small;
 }
