@@ -60,7 +60,7 @@ class GroupTests(APITestCase):
         self.client.login(username="testuser1", password="testpassword")
 
     ###########################################################################################################
-    #                                Group "GET(list)" method tests                                     #
+    #                                Group "GET(list)" method tests                                           #
     ###########################################################################################################
 
     # test if user is not authenticated
@@ -91,7 +91,7 @@ class GroupTests(APITestCase):
         self._validate_groups(response.data["custom_groups"])
 
     ###########################################################################################################
-    #                                Group "GET(retrieve)" method tests                                     #
+    #                                Group "GET(retrieve)" method tests                                       #
     ###########################################################################################################
 
     # test if user is not authenticated
@@ -124,7 +124,7 @@ class GroupTests(APITestCase):
         self._validate_group(response.data)
 
     ###########################################################################################################
-    #                                Group "POST(create)" method tests                                     #
+    #                                Group "POST(create)" method tests                                        #
     ###########################################################################################################
 
     # test if user is not authenticated
@@ -161,7 +161,7 @@ class GroupTests(APITestCase):
         self._validate_group(response.data, expected_name="testgroup3", expected_description="testdescription")
 
     ###########################################################################################################
-    #                                Group "PUT(update)" method tests                                     #
+    #                                Group "PUT(update)" method tests                                         #
     ###########################################################################################################
 
     # test if user is not authenticated

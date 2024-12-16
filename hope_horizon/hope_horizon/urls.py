@@ -33,6 +33,7 @@ router.register(r"group", GroupViewSet, basename="group")
 router.register(r"group_user", GroupUserViewSet, basename="group_user")
 router.register(r"blog_post_type", BlogPostTypeViewSet, basename="blog_post_type")
 router.register(r"blog_post", BlogPostViewSet, basename="blog_post")
+router.register(r'comment', CommentViewSet, basename='comment')
 
 
 urlpatterns = [
