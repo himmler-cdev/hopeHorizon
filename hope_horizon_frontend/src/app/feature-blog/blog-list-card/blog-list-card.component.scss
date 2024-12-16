@@ -1,4 +1,4 @@
-.blogList__card {
+.card {
   margin-block: 16px;
   padding-block: 8px;
   background-color: #e0e0e0;
@@ -6,7 +6,7 @@
   flex-direction: column;
 }
 
-.blogList__card__content p {
+.card-content p {
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;

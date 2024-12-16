@@ -1,4 +1,4 @@
-<mat-toolbar class="header__toolbar mat-elevation-z4">
+<mat-toolbar class="header-toolbar mat-elevation-z4">
   <!-- Left Content -->
   <div class="flex-grow-1 d-flex align-items-center">
     <a class="d-none d-md-block me-2">
@@ -6,24 +6,25 @@
     </a>
 
     <!-- Navigation Links -->
-    <a mat-button class="mx-2 header__link" routerLink="/home">
+    <a mat-button class="mx-2 header-link" routerLink="/home">
       Home
     </a>
-    <a mat-button class="mx-2 header__link" routerLink="/feed">
+    <a mat-button class="mx-2 header-link" routerLink="/feed">
       Feed
     </a>
-    <a mat-button class="mx-2 header__link" routerLink="/journal">
+    <a mat-button class="mx-2 header-link" routerLink="/journal">
       Journal
     </a>
-    <a mat-button class="mx-2 header__link flex" routerLink="/group">
+    <a mat-button class="mx-2 header-link flex" routerLink="/group">
       Group
     </a>
   </div>
 
   <!-- End/Right Content -->
   <button mat-icon-button [matMenuTriggerFor]="menu" class="me-2" aria-label="Account menu">
-    <mat-icon class="header__iconSize">account_circle</mat-icon>
+    <mat-icon class="header-iconSize">account_circle</mat-icon>
   </button>
+
   <mat-menu #menu="matMenu">
     <button mat-menu-item routerLink="/preferences">Preferences</button>
     <button mat-menu-item (click)="onLogout()">Logout</button>
