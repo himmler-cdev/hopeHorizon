@@ -7,14 +7,14 @@ import {BlogPostEntity} from '../entity/blog-post.entity';
 @Component({
   selector: 'app-blog-list-card',
   standalone: true,
-    imports: [
-        MatCard,
-        MatCardContent,
-        MatCardHeader,
-        MatCardTitle,
-        MatIcon,
-        MatIconButton
-    ],
+  imports: [
+    MatCard,
+    MatCardContent,
+    MatCardHeader,
+    MatCardTitle,
+    MatIcon,
+    MatIconButton
+  ],
   templateUrl: './blog-list-card.component.html',
   styleUrl: './blog-list-card.component.scss'
 })

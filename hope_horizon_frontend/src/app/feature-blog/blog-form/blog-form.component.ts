@@ -4,16 +4,10 @@ import {BlogPostTypeService} from '../service/blog-post-type.service';
 import {BlogPostService} from '../service/blog-post.service';
 import {BlogPostEntity} from '../entity/blog-post.entity';
 import {Router} from '@angular/router';
-import {MatFormField, MatLabel, MatSuffix} from '@angular/material/form-field';
+import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {BlogPostTypeEntity} from '../entity/blog-post-type.entity';
 import {MatInput} from '@angular/material/input';
 import {MatOption, MatSelect} from '@angular/material/select';
-import {DatePipe, NgClass} from '@angular/common';
-import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
-import {MatButton, MatIconButton} from '@angular/material/button';
-import {MatIcon} from '@angular/material/icon';
-import {BlogListCardComponent} from '../blog-list-card/blog-list-card.component';
-import {MatChip} from '@angular/material/chips';
 
 @Component({
   selector: 'app-blog-form',

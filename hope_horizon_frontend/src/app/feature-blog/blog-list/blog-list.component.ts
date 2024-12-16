@@ -1,5 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {BlogPostService} from '../service/blog-post.service';
+import {Component, Input} from '@angular/core';
 import {BlogPostEntity} from '../entity/blog-post.entity';
 import {DatePipe, NgClass} from '@angular/common';
 import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
@@ -12,6 +11,7 @@ import {MatOption, MatSelect} from '@angular/material/select';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {MatChip} from '@angular/material/chips';
 import {BlogPostTypeEntity} from '../entity/blog-post-type.entity';
+import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-blog-list',
@@ -34,7 +34,8 @@ import {BlogPostTypeEntity} from '../entity/blog-post-type.entity';
     ReactiveFormsModule,
     MatChip,
     NgClass,
-    MatButton
+    MatButton,
+    RouterLink
   ],
   templateUrl: './blog-list.component.html',
   styleUrl: './blog-list.component.scss'
