@@ -1,7 +1,7 @@
-import {Component, OnInit} from '@angular/core';
-import {BlogPostService} from '../blog-post.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {BlogPostService} from '../service/blog-post.service';
 import {BlogPostEntity} from '../entity/blog-post.entity';
-import {DatePipe, NgClass, NgForOf} from '@angular/common';
+import {DatePipe, NgClass} from '@angular/common';
 import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
@@ -11,12 +11,12 @@ import {MatInput} from '@angular/material/input';
 import {MatOption, MatSelect} from '@angular/material/select';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {MatChip} from '@angular/material/chips';
+import {BlogPostTypeEntity} from '../entity/blog-post-type.entity';
 
 @Component({
   selector: 'app-blog-list',
   standalone: true,
   imports: [
-    NgForOf,
     DatePipe,
     MatCard,
     MatCardTitle,
@@ -39,26 +39,13 @@ import {MatChip} from '@angular/material/chips';
   templateUrl: './blog-list.component.html',
   styleUrl: './blog-list.component.scss'
 })
-export class BlogListComponent implements OnInit {
-  blogPostList: BlogPostEntity[] = [];
+export class BlogListComponent {
+  @Input({required: true}) blogPostList!: BlogPostEntity[];
+  @Input() showFilter = true;
+  @Input() filterOptions: BlogPostTypeEntity[] = [];
+
   searchControl = new FormControl('');
   filterControl = new FormControl(null);
-  options = [
-    {value: 'option1', viewValue: 'Option 1'},
-    {value: 'option2', viewValue: 'Option 2'},
-    {value: 'option3', viewValue: 'Option 3'}
-  ];
-
-  constructor(private _blogPostService: BlogPostService) {
-  }
-
-  ngOnInit() {
-    this._blogPostService.getBlogPosts().subscribe((blogPosts) => {
-      blogPosts.map((blogPost) => {
-        this.blogPostList.push(BlogPostEntity.fromDto(blogPost));
-      });
-    });
-  }
 
   clearSearchFilter() {
     this.searchControl.setValue('');

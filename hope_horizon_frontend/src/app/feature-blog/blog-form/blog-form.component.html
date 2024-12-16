@@ -1,0 +1,22 @@
+<form [formGroup]="blogFormGroup" (ngSubmit)="createOrUpdate()" class="m-3 px-3 me-5">
+  <!-- Title and Select -->
+  <div class="d-flex flex-column flex-md-row gap-2">
+    <div class="title-field me-md-2">
+      <mat-form-field class="w-100" appearance="outline">
+        <mat-label>Title</mat-label>
+        <input matInput formControlName="title"/>
+      </mat-form-field>
+    </div>
+    <div class="type-field">
+      <mat-form-field class="w-100" appearance="outline">
+        <mat-label>Type</mat-label>
+        <mat-select formControlName="blogPostTypeId">
+          @for (option of blogPostTypes; track $index) {
+            <mat-option value="{{ option.id }}">{{ option.type }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+</form>

@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {BlogPostDto} from './dto/blog-post.dto';
+import {BlogPostDto} from '../dto/blog-post.dto';
 import {Observable, of} from 'rxjs';
 
 @Injectable({
