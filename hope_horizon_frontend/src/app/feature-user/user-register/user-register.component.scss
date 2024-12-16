@@ -66,6 +66,11 @@
     margin-top: 10px; // Adds some space above the button
 }
 
+.form-group-last {
+    text-align: left;
+    width: 100%; // Ensure the form group takes full width
+}
+
 button {
     width: 40%;
     padding: 10px;
@@ -92,4 +97,11 @@ button:hover {
     background-position: center;
     width: 50%; // Adjust the width as needed
     height: 65%; // Ensure it takes the full height of the container
+}
+
+.error-message {
+    color: red;
+    /* Red color for error */
+    text-align: left;
+    font-size: small;
 }
