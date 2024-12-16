@@ -1,8 +1,11 @@
 import {Routes} from '@angular/router';
-import {BlogListComponent} from './feature-blog/blog-list/blog-list.component';
-import {BlogListEditComponent} from './feature-blog/blog-list-edit/blog-list-edit.component';
+import {BlogFeedComponent} from './feature-blog/blog-feed/blog-feed.component';
+import {BlogJournalComponent} from './feature-blog/blog-journal/blog-journal.component';
+import {BlogFormComponent} from './feature-blog/blog-form/blog-form.component';
 
 export const routes: Routes = [
-  {path: 'blog-list', component: BlogListComponent},
-  {path: 'blog-list-edit', component: BlogListEditComponent}
+  {path: 'feed', component: BlogFeedComponent},
+  {path: 'journal', component: BlogJournalComponent},
+  {path: 'blog/create', component: BlogFormComponent},
+  {path: 'blog/edit/:id', component: BlogFormComponent}
 ];

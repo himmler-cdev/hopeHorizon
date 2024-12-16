@@ -3,6 +3,7 @@ import {MatToolbar} from '@angular/material/toolbar';
 import {MatIcon} from '@angular/material/icon';
 import {MatAnchor, MatButton, MatIconButton} from '@angular/material/button';
 import {NgOptimizedImage} from '@angular/common';
+import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -13,7 +14,8 @@ import {NgOptimizedImage} from '@angular/common';
     MatIconButton,
     NgOptimizedImage,
     MatButton,
-    MatAnchor
+    MatAnchor,
+    RouterLink
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
