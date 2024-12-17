@@ -1,8 +1,25 @@
 .title-field {
-  flex: 0 0 75%;
+  flex: 0.8;
 }
 
 .type-field {
-  flex: 0 0 25%;
+  flex: 0.2;
   min-width: 200px;
+}
+
+.save-button {
+  background-color: #4c9a64;
+  color: white;
+  min-width: 180px;
+}
+
+.save-button:disabled {
+  background-color: #88a68f;
+  color: #ffffff;
+}
+
+.deny-button {
+  background-color: #5e636e;
+  color: white;
+  min-width: 180px;
 }

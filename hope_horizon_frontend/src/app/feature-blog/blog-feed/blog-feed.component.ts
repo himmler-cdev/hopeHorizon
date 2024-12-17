@@ -18,8 +18,8 @@ export class BlogFeedComponent implements OnInit {
   }
 
   ngOnInit() {
-    this._blogPostService.getBlogPosts().subscribe((blogPosts) => {
-      blogPosts.map((blogPost) => {
+    this._blogPostService.getBlogPosts().subscribe((response) => {
+      response.blog_posts.map((blogPost) => {
         this.blogPostList.push(BlogPostEntity.fromDto(blogPost));
       });
     });

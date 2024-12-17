@@ -1,10 +1,21 @@
-<form [formGroup]="blogFormGroup" (ngSubmit)="createOrUpdate()" class="m-3 px-3 me-5">
+<form [formGroup]="blogFormGroup" class="m-3 px-3 me-5">
   <!-- Title and Select -->
-  <div class="d-flex flex-column flex-md-row gap-2">
-    <div class="title-field me-md-2">
+  <div class="d-flex flex-column flex-md-row">
+    <div class="title-field me-md-4">
       <mat-form-field class="w-100" appearance="outline">
         <mat-label>Title</mat-label>
         <input matInput formControlName="title"/>
+
+        <!-- Error Message -->
+        @if (blogFormGroup.controls['title'].hasError('required')) {
+          <mat-error>Title is required</mat-error>
+        }
+        @if (blogFormGroup.controls['title'].hasError('maxlength')) {
+          <mat-error>Title cannot be more than 250 characters</mat-error>
+        }
+        @if (blogFormGroup.controls['title'].hasError('whitespace')) {
+          <mat-error>Title cannot be all whitespace. It must contain at least one non-whitespace character</mat-error>
+        }
       </mat-form-field>
     </div>
     <div class="type-field">
@@ -15,8 +26,61 @@
             <mat-option value="{{ option.id }}">{{ option.type }}</mat-option>
           }
         </mat-select>
+
+        <!-- Error Message -->
+        @if (blogFormGroup.controls['blogPostTypeId'].hasError('required')) {
+          <mat-error>Type is required</mat-error>
+        }
       </mat-form-field>
     </div>
   </div>
 
+  <!-- Content -->
+  <div class="mt-2">
+    <mat-form-field class="w-100" appearance="outline">
+      <mat-label>Content</mat-label>
+      <textarea matInput formControlName="content" rows="20">
+      </textarea>
+
+      <!-- Error Message -->
+      @if (blogFormGroup.controls['content'].hasError('required')) {
+        <mat-error>Content is required</mat-error>
+      }
+      @if (blogFormGroup.controls['content'].hasError('whitespace')) {
+        <mat-error>Content cannot be all whitespace. It must contain at least one non-whitespace character</mat-error>
+      }
+    </mat-form-field>
+  </div>
+
+  <!-- Cancel/Clear and Submit Buttons -->
+  <div class="mt-2">
+    @if (blogPostId) {
+      <!-- Edit Mode -->
+      <div>
+        <button mat-raised-button color="primary" class="deny-button mat-elevation-z3 me-3" (click)="openDeleteDialog()">
+          Delete Blog
+        </button>
+      </div>
+      <div class="d-flex justify-content-end align-items-end">
+        <button mat-raised-button color="primary" class="deny-button mat-elevation-z3 me-3" (click)="openCancelDialog()">
+          Cancel
+        </button>
+        <button mat-raised-button color="primary" class="save-button mat-elevation-z3" [disabled]="!blogFormGroup.valid"
+                (click)="createOrUpdate()">
+          Update Blog
+        </button>
+      </div>
+    } @else {
+      <!-- Create Mode -->
+      <div class="d-flex justify-content-end align-items-end">
+        <button mat-raised-button color="primary" class="deny-button mat-elevation-z3 me-3" (click)="openCancelDialog()">
+          Clear
+        </button>
+        <button mat-raised-button color="primary" class="save-button mat-elevation-z3" [disabled]="!blogFormGroup.valid"
+                (click)="createOrUpdate()">
+          Create Blog
+        </button>
+      </div>
+    }
+  </div>
 </form>
