@@ -58,7 +58,7 @@ class GroupUserViewSet(viewsets.ModelViewSet):
                 user_id=new_group_user,  # Notify the blog post owner
                 group_id=group
                 )
-            GroupUser.objects.create(group_id=group, user_id=new_group_user, is_owner=False, is_active=True)
+            GroupUser.objects.create(group_id=group, user_id=new_group_user, is_owner=False, is_active=False)
 
         #TODO: Notifications
         return Response({"detail": "User(s) added successfully"}, status=status.HTTP_204_NO_CONTENT)

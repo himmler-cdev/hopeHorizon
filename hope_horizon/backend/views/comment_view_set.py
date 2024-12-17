@@ -84,9 +84,6 @@ class CommentViewSet(viewsets.ModelViewSet):
                 ):
             return Response({"detail": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
 
-        #TODO: create notification here once implemented
-        #TODO: can only comment on group post if in group (not implemented yet)
-
         comment = serializer.save(user_id=request.user)
 
         Notification.objects.create(
