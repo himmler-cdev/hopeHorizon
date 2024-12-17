@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from django.core.paginator import Paginator
 from backend.models import Comment
 from backend.models import BlogPost
+from backend.models import Notification
 from backend.serializers import CommentSerializer
 from rest_framework.permissions import IsAuthenticated
 
@@ -86,7 +87,16 @@ class CommentViewSet(viewsets.ModelViewSet):
         #TODO: create notification here once implemented
         #TODO: can only comment on group post if in group (not implemented yet)
 
-        serializer.save(user_id=request.user)
+        comment = serializer.save(user_id=request.user)
+
+        Notification.objects.create(
+        is_read=False,
+        content=f"A new comment was added to your blog post: {blog_post.title}",
+        user_id=blog_post.user_id,  # Notify the blog post owner
+        comment_id=comment,  # Reference the created comment
+        group_id=blog_post.group_id if hasattr(blog_post, 'group_id') else None  # Optional group association
+        )
+
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
