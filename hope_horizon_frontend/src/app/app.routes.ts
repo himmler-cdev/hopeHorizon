@@ -7,8 +7,12 @@ import {BlogListEditComponent} from './feature-blog/blog-list-edit/blog-list-edi
 import {BlogFeedComponent} from './feature-blog/blog-feed/blog-feed.component';
 import {BlogJournalComponent} from './feature-blog/blog-journal/blog-journal.component';
 import {BlogFormComponent} from './feature-blog/blog-form/blog-form.component';
+import {BlogDetailComponent} from './feature-blog/blog-detail/blog-detail.component';
 
 export const routes: Routes = [
+  /**
+   * Blog routes
+   */
   //{ path: '**', redirectTo: '/blog-list' }, // TODO: 404 page
   { path: '', redirectTo: '/blog-list', pathMatch: 'full' }, // TODO: home page
   { path: 'login', component: UserLoginComponent },
@@ -18,5 +22,10 @@ export const routes: Routes = [
   {path: 'feed', component: BlogFeedComponent},
   {path: 'journal', component: BlogJournalComponent},
   {path: 'blog/create', component: BlogFormComponent},
-  {path: 'blog/edit/:id', component: BlogFormComponent}
+  {path: 'blog/edit/:id', component: BlogFormComponent},
+  {path: 'blog/:id', component: BlogDetailComponent}
+
+  /**
+   * TODO: YOUR ROUTES @Kamilo, @David
+   */
 ];
