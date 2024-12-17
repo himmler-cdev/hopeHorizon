@@ -1,3 +1,5 @@
+import {BlogPostTypeDto} from './blog-post-type.dto';
+
 export interface BlogPostDto {
   id?: number;
   title?: string;
@@ -15,4 +17,8 @@ export interface BlogPostsDto {
     page_size: number;
     total_size: number;
   }
+}
+
+export interface BlogPostsDto {
+  blog_posts: BlogPostDto[];
 }
