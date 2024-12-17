@@ -70,7 +70,7 @@ export class BlogFormComponent implements OnInit {
     return entity;
   }
 
-  createOrUpdate() {
+  protected createOrUpdate() {
     if (this.blogFormGroup.invalid) {
       return;
     }
@@ -92,7 +92,7 @@ export class BlogFormComponent implements OnInit {
   protected openDeleteDialog() {
     const dialogRef = this._dialog.open(ConfirmDialogComponent, {
       data: {
-        title: 'Delete Blog Post?',
+        title: 'Delete Blog Post',
         message: 'Are you sure you want to delete this blog post?',
         confirmText: 'Delete',
         cancelText: 'Cancel'
@@ -109,7 +109,7 @@ export class BlogFormComponent implements OnInit {
   protected openCancelDialog() {
     const dialogRef = this._dialog.open(ConfirmDialogComponent, {
       data: {
-        title: 'Clear Form?',
+        title: 'Clear Form',
         message: 'Are you sure you want to clear the form?',
         confirmText: 'Clear',
         cancelText: 'Cancel'
@@ -127,7 +127,7 @@ export class BlogFormComponent implements OnInit {
     this.blogFormGroup.reset();
   }
 
-  protected _deleteBlogPost() {
+  private _deleteBlogPost() {
     if (!this.blogPostId) {
       return;
     }

@@ -31,7 +31,7 @@ export class ConfirmDialogComponent {
   readonly data  = inject<ConfirmDialogData>(MAT_DIALOG_DATA);
   readonly dialogRef = inject(MatDialogRef<ConfirmDialogComponent>);
 
-  onCancel() {
+  protected onCancel() {
     this.dialogRef.close();
   }
 }

@@ -1,5 +1,3 @@
-import {BlogPostTypeDto} from './blog-post-type.dto';
-
 export interface BlogPostDto {
   id?: number;
   title?: string;
