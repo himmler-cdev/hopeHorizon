@@ -1,5 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+from backend.models.notification import Notification
 from backend.serializers import GroupUserSerializer
 from backend.models import CustomGroup, GroupUser, User
 from rest_framework.permissions import IsAuthenticated
@@ -51,7 +52,13 @@ class GroupUserViewSet(viewsets.ModelViewSet):
             if GroupUser.objects.filter(group_id=group, user_id=new_group_user).exists():
                 return Response({"detail": "User already exists in the group"}, status=status.HTTP_400_BAD_REQUEST)
             # add the user to the group
-            GroupUser.objects.create(group_id=group, user_id=new_group_user, is_owner=False, is_active=True)
+            Notification.objects.create(
+                is_read=False,
+                content=f"You have been invited to group: {group.name}",
+                user_id=new_group_user,  # Notify the blog post owner
+                group_id=group
+                )
+            GroupUser.objects.create(group_id=group, user_id=new_group_user, is_owner=False, is_active=False)
 
         #TODO: Notifications
         return Response({"detail": "User(s) added successfully"}, status=status.HTTP_204_NO_CONTENT)

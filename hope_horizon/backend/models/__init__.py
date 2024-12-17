@@ -7,3 +7,4 @@ from .comment import Comment
 from .blog_post import BlogPost
 from .group import CustomGroup
 from .group_user import GroupUser
+from .notification import Notification

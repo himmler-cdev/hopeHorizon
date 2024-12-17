@@ -10,3 +10,4 @@ from .blog_post_serializer import BlogPostSerializer, BlogPostListSerializer
 from .group_serializer import GroupSerializer
 from .group_user_serializer import GroupUserSerializer
 from .comment_serializer import CommentSerializer
+from .notification_serializer import NotificationSerializer
