@@ -16,6 +16,7 @@ export class BlogPostTypeService {
     if (this._cachedBlogPostTypes) {
       return of(this._cachedBlogPostTypes);
     }
+
     return this._http.get<Readonly<BlogPostTypesDto>>('/api/blog_post_type/').pipe(
       tap(data => this._cachedBlogPostTypes = data)
     );
