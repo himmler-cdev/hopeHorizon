@@ -1,7 +1,7 @@
 from django.db import models
 from .blog_post_type import BlogPostType
 from .user import User
-from .group import CustomGroup
+from .forum import Forum
 
 
 class BlogPost(models.Model):
@@ -10,4 +10,4 @@ class BlogPost(models.Model):
     content = models.TextField()
     blog_post_type_id = models.ForeignKey(BlogPostType, on_delete=models.PROTECT, null=True)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    group_id = models.ForeignKey(CustomGroup, on_delete=models.CASCADE, null=True)
+    forum_id = models.ForeignKey(Forum, on_delete=models.CASCADE, null=True)

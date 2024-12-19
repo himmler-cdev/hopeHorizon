@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from backend.models import BlogPost, BlogPostType, UserRole, GroupUser, CustomGroup
+from backend.models import BlogPost, BlogPostType, UserRole, ForumUser, Forum
 from backend.serializers import BlogPostSerializer, BlogPostListSerializer
 
 
@@ -28,7 +28,7 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         blog_post_type_id = request.GET.get('blog_post_type_id', None)
         owned = request.GET.get('owned', None)
         workspace = request.GET.get('workspace', None)
-        group_name = request.GET.get('group_name', None)
+        forum_name = request.GET.get('forum_name', None)
 
         # Pagination
         if page < 1:
@@ -53,17 +53,17 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         if workspace is not None and workspace.lower() not in ['true', 'false']:
             return Response({"detail": "Invalid value for workspace parameter"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Group filtering
-        if blog_post_type_id == BlogPostType.objects.get(type="Group").id:
-            if group_name is not None:
-                group = CustomGroup.objects.filter(name__icontains=group_name).first()
-                if group and GroupUser.objects.filter(group_id=group.id, user_id=request.user.id, is_active=True).exists():
-                    blog_posts = blog_posts.filter(group_id=group.id)
+        # Forum filtering
+        if blog_post_type_id == BlogPostType.objects.get(type="Forum").id:
+            if forum_name is not None:
+                forum = Forum.objects.filter(name__icontains=forum_name).first()
+                if forum and ForumUser.objects.filter(forum_id=forum.id, user_id=request.user.id, is_active=True).exists():
+                    blog_posts = blog_posts.filter(forum_id=forum.id)
                 else:
-                    return Response({"detail": "You are not a member of the requested group or the group does not exist"}, status=status.HTTP_403_FORBIDDEN)
+                    return Response({"detail": "You are not a member of the requested forum or the forum does not exist"}, status=status.HTTP_403_FORBIDDEN)
             else:
-                group_ids = GroupUser.objects.filter(user_id=request.user.id, is_active=True).values_list('group_id', flat=True)
-                blog_posts = blog_posts.filter(group_id__in=group_ids)
+                forum_ids = ForumUser.objects.filter(user_id=request.user.id, is_active=True).values_list('forum_id', flat=True)
+                blog_posts = blog_posts.filter(forum_id__in=forum_ids)
         # Check if user is a therapist
         elif request.user.user_role_id == UserRole.objects.get(role="Therapist"):
             blog_posts = self._filter_for_therapist(blog_posts, workspace)
@@ -111,9 +111,9 @@ class BlogPostViewSet(viewsets.ModelViewSet):
             serializer = self.serializers["default"](blog_post)
             return Response(serializer.data, status=status.HTTP_200_OK)
         
-        # Check if user is in group of the blog_post
-        group_users = GroupUser.objects.filter(group_id=blog_post.group_id, user_id=request.user.id, is_active=True)
-        if blog_post.blog_post_type_id == BlogPostType.objects.get(type="Group") and group_users.exists():
+        # Check if user is in forum of the blog_post
+        forum_users = ForumUser.objects.filter(forum_id=blog_post.forum_id, user_id=request.user.id, is_active=True)
+        if blog_post.blog_post_type_id == BlogPostType.objects.get(type="Forum") and forum_users.exists():
             serializer = self.serializers["default"](blog_post)
             return Response(serializer.data, status=status.HTTP_200_OK)
     
@@ -124,15 +124,15 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         if not serializer.is_valid():
             return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check if user tries to create a group blog post
-        if request.data.get('blog_post_type_id', None) == BlogPostType.objects.get(type="Group").id:
+        # Check if user tries to create a forum blog post
+        if request.data.get('blog_post_type_id', None) == BlogPostType.objects.get(type="Forum").id:
             try:
-                CustomGroup.objects.get(id=request.data.get('group_id'))
-            except CustomGroup.DoesNotExist:
-                return Response({"detail": "Invalid group id"}, status=status.HTTP_400_BAD_REQUEST)
-            serializer.save(user_id=request.user, group_id_id=request.data.get('group_id'))
+                Forum.objects.get(id=request.data.get('forum_id'))
+            except Forum.DoesNotExist:
+                return Response({"detail": "Invalid forum id"}, status=status.HTTP_400_BAD_REQUEST)
+            serializer.save(user_id=request.user, forum_id_id=request.data.get('forum_id'))
         else:
-            serializer.save(user_id=request.user, group_id=None)
+            serializer.save(user_id=request.user, forum_id=None)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -149,15 +149,15 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         if not serializer.is_valid():
             return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Check if user tries to create a group blog post
-        if request.data.get('blog_post_type_id', None) == BlogPostType.objects.get(type="Group").id:
+        # Check if user tries to create a forum blog post
+        if request.data.get('blog_post_type_id', None) == BlogPostType.objects.get(type="Forum").id:
             try:
-                CustomGroup.objects.get(id=request.data.get('group_id'))
-            except CustomGroup.DoesNotExist:
-                return Response({"detail": "Invalid group id"}, status=status.HTTP_400_BAD_REQUEST)
-            serializer.save(group_id_id=request.data.get('group_id'))
+                Forum.objects.get(id=request.data.get('forum_id'))
+            except Forum.DoesNotExist:
+                return Response({"detail": "Invalid forum id"}, status=status.HTTP_400_BAD_REQUEST)
+            serializer.save(forum_id_id=request.data.get('forum_id'))
         else:
-            serializer.save(group_id=None)
+            serializer.save(forum_id=None)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
     

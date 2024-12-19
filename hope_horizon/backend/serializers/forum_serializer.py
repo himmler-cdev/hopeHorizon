@@ -1,10 +1,10 @@
 from rest_framework import serializers
-from backend.models import CustomGroup
+from backend.models import Forum
 
 
-class GroupSerializer(serializers.ModelSerializer):
+class ForumSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomGroup
+        model = Forum
         fields = ["id", "name", "description"]
         read_only_fields = ["id"]
         extra_kwargs = {
