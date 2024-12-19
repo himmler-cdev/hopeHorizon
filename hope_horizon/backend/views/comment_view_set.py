@@ -87,11 +87,11 @@ class CommentViewSet(viewsets.ModelViewSet):
         comment = serializer.save(user_id=request.user)
 
         Notification.objects.create(
-        is_read=False,
-        content=f"A new comment was added to your blog post: {blog_post.title}",
-        user_id=blog_post.user_id,  # Notify the blog post owner
-        comment_id=comment,  # Reference the created comment
-        group_id=blog_post.group_id if hasattr(blog_post, 'group_id') else None  # Optional group association
+            is_read=False,
+            content=f"A new comment was added to your blog post: {blog_post.title}",
+            user_id=blog_post.user_id,  # Notify the blog post owner
+            comment_id=comment,  # Reference the created comment
+            group_id=blog_post.group_id if hasattr(blog_post, 'group_id') else None  # Optional group association
         )
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
