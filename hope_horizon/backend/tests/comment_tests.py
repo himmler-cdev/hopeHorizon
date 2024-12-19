@@ -5,6 +5,8 @@ from backend.models import BlogPost
 from backend.models import Comment
 from backend.models import User
 from backend.models.blog_post_type import BlogPostType
+from backend.models.group import CustomGroup
+from backend.models.group_user import GroupUser
 from backend.models.user_role import UserRole
 from datetime import date
 
@@ -323,6 +325,30 @@ class CommentTests(TestCase):
         response = self.client.post("/api/comment/", data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+    def test_create_comment_group_user(self):
+        # Test creating a comment on a blog post in a group
+        self.client.logout()
+        self.client.login(username="testuser", password="password")
+        group = CustomGroup.objects.create(name="Test Group", description="Test Description")
+        GroupUser.objects.create(user_id=self.user, group_id=group, is_owner=True, is_active=True)
+        
+        blogpost5 = BlogPost.objects.create( 
+            title="Test Blog",
+            content="Test Content",
+            user_id=self.user,
+            blog_post_type_id=BlogPostType.objects.get(type="Public")
+            )
+        
+        blogpost5.group_id = CustomGroup.objects.get(name="Test Group")
+
+        data = {
+            "blog_post_id": blogpost5.id,
+            "content": "New Comment",
+        }
+
+        response = self.client.post("/api/comment/", data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
     def test_create_comment_bad_request_content(self):
         # Test creating a comment without content
         data = {
@@ -338,7 +364,7 @@ class CommentTests(TestCase):
         }
         response = self.client.post("/api/comment/", data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    
+
     def test_create_comment_private_blog_post(self):
         # Test creating a comment on a private blog post
         self.client.logout()
