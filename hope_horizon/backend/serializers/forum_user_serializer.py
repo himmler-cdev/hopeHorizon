@@ -1,11 +1,10 @@
 from rest_framework import serializers
-from backend.models import GroupUser
-from .user_serializer import UserListSerializer
+from backend.models import ForumUser
 
-class GroupUserSerializer(serializers.ModelSerializer):
+class ForumUserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user_id.username', read_only=True)
     class Meta:
-        model = GroupUser
+        model = ForumUser
         fields = ["id", "user_id", "username"]
         read_only_fields = ["id"]
 

@@ -38,33 +38,33 @@ class UserStatusTests(APITestCase):
     def test_list_user_statuses_unauthenticated(self):
         self.client.logout()
         response = self.client.get(
-            "/api/user_status/", {"from": "2000-01-01"}, follow=True
+            "/api/user-status/", {"from": "2000-01-01"}, follow=True
         )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     # query parameters are invalid
     def test_list_user_statuses_invalid_parameters(self):
-        response = self.client.get("/api/user_status/", follow=True)
+        response = self.client.get("/api/user-status/", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     # query parameters from date is invalid
     def test_list_user_statuses_invalid_from_date(self):
-        response = self.client.get("/api/user_status/", {"from": "thisIsNotADate"}, follow=True)
+        response = self.client.get("/api/user-status/", {"from": "thisIsNotADate"}, follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     # query parameters to date is invalid
     def test_list_user_statuses_invalid_to_date(self):
-        response = self.client.get("/api/user_status/", {"from": "1990-01-01", "to": "thisIsNotADate"}, follow=True)
+        response = self.client.get("/api/user-status/", {"from": "1990-01-01", "to": "thisIsNotADate"}, follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     # query parameters are valid
     def test_list_user_statuses_valid_parameters(self):
         response = self.client.post(
-            "/api/user_status/", self.test_user_status_dict, format="json", follow=True
+            "/api/user-status/", self.test_user_status_dict, format="json", follow=True
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         response = self.client.get(
-            "/api/user_status/", {"from": "1990-01-01"}, follow=True
+            "/api/user-status/", {"from": "1990-01-01"}, follow=True
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["user_statuses"]), 1)
@@ -75,7 +75,7 @@ class UserStatusTests(APITestCase):
         start_date = dt.date(2000, 1, 1)
         self._add_and_test_user_statuses(100, start_date)
         response = self.client.get(
-            "/api/user_status/", {"from": "2000-01-01"}, follow=True
+            "/api/user-status/", {"from": "2000-01-01"}, follow=True
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["user_statuses"]), 100)
@@ -89,7 +89,7 @@ class UserStatusTests(APITestCase):
         start_date = dt.date(2000, 1, 1)
         self._add_and_test_user_statuses(100, start_date)
         response = self.client.get(
-            "/api/user_status/", {"from": "2000-01-01", "to": "2000-01-20"}, follow=True
+            "/api/user-status/", {"from": "2000-01-01", "to": "2000-01-20"}, follow=True
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["user_statuses"]), 20)
@@ -103,7 +103,7 @@ class UserStatusTests(APITestCase):
         start_date = dt.date(2000, 1, 1)
         self._add_and_test_user_statuses(100, start_date)
         response = self.client.get(
-            "/api/user_status/", {"from": "2000-01-20", "to": "2000-01-10"}, follow=True
+            "/api/user-status/", {"from": "2000-01-20", "to": "2000-01-10"}, follow=True
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["user_statuses"]), 0)
@@ -116,7 +116,7 @@ class UserStatusTests(APITestCase):
     def test_create_user_status_unauthenticated(self):
         self.client.logout()
         response = self.client.post(
-            "/api/user_status/", self.test_user_status_dict, format="json", follow=True
+            "/api/user-status/", self.test_user_status_dict, format="json", follow=True
         )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -124,14 +124,14 @@ class UserStatusTests(APITestCase):
     def test_create_user_status_invalid_data(self):
         self.test_user_status_dict.pop("mood")
         response = self.client.post(
-            "/api/user_status/", self.test_user_status_dict, format="json", follow=True
+            "/api/user-status/", self.test_user_status_dict, format="json", follow=True
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     # data is valid
     def test_create_user_status_valid_data(self):
         response = self.client.post(
-            "/api/user_status/", self.test_user_status_dict, format="json", follow=True
+            "/api/user-status/", self.test_user_status_dict, format="json", follow=True
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self._validate_data(response.data, dt.date.today())
@@ -139,11 +139,11 @@ class UserStatusTests(APITestCase):
     # data is valid and entry already exists
     def test_create_user_status_entry_exists(self):
         response = self.client.post(
-            "/api/user_status/", self.test_user_status_dict, format="json", follow=True
+            "/api/user-status/", self.test_user_status_dict, format="json", follow=True
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         response = self.client.post(
-            "/api/user_status/", self.test_user_status_dict, format="json", follow=True
+            "/api/user-status/", self.test_user_status_dict, format="json", follow=True
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -178,12 +178,12 @@ class UserStatusTests(APITestCase):
         self.client.login(username="testuser", password="testpassword")
         for i in range(num_entries):
             response = self.client.post(
-                "/api/user_status/", self.test_user_status_dict, format="json", follow=True
+                "/api/user-status/", self.test_user_status_dict, format="json", follow=True
             )
             if response.status_code == status.HTTP_401_UNAUTHORIZED:
                 self.client.login(username="testuser", password="testpassword")
                 response = self.client.post(
-                    "/api/user_status/",
+                    "/api/user-status/",
                     self.test_user_status_dict,
                     format="json",
                     follow=True,

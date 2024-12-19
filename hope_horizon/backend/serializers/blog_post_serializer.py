@@ -5,13 +5,13 @@ from backend.models import BlogPost
 class BlogPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlogPost
-        fields = ["id", "date", "title", "content", "blog_post_type_id", "group_id"]
+        fields = ["id", "date", "title", "content", "blog_post_type_id", "forum_id"]
         extra_kwargs = {
             "title": {"required": True},
             "content": {"required": True},
             "blog_post_type_id": {"required": True}
         }
-        read_only_fields = ["id", "date", "group_id"]
+        read_only_fields = ["id", "date", "forum_id"]
 
 class BlogPostListSerializer(serializers.Serializer):
     page_information = serializers.SerializerMethodField()

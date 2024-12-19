@@ -1,9 +1,9 @@
 from django.db import models
-from backend.models.user import User
-from backend.models.group import CustomGroup
+from .user import User
+from .forum import Forum
 
-class GroupUser(models.Model):
+class ForumUser(models.Model):
     is_owner = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    group_id = models.ForeignKey(CustomGroup, on_delete=models.PROTECT)
+    forum_id = models.ForeignKey(Forum, on_delete=models.PROTECT)
     user_id = models.ForeignKey(User, on_delete=models.PROTECT)
