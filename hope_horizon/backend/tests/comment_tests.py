@@ -1,13 +1,7 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
-from backend.models import BlogPost
-from backend.models import Comment
-from backend.models import User
-from backend.models.blog_post_type import BlogPostType
-from backend.models.group import CustomGroup
-from backend.models.group_user import GroupUser
-from backend.models.user_role import UserRole
+from backend.models import *
 from datetime import date
 
 class CommentTests(TestCase):
@@ -88,7 +82,7 @@ class CommentTests(TestCase):
         self.client.login(username="testuser", password="password")
 
     ###########################################################################################################
-    #                                Group "GET(retrieve)" method tests                                       #
+    #                                Comment "GET(retrieve)" method tests                                       #
     ###########################################################################################################
 
     def test_get_comment_unauthenticated(self):
@@ -160,7 +154,7 @@ class CommentTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     ###########################################################################################################
-    #                                Group "GET(list)" method tests                                           #
+    #                                Comment "GET(list)" method tests                                           #
     ###########################################################################################################
 
     def test_get_comments_list_unauthenticated(self):
@@ -325,12 +319,12 @@ class CommentTests(TestCase):
         response = self.client.post("/api/comment/", data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_create_comment_group_user(self):
-        # Test creating a comment on a blog post in a group
+    def test_create_comment_forum_user(self):
+        # Test creating a comment on a blog post in a forum
         self.client.logout()
         self.client.login(username="testuser", password="password")
-        group = CustomGroup.objects.create(name="Test Group", description="Test Description")
-        GroupUser.objects.create(user_id=self.user, group_id=group, is_owner=True, is_active=True)
+        forum = Forum.objects.create(name="Test Forum", description="Test Description")
+        ForumUser.objects.create(user_id=self.user, forum_id=forum, is_owner=True, is_active=True)
         
         blogpost5 = BlogPost.objects.create( 
             title="Test Blog",
@@ -339,7 +333,7 @@ class CommentTests(TestCase):
             blog_post_type_id=BlogPostType.objects.get(type="Public")
             )
         
-        blogpost5.group_id = CustomGroup.objects.get(name="Test Group")
+        blogpost5.forum_id = Forum.objects.get(name="Test Forum")
 
         data = {
             "blog_post_id": blogpost5.id,

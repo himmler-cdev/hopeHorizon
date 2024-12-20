@@ -1,14 +1,7 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
-from backend.models import BlogPost
-from backend.models import Comment
-from backend.models import User
-from backend.models.blog_post_type import BlogPostType
-from backend.models.group import CustomGroup
-from backend.models.group_user import GroupUser
-from backend.models.notification import Notification
-from backend.models.user_role import UserRole
+from backend.models import *
 from datetime import date
 
 
@@ -57,7 +50,7 @@ class NotificationTests(TestCase):
         self.client.login(username="testuser", password="password")
 
     ###########################################################################################################
-    #                                Group "GET(list)" method tests                                           #
+    #                                Notification "GET(list)" method tests                                           #
     ###########################################################################################################
 
     def test_get_notifications_list_unauthenticated(self):
@@ -81,15 +74,15 @@ class NotificationTests(TestCase):
         self.assertEqual(notification["user_id"], self.user.id)
         self.assertFalse(notification["is_read"])
 
-    def test_get_notifications_list_group_invitation(self):
-        # Test to verify that a group invitation creats a notification
+    def test_get_notifications_list_forum_invitation(self):
+        # Test to verify that a forum invitation creats a notification
         self.client.logout()
         self.client.login(username="testuser2", password="password")
-        group = CustomGroup.objects.create(name="Test Group", description="Test Description")
+        forum = Forum.objects.create(name="Test Forum", description="Test Description")
 
-        GroupUser.objects.create(user_id=self.user2, group_id=group, is_owner=True, is_active=True)
-        data = {"group_id": 1,"users": [self.user.id]}
-        response = self.client.post("/api/group_user/", data)
+        ForumUser.objects.create(user_id=self.user2, forum_id=forum, is_owner=True, is_active=True)
+        data = {"forum_id": 1,"users": [self.user.id]}
+        response = self.client.post("/api/forum-user/", data)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         self.client.logout()
@@ -98,7 +91,7 @@ class NotificationTests(TestCase):
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         notification = response.data["notifications"][1]
-        self.assertEqual(notification["content"], f"You have been invited to group: {group.name}")
+        self.assertEqual(notification["content"], f"You have been invited to forum: {forum.name}")
         self.assertEqual(notification["user_id"], self.user.id)
         self.assertFalse(notification["is_read"])
 

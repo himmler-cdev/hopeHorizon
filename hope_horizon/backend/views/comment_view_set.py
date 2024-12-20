@@ -91,7 +91,7 @@ class CommentViewSet(viewsets.ModelViewSet):
             content=f"A new comment was added to your blog post: {blog_post.title}",
             user_id=blog_post.user_id,  # Notify the blog post owner
             comment_id=comment,  # Reference the created comment
-            group_id=blog_post.group_id if hasattr(blog_post, 'group_id') else None  # Optional group association
+            forum_id=blog_post.forum_id if hasattr(blog_post, 'forum_id') else None  # Optional forum association
         )
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
