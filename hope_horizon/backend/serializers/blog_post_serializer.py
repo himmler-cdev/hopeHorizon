@@ -21,7 +21,7 @@ class BlogPostListSerializer(serializers.Serializer):
         return {
             "page": obj.get('page', 1),
             "page_size": obj.get('page_size', 10),
-            "actualSize": len(obj.get('blog_posts', []))
+            "actual_size": len(obj.get('blog_posts', []))
         }
 
     class Meta:

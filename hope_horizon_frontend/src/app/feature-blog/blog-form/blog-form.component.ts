@@ -124,6 +124,7 @@ export class BlogFormComponent implements OnInit {
   }
 
   private _clearForm() {
+    // TODO: Discuss clear strategy with team
     this.blogFormGroup.reset();
   }
 

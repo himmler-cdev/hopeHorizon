@@ -88,7 +88,7 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         data = {
             "page": page,
             "page_size": page_size,
-            "actualSize": totalPosts,
+            "actual_size": totalPosts,
             "blog_posts": blog_posts
         }
 
