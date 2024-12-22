@@ -34,20 +34,10 @@ export class UserLoginComponent {
 
   onLogin() {
     if (this.loginForm.valid) {
-      const { username, password } = this.loginForm.value;
-      this.userService.login(username, password).subscribe(
-        response => {
-          console.log('Login successful', response);
-          this.errorMessage = ''; // Clear any previous error message
-          localStorage.setItem('access_token', response.access);
-          localStorage.setItem('refresh_token', response.refresh);
-          this.router.navigate(['/home']);
-        },
-        error => {
-          console.error('Login failed', error);
-          this.errorMessage = error.error.detail;
-        }
-      );
+      let res = this.userService.login(this.loginForm.value)
+      if (!res) {
+        this.errorMessage = 'Invalid username or password';
+      } 
     } else {
       this.errorMessage = '';
     }

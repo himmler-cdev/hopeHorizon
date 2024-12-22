@@ -6,7 +6,7 @@ export class UserEntity {
     password?: string;
     email?: string;
     birthdate?: Date;
-    user_role_id?: number;
+    user_role?: string;
 
     toDto(): UserDto {
         return {
@@ -15,7 +15,6 @@ export class UserEntity {
             password: this.password,
             email: this.email,
             birthdate: this.birthdate?.toISOString(),
-            user_role_id: this.user_role_id
         };
     }
 
@@ -26,7 +25,7 @@ export class UserEntity {
         entity.password = dto.password;
         entity.email = dto.email;
         entity.birthdate = dto.birthdate ? new Date(dto.birthdate) : undefined;
-        entity.user_role_id = dto.user_role_id;
+        entity.user_role = dto.user_role;
         return entity;
     }
 }

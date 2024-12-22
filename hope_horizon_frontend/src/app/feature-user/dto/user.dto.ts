@@ -4,5 +4,5 @@ export interface UserDto {
     password?: string;
     email?: string;
     birthdate?: string;
-    user_role_id?: number;
+    user_role?: string;
 }

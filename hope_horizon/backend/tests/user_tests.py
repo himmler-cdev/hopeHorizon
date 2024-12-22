@@ -12,7 +12,6 @@ class UserTests(APITestCase):
             "password": "testpassword",
             "email": "test@gmail.com",
             "birthdate": Date(1990, 1, 1).strftime("%Y-%m-%d"),
-            "user_role_id": UserRole.objects.get(role="User").id,
         }
 
     ###########################################################################################################
@@ -117,12 +116,6 @@ class UserTests(APITestCase):
         response = self.client.post("/api/user/", self.test_user_dict, format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # test user creation with invalid data, invalid user_role_id
-    def test_create_user_invalid_user_role_id(self):
-        self.test_user_dict['user_role_id'] = 9999 # invalid user_role_id
-        response = self.client.post("/api/user/", self.test_user_dict, format="json", follow=True)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
     # test user creation with valid data, user already exists
     def test_create_user_user_exists(self):
         response = self.client.post("/api/user/", self.test_user_dict, format="json", follow=True)
@@ -178,15 +171,6 @@ class UserTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.client.login(username=self.test_user_dict["username"], password=self.test_user_dict["password"])
         self.test_user_dict['birthdate'] = ""
-        response = self.client.put(f"/api/user/{response.data["id"]}/", self.test_user_dict, format="json", follow=True)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    # test user update with invalid data, invalid user_role_id
-    def test_update_user_invalid_user_role_id(self):
-        response = self.client.post("/api/user/", self.test_user_dict, format="json", follow=True)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.client.login(username=self.test_user_dict["username"], password=self.test_user_dict["password"])
-        self.test_user_dict['user_role_id'] = 9999 # invalid user_role_id
         response = self.client.put(f"/api/user/{response.data["id"]}/", self.test_user_dict, format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -289,7 +273,7 @@ class UserTests(APITestCase):
         self.assertEqual(response_data["username"], self.test_user_dict["username"])
         self.assertEqual(response_data["email"], self.test_user_dict["email"])
         self.assertEqual(response_data["birthdate"], self.test_user_dict["birthdate"])
-        self.assertEqual(response_data["user_role_id"], self.test_user_dict["user_role_id"])
+        self.assertEqual(response_data["user_role"], "User")
 
     def _validate_user_list(self, usernames, response_data):
         for i in range(len(response_data)):
