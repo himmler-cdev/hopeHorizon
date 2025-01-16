@@ -1,0 +1,25 @@
+.title-field {
+  flex: 0.8;
+}
+
+.save-button {
+  background-color: #4c9a64;
+  color: white;
+  min-width: 180px;
+}
+
+.save-button:disabled {
+  background-color: #88a68f;
+  color: white;
+}
+
+.deny-button {
+  background-color: #5e636e;
+  color: white;
+  min-width: 180px;
+}
+
+.search-bar {
+  flex: 1 1 auto;
+  margin-right: 0.5rem;
+}

@@ -1,0 +1,48 @@
+<!-- Search Filter Users -->
+<div class="d-flex flex-row search-filter">
+  <div class="search-bar">
+    <mat-form-field class="w-100" appearance="outline">
+      <mat-label>Search for a User</mat-label>
+      <input matInput [formControl]="searchControl" />
+      @if (searchControl.value === '') {
+      <mat-icon matSuffix class="me-1">search</mat-icon>
+      } @else {
+      <button
+        mat-icon-button
+        matSuffix
+        class="me-1"
+        (click)="clearSearchFilter()"
+      >
+        <mat-icon>clear</mat-icon>
+      </button>
+      }
+    </mat-form-field>
+  </div>
+</div>
+
+<!-- Forum Users List -->
+@for (forumUser of forumUsers; track $index) {
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>{{ forumUser.username }}</mat-card-title>
+    <button mat-icon-button (click)="deleteUser(forumUser)">
+        <mat-icon>delete</mat-icon>
+      </button>
+  </mat-card-header>
+</mat-card>
+} 
+
+<!-- Selected Users List -->
+@if(selectedUsers.length > 0) {
+    <h3>Selected Users</h3>
+    @for (user of selectedUsers; track $index) {
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>{{ user.username }}</mat-card-title>
+          <button mat-icon-button (click)="removeUser(user)">
+            <mat-icon>clear</mat-icon>
+          </button>
+        </mat-card-header>
+      </mat-card>
+    }
+}

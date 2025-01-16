@@ -1,0 +1,52 @@
+import {Component, Input} from '@angular/core';
+import {DatePipe, NgClass} from '@angular/common';
+import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
+import {MatButton, MatIconButton} from '@angular/material/button';
+import {MatIcon} from '@angular/material/icon';
+import {MatFormField, MatLabel, MatSuffix} from '@angular/material/form-field';
+import {MatInput} from '@angular/material/input';
+import {MatOption, MatSelect} from '@angular/material/select';
+import {FormControl, ReactiveFormsModule} from '@angular/forms';
+import {MatChip} from '@angular/material/chips';
+import {RouterLink} from '@angular/router';
+import { ForumEntity } from '../entity/forum.entity';
+import { ForumListCardComponent } from "../forum-list-card/forum-list-card.component";
+
+@Component({
+  selector: 'app-forum-list',
+  standalone: true,
+  imports: [
+    MatCard,
+    MatCardTitle,
+    MatCardHeader,
+    MatCardContent,
+    MatIconButton,
+    MatIcon,
+    MatFormField,
+    MatInput,
+    MatSelect,
+    MatOption,
+    MatLabel,
+    MatSuffix,
+    ReactiveFormsModule,
+    MatChip,
+    NgClass,
+    MatButton,
+    RouterLink,
+    ForumListCardComponent
+],
+  templateUrl: './forum-list.component.html',
+  styleUrl: './forum-list.component.scss'
+})
+export class ForumListComponent {
+  @Input({required: true}) forumList!: ForumEntity[];
+  @Input() showFilter = true;
+  @Input() filterOptions: Array<string> = [];
+
+  searchControl = new FormControl('');
+  filterControl = new FormControl(null);
+
+  clearSearchFilter() {
+    this.searchControl.setValue('');
+  }
+}
