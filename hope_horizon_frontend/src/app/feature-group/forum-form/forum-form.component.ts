@@ -17,9 +17,10 @@ import { ConfirmDialogComponent } from '../../../shared/dialogs/confirm-dialog/c
 import { ForumService } from '../service/forum.service';
 import { ForumEntity } from '../entity/forum.entity';
 import { MatIcon } from '@angular/material/icon';
-import { ForumFormUserComponent } from '../forum-form-user/forum-form-user.component';
 import { ForumUserEntity } from '../entity/fourm-user.entity';
 import { ForumUserService } from '../service/forum-user.service';
+import { ForumChipsUserComponent } from '../forum-chips-user/forum-chips-user.component';
+import { MockData } from '../service/mockdata';
 
 @Component({
   selector: 'app-forum-form',
@@ -37,7 +38,7 @@ import { ForumUserService } from '../service/forum-user.service';
     MatButton,
     RouterLink,
     MatError,
-    ForumFormUserComponent,
+    ForumChipsUserComponent
   ],
   templateUrl: './forum-form.component.html',
   styleUrl: './forum-form.component.scss',
@@ -48,6 +49,10 @@ export class ForumFormComponent implements OnInit {
   searchControl = new FormControl('');
   forumUsers: ForumUserEntity[] = [];
   allUsers: ForumUserEntity[] = [];
+
+  private mockData = new MockData();
+  loggedInUser = this.mockData.loggedInUser;
+  
 
   constructor(
     private _forumService: ForumService,
@@ -91,6 +96,12 @@ export class ForumFormComponent implements OnInit {
   loadAllUsers() {
     this._forumUserService.getAllUsers().subscribe((users) => {
       users.forum_users.map((user) => {
+        if (user.user_id === this.loggedInUser.id) {
+          return; // Skip the logged in user
+        }
+        if (this.forumUsers.find((u) => u.id === user.user_id)) {
+          return; // Skip users already in the forum
+        }
         this.allUsers.push(ForumUserEntity.fromDto(user));
       });
   })};
@@ -98,6 +109,9 @@ export class ForumFormComponent implements OnInit {
   loadForumUsers(forumId: number) {
     this._forumUserService.getForumUsers(forumId).subscribe((users) => {
       users.forum_users.map((user) => {
+        if (user.user_id === this.loggedInUser.id) {
+          return; // Skip the logged in user
+        }
         this.forumUsers.push(ForumUserEntity.fromDto(user));
       });
     });

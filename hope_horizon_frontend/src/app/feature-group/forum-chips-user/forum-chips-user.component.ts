@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatIconButton, MatButton } from '@angular/material/button';
 import {
@@ -39,9 +39,10 @@ import { MatChipInputEvent, MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { map, startWith } from 'rxjs';
+import { MockData } from '../service/mockdata';
 
 @Component({
-  selector: 'app-forum-form-user',
+  selector: 'app-forum-chips-user',
   standalone: true,
   imports: [
     MatCard,
@@ -68,12 +69,69 @@ import { map, startWith } from 'rxjs';
     FormsModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './forum-form-user.component.html',
-  styleUrl: './forum-form-user.component.scss',
+  templateUrl: './forum-chips-user.component.html',
+  styleUrl: './forum-chips-user.component.scss',
 })
-export class ForumFormUserComponent {
+export class ForumChipsUserComponent {
   @Input({ required: true }) forumUsers!: ForumUserEntity[];
-  @Input({ required: true }) allUsers!: ForumUserEntity[]; //TODO: get all users from database
+  @Input({ required: true }) allUsers!: ForumUserEntity[];
+
+  //Output to return added or deleted users
+  @Output() usersUpdated = new EventEmitter<ForumUserEntity[]>();
+
+  readonly separatorKeysCodes: number[] = [ENTER, COMMA];
+  readonly currentUser = model('');
+  readonly actualUsers = signal(this.forumUsers);
+  readonly filteredUsers = computed(() => {
+    const currentUser = this.currentUser().toLowerCase();
+    return currentUser
+      ? this.allUsers.filter(user => user.username && user.username.toLowerCase().includes(currentUser))
+      : this.allUsers.map(user => user.username);
+    });
+
+  readonly announcer = inject(LiveAnnouncer);
+
+  add(event: MatChipInputEvent): void {
+    const value = (event.value || '').trim();
+
+    if (value) {
+      const newUser = this.allUsers.find(user => user.username === value);
+      if (newUser) {
+        this.actualUsers.update(user => [...user, newUser]);
+      }
+    }
+
+    // Clear the input value
+    this.currentUser.set('');
+  }
+
+  remove(user: ForumUserEntity): void {
+    this.actualUsers.update(users => {
+      const index = users.indexOf(user);
+      if (index < 0) {
+        return users;
+      }
+
+      users.splice(index, 1);
+      this.announcer.announce(`Removed ${user.username}`);
+      return [...users];
+    });
+  }
+
+  selected(event: MatAutocompleteSelectedEvent): void {
+    this.actualUsers.update(users => [...users, event.option.value]);
+    this.currentUser.set('');
+    event.option.deselect();
+  }
+}
+
+
+
+
+  /*
+  private mockData = new MockData();
+  forumId = this.mockData.forumList.forums.filter((f) => f.id === this.forumUsers[0].forum_id)[0].id;
+
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
   readonly currentUser = model('');
   readonly filteredUsers = computed(() => {
@@ -140,3 +198,4 @@ export class ForumFormUserComponent {
   }
 
 }
+  */

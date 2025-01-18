@@ -61,11 +61,11 @@ export class ForumService {
   
   }
 
-  deleteForum(id: number) {
+  deleteForum(id: number): Observable<void>{
     //return this._http.delete(`/api/forum/${id}/`);
     const index = this.forumList.forums.findIndex(forum => forum.id === id);
     this.forumList.forums.splice(index, 1);
     this.forumUserList.forum_users = this.forumUserList.forum_users.filter(forumUser => forumUser.forum_id !== id);
-    return of();
+    return of(void 0);
   }
 }

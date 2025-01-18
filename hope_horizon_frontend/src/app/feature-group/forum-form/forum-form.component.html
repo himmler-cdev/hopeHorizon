@@ -1,7 +1,7 @@
 <form [formGroup]="forumFormGroup" class="m-3 px-3 me-5">
   <!-- Title and Select -->
   <div class="d-flex flex-column flex-md-row">
-    <div class="title-field me-md-4">
+    <div class="title-field">
       <mat-form-field class="w-100" appearance="outline">
         <mat-label>Title</mat-label>
         <input matInput formControlName="name" />
@@ -25,7 +25,7 @@
   <div class="mt-2">
     <mat-form-field class="w-100" appearance="outline">
       <mat-label>Description</mat-label>
-      <textarea matInput formControlName="description" rows="20"> </textarea>
+      <textarea matInput formControlName="description" rows="10"> </textarea>
 
       <!-- Error Message -->
       @if (forumFormGroup.controls['description'].hasError('required')) {
@@ -40,10 +40,10 @@
   </div>
 
 
-  <!-- Forum Users -->
-  <app-forum-form-user [forumUsers]="forumUsers" [allUsers]="allUsers"></app-forum-form-user>
+  <!-- Forum Users 
+  <app-forum-chips-user [forumUsers]="forumUsers" [allUsers]="allUsers"></app-forum-chips-user>
 
-
+  -->
   <!-- Cancel/Clear and Submit Buttons -->
   <div class="mt-2">
     @if (forumId) {
