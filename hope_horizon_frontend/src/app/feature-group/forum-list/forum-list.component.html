@@ -16,7 +16,7 @@
   @if (showFilter) {
     <div class="dropdown">
       <mat-form-field class="w-100" appearance="outline">
-        <mat-select placeholder="Select an Option">
+        <mat-select [formControl]="filterControl" placeholder="Select an Option">
           @for (option of filterOptions; track $index) {
             <mat-option value="{{ option }}">{{ option }}</mat-option>
           }
@@ -31,7 +31,11 @@
   </div>
 </div>
 
-<!-- Forums -->
-@for (forum of forumList; track $index) {
-  <app-forum-list-card [forum]="forum"></app-forum-list-card>
+<!-- Forms -->
+@for (forum of filteredForumList; track $index) {
+  @for (forumUser of forumUsersOfUser; track $index) {
+    @if (forumUser.forum_id === forum.id) {
+      <app-forum-list-card [forum]="forum" [forumUser]="forumUser" (forumUserLeft)="handleForumUserLeft($event)"></app-forum-list-card>
+    }
+  }
 }

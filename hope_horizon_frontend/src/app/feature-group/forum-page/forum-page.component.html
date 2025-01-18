@@ -1,3 +1,9 @@
 <div class="mx-2">
-  <app-forum-list [forumList]="forumList" [showFilter]="true" [filterOptions]="filterOptions"></app-forum-list>
+  <app-forum-list
+    [forumUsersOfUser]="forumUsersOfUser"
+    [forumList]="forumList"
+    [showFilter]="true"
+    [filterOptions]="filterOptions"
+    (forumUserLeft)="handleForumUserLeft($event)"
+  ></app-forum-list>
 </div>

@@ -1,8 +1,7 @@
 export interface ForumUserDto {
   id?: number;
   is_owner?: boolean;
-  is_active?: boolean;
-  group_id?: number;
+  forum_id?: number;
   user_id?: number;
   username?: string;
 }

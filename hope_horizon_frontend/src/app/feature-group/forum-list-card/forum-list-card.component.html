@@ -1,4 +1,4 @@
-<mat-card class="mat-elevation-z3 card d-flex flex-column" (click)="openForum()">
+<mat-card class="mat-elevation-z3 card d-flex flex-column" (click)="openBlogs()">
   <div class="d-flex justify-content-between align-items-center flex-grow-1">
     <div>
       <mat-card-header>
@@ -8,11 +8,19 @@
         <p>{{ forum.description }}</p>
       </mat-card-content>
     </div>
+    @if(forumUser.is_owner) {
     <div class="d-flex align-items-center">
       <button mat-icon-button class="me-2" (click)="openForum()">
         <mat-icon>edit</mat-icon>
-        <!-- TODO: Add functionality to segregate between member and owner -->
       </button>
     </div>
-  </div>
+    } @else {
+      <div class="d-flex align-items-center">
+        <button mat-icon-button class="me-2" (click)="leaveForum()">
+          <mat-icon>exit_to_app</mat-icon>
+        </button>
+    </div>
+    }
+    </div>
 </mat-card>
+

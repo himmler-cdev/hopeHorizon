@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import {
   AbstractControl,
   FormControl,
@@ -7,7 +7,7 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatOption, MatSelect } from '@angular/material/select';
@@ -17,6 +17,9 @@ import { ConfirmDialogComponent } from '../../../shared/dialogs/confirm-dialog/c
 import { ForumService } from '../service/forum.service';
 import { ForumEntity } from '../entity/forum.entity';
 import { MatIcon } from '@angular/material/icon';
+import { ForumFormUserComponent } from '../forum-form-user/forum-form-user.component';
+import { ForumUserEntity } from '../entity/fourm-user.entity';
+import { ForumUserService } from '../service/forum-user.service';
 
 @Component({
   selector: 'app-forum-form',
@@ -34,19 +37,24 @@ import { MatIcon } from '@angular/material/icon';
     MatButton,
     RouterLink,
     MatError,
+    ForumFormUserComponent,
   ],
   templateUrl: './forum-form.component.html',
   styleUrl: './forum-form.component.scss',
 })
 export class ForumFormComponent implements OnInit {
   forumFormGroup: FormGroup;
-  forumId: number | undefined = undefined;
+  forumId: number | undefined;
   searchControl = new FormControl('');
+  forumUsers: ForumUserEntity[] = [];
+  allUsers: ForumUserEntity[] = [];
 
   constructor(
     private _forumService: ForumService,
     private _router: Router,
-    private _dialog: MatDialog
+    private _dialog: MatDialog,
+    private _forumUserService: ForumUserService,
+    private _route: ActivatedRoute
   ) {
     this.forumFormGroup = new FormGroup({
       id: new FormControl(null),
@@ -63,7 +71,13 @@ export class ForumFormComponent implements OnInit {
   }
 
   ngOnInit() {
+    //this.forumId = 1;
+    this._route.paramMap.subscribe((params) => {
+      this.forumId = Number(params.get('id'));
+    })
     if (this.forumId) {
+      this.loadForumUsers(this.forumId);
+      this.loadAllUsers();
       this._forumService.getForum(this.forumId).subscribe((response) => {
         this.forumFormGroup.patchValue({
           id: response.id,
@@ -72,6 +86,21 @@ export class ForumFormComponent implements OnInit {
         });
       });
     }
+  }
+
+  loadAllUsers() {
+    this._forumUserService.getAllUsers().subscribe((users) => {
+      users.forum_users.map((user) => {
+        this.allUsers.push(ForumUserEntity.fromDto(user));
+      });
+  })};
+
+  loadForumUsers(forumId: number) {
+    this._forumUserService.getForumUsers(forumId).subscribe((users) => {
+      users.forum_users.map((user) => {
+        this.forumUsers.push(ForumUserEntity.fromDto(user));
+      });
+    });
   }
 
   private persistForm(): ForumEntity {
