@@ -1,4 +1,4 @@
-<form [formGroup]="blogFormGroup" class="m-3 px-3 me-5">
+<form [formGroup]="blogFormGroup" class="m-3">
   <!-- Title and Select -->
   <div class="d-flex flex-column flex-md-row">
     <div class="title-field me-md-4">
@@ -23,7 +23,7 @@
         <mat-label>Type</mat-label>
         <mat-select formControlName="blogPostTypeId">
           @for (option of blogPostTypes; track $index) {
-            <mat-option value="{{ option.id }}">{{ option.type }}</mat-option>
+            <mat-option [value]="option.id">{{ option.type }}</mat-option>
           }
         </mat-select>
 
@@ -39,7 +39,7 @@
   <div class="mt-2">
     <mat-form-field class="w-100" appearance="outline">
       <mat-label>Content</mat-label>
-      <textarea matInput formControlName="content" rows="20">
+      <textarea matInput formControlName="content" cdkTextareaAutosize [cdkAutosizeMinRows]="20" spellcheck="false">
       </textarea>
 
       <!-- Error Message -->
@@ -56,24 +56,31 @@
   <div class="mt-2">
     @if (blogPostId) {
       <!-- Edit Mode -->
-      <div>
-        <button mat-raised-button color="primary" class="deny-button mat-elevation-z3 me-3" (click)="openDeleteDialog()">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-end">
+        <button mat-raised-button color="primary" class="delete-button mat-elevation-z3 me-md-3 mb-2 mb-md-0"
+                (click)="openDeleteDialog()">
           Delete Blog
         </button>
-      </div>
-      <div class="d-flex justify-content-end align-items-end">
-        <button mat-raised-button color="primary" class="deny-button mat-elevation-z3 me-3" (click)="openCancelDialog()">
-          Cancel
-        </button>
-        <button mat-raised-button color="primary" class="save-button mat-elevation-z3" [disabled]="!blogFormGroup.valid"
-                (click)="createOrUpdate()">
-          Update Blog
-        </button>
+        <div class="d-flex flex-column flex-md-row">
+          <button mat-raised-button color="primary" class="deny-button mat-elevation-z3 me-md-3 mb-2 mb-md-0"
+                  (click)="goBack()">
+            Cancel
+          </button>
+          <button mat-raised-button color="primary" class="save-button mat-elevation-z3"
+                  [disabled]="!blogFormGroup.valid"
+                  (click)="createOrUpdate()">
+            Update Blog
+          </button>
+        </div>
       </div>
     } @else {
       <!-- Create Mode -->
-      <div class="d-flex justify-content-end align-items-end">
-        <button mat-raised-button color="primary" class="deny-button mat-elevation-z3 me-3" (click)="openCancelDialog()">
+      <div class="d-flex flex-column flex-md-row justify-content-end align-items-end">
+        <button mat-raised-button color="primary" class="deny-button mat-elevation-z3 me-md-3 mb-2 mb-md-0"
+                (click)="goBack()">Back
+        </button>
+        <button mat-raised-button color="primary" class="deny-button mat-elevation-z3 me-md-3 mb-2 mb-md-0"
+                (click)="openCancelDialog()">
           Clear
         </button>
         <button mat-raised-button color="primary" class="save-button mat-elevation-z3" [disabled]="!blogFormGroup.valid"

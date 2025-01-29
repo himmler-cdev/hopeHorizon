@@ -10,8 +10,8 @@ export class BlogPostService {
   constructor(private _http: HttpClient) {
   }
 
-  getBlogPosts() {
-    return this._http.get<Readonly<BlogPostsDto>>('/api/blog-post?owned=true?page=1');
+  getBlogPosts(queryParams?: Record<string, string | number | boolean>) {
+    return this._http.get<Readonly<BlogPostsDto>>('/api/blog-post/', {params: queryParams});
   }
 
   getBlogPost(id: number) {

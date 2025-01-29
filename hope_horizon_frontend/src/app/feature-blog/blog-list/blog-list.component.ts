@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {BlogPostEntity} from '../entity/blog-post.entity';
 import {DatePipe, NgClass} from '@angular/common';
 import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
@@ -45,8 +45,21 @@ export class BlogListComponent {
   @Input() showFilter = true;
   @Input() filterOptions: BlogPostTypeEntity[] = [];
 
+  @Output() searchChange = new EventEmitter<string | null>();
+  @Output() filterChange = new EventEmitter<number | null>();
+
   searchControl = new FormControl('');
   filterControl = new FormControl(null);
+
+  constructor() {
+    this.searchControl.valueChanges.subscribe(value => {
+      this.searchChange.emit(value);
+    });
+
+    this.filterControl.valueChanges.subscribe(value => {
+      this.filterChange.emit(value);
+    });
+  }
 
   clearSearchFilter() {
     this.searchControl.setValue('');

@@ -16,7 +16,8 @@
   @if (showFilter) {
     <div class="dropdown">
       <mat-form-field class="w-100" appearance="outline">
-        <mat-select placeholder="Select an Option">
+        <mat-select placeholder="Select an Option" [formControl]="filterControl">
+          <mat-option [value]="null">All</mat-option>
           @for (option of filterOptions; track $index) {
             <mat-option value="{{ option.id }}">{{ option.type }}</mat-option>
           }

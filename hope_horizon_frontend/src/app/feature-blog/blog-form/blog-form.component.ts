@@ -3,7 +3,7 @@ import {AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidatorF
 import {BlogPostTypeService} from '../service/blog-post-type.service';
 import {BlogPostService} from '../service/blog-post.service';
 import {BlogPostEntity} from '../entity/blog-post.entity';
-import {Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {MatError, MatFormField, MatLabel} from '@angular/material/form-field';
 import {BlogPostTypeEntity} from '../entity/blog-post-type.entity';
 import {MatInput} from '@angular/material/input';
@@ -11,6 +11,8 @@ import {MatOption, MatSelect} from '@angular/material/select';
 import {MatButton} from '@angular/material/button';
 import {MatDialog} from '@angular/material/dialog';
 import {ConfirmDialogComponent} from '../../../shared/dialogs/confirm-dialog/confirm-dialog.component';
+import {Location} from '@angular/common';
+import {CdkTextareaAutosize} from '@angular/cdk/text-field';
 
 @Component({
   selector: 'app-blog-form',
@@ -24,7 +26,8 @@ import {ConfirmDialogComponent} from '../../../shared/dialogs/confirm-dialog/con
     MatLabel,
     MatButton,
     RouterLink,
-    MatError
+    MatError,
+    CdkTextareaAutosize
   ],
   templateUrl: './blog-form.component.html',
   styleUrl: './blog-form.component.scss'
@@ -38,7 +41,9 @@ export class BlogFormComponent implements OnInit {
     private _blogPostTypeService: BlogPostTypeService,
     private _blogPostService: BlogPostService,
     private _router: Router,
-    private _dialog: MatDialog
+    private _dialog: MatDialog,
+    private _location: Location,
+    private _route: ActivatedRoute
   ) {
     this.blogFormGroup = new FormGroup({
       id: new FormControl(null),
@@ -51,10 +56,27 @@ export class BlogFormComponent implements OnInit {
 
   ngOnInit() {
     this._blogPostTypeService.getBlogPostTypes().subscribe((response) => {
-      response.blog_post_types.map((blogPostType) => {
-        this.blogPostTypes.push(BlogPostTypeEntity.fromDto(blogPostType));
-      });
+      response.blog_post_types
+        .filter((blogPostType) => blogPostType.type?.toLowerCase() !== 'forum')
+        .map((blogPostType) => {
+          this.blogPostTypes.push(BlogPostTypeEntity.fromDto(blogPostType));
+        });
     });
+
+    this.blogPostId = Number(this._route.snapshot.paramMap.get('id'));
+
+    if (this.blogPostId) {
+      this._blogPostService.getBlogPost(this.blogPostId).subscribe((blogDto) => {
+        const blogEntity = BlogPostEntity.fromDto(blogDto);
+        this.blogFormGroup.patchValue({
+          id: blogEntity.id,
+          title: blogEntity.title,
+          date: blogEntity.date,
+          content: blogEntity.content,
+          blogPostTypeId: blogEntity.blogPostTypeId
+        });
+      });
+    }
   }
 
   private persistForm(): BlogPostEntity {
@@ -147,5 +169,22 @@ export class BlogFormComponent implements OnInit {
       const isValid = !isWhitespace;
       return isValid ? null : {'whitespace': true};
     };
+  }
+
+  protected goBack() {
+    const dialogRef = this._dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Go Back',
+        message: 'Are you sure you want to go back? Any unsaved changes will be lost.',
+        confirmText: 'Go Back',
+        cancelText: 'Cancel'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this._location.back();
+      }
+    });
   }
 }

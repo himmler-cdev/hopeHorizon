@@ -1,4 +1,4 @@
-import {Component, EventEmitter, inject, Input, Output} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -28,7 +28,7 @@ import {ConfirmDialogData} from '../../interface/confirm-dialog-data.interface';
   styleUrl: './confirm-dialog.component.scss'
 })
 export class ConfirmDialogComponent {
-  readonly data  = inject<ConfirmDialogData>(MAT_DIALOG_DATA);
+  readonly data = inject<ConfirmDialogData>(MAT_DIALOG_DATA);
   readonly dialogRef = inject(MatDialogRef<ConfirmDialogComponent>);
 
   protected onCancel() {

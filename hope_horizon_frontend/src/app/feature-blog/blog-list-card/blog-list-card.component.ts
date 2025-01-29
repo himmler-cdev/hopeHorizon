@@ -3,7 +3,7 @@ import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/mat
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {BlogPostEntity} from '../entity/blog-post.entity';
-import {Router, RouterLink} from '@angular/router';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-blog-list-card',
@@ -22,7 +22,8 @@ import {Router, RouterLink} from '@angular/router';
 export class BlogListCardComponent {
   @Input({required: true}) blog!: BlogPostEntity;
 
-  constructor(private _router: Router,) {}
+  constructor(private _router: Router) {
+  }
 
   openBlogPost() {
     this._router.navigate(['/blog/', this.blog.id]);

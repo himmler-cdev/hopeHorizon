@@ -6,6 +6,8 @@ export class BlogPostEntity {
   date?: Date;
   content?: string;
   blogPostTypeId?: number;
+  userId?: number;
+  forumId?: number;
 
   toDto(): BlogPostDto {
     return {
@@ -13,7 +15,9 @@ export class BlogPostEntity {
       title: this.title,
       date: this.date?.toISOString(),
       content: this.content,
-      blog_post_type_id: this.blogPostTypeId
+      blog_post_type_id: this.blogPostTypeId,
+      user_id: this.userId,
+      forum_id: this.forumId
     };
   }
 
@@ -24,6 +28,8 @@ export class BlogPostEntity {
     entity.date = dto.date ? new Date(dto.date) : undefined
     entity.content = dto.content;
     entity.blogPostTypeId = dto.blog_post_type_id;
+    entity.userId = dto.user_id;
+    entity.forumId = dto.forum_id;
 
     return entity;
   }
