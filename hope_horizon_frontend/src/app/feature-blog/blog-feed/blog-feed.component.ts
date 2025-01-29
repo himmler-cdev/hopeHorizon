@@ -30,14 +30,11 @@ export class BlogFeedComponent implements OnInit {
   }
 
   ngOnInit() {
-    this._userService.getUserData(this._userService.getUserId()).subscribe((user) => {
-      this.user = UserEntity.fromDto(user);
-      this.loadBlogPosts();
-    });
+    this.user = this._userService.getUserDataImmediate();
+    this.loadBlogPosts();
   }
 
   protected loadBlogPosts() {
-
     this._blogPostService.getBlogPosts({
       owned: 'false',
       page: (this.currentPage + 1).toString(),

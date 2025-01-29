@@ -42,6 +42,6 @@ export class BlogDetailComponent implements OnInit {
       });
     }
 
-    this.userId = this._userService.getUserId();
+    this.userId = this._userService.getUserDataImmediate()?.id || -1;
   }
 }
