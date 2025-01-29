@@ -8,21 +8,25 @@ import { MockData } from './mockdata';
   providedIn: 'root',
 })
 export class ForumService {
-  private mockData = new MockData();
-  forumList = this.mockData.forumList;
-  loggedInUser = this.mockData.loggedInUser;
-  forumUserList = this.mockData.forumUserList;
+  //private mockData = new MockData();
+  //forumList = this.mockData.forumList;
+  //loggedInUser = this.mockData.loggedInUser;
+  //forumUserList = this.mockData.forumUserList;
+
+  private apiUrl = 'http://127.0.0.1:8000/api/forum';
 
   constructor(private _http: HttpClient) {}
 
   getForums(): Observable<ForumsDto> {
-    //return this._http.get<Readonly<ForumsDto>>('/api/forum?owned=true');
+    return this._http.get<Readonly<ForumsDto>>('/api/forum?owned=true');
+    /*
     // Filter forums based on the logged-in user
     const userForums = this.forumUserList.forum_users
       .filter(forumUser => forumUser.user_id === this.loggedInUser.id)
       .map(forumUser => this.forumList.forums.find(forum => forum.id === forumUser.forum_id))
       .filter(forum => forum !== undefined) as ForumDto[];
     return of({ forums: userForums });
+    */
   }
 
   getForum(id: number): Observable<ForumDto> {
