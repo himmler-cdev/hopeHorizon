@@ -40,10 +40,10 @@
   </div>
 
 
-  <!-- Forum Users 
-  <app-forum-chips-user [forumUsers]="forumUsers" [allUsers]="allUsers"></app-forum-chips-user>
-
-  -->
+  <!-- Forum Users  -->
+  <app-forum-user-chip [forumUserNames]="forumUserNames" [allUserNames]="allUserNames" (updatedForumUserNames)="onForumUserNamesChange($event)"></app-forum-user-chip>
+  
+  
   <!-- Cancel/Clear and Submit Buttons -->
   <div class="mt-2">
     @if (forumId) {

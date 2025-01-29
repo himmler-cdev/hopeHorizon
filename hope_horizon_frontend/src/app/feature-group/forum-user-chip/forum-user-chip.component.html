@@ -1,18 +1,20 @@
 <form>
-  <mat-form-field class="forum-user-chip-list">
-    <mat-label>Selected Users</mat-label>
+  <mat-form-field class="example-chip-list full-width">
+    <mat-label>Forum Users</mat-label>
     <mat-chip-grid #chipGrid aria-label="User selection">
-      @for (user of forumUsers; track $index) {
-      <mat-chip-row (removed)="remove(user)">
-        {{ user.username }}
-        <button matChipRemove [attr.aria-label]="'remove ' + user.username">
-          <mat-icon>cancel</mat-icon>
-        </button>
-      </mat-chip-row>
-    }
+      @for (user of actualUserNames(); track $index) {
+        <mat-chip-row (removed)="remove(user)">
+          {{user}}
+          <button matChipRemove [attr.aria-label]="'remove ' + user">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip-row>
+      }
     </mat-chip-grid>
     <input
+      name="currentUser"
       placeholder="New User..."
+      #UserInput
       [(ngModel)]="currentUser"
       [matChipInputFor]="chipGrid"
       [matAutocomplete]="auto"
@@ -21,10 +23,8 @@
     />
     <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
       @for (user of filteredUsers(); track user) {
-      <mat-option [value]="user">
-        {{ user.username }}
-      </mat-option>
-    }
+        <mat-option [value]="user">{{user}}</mat-option>
+      }
     </mat-autocomplete>
   </mat-form-field>
 </form>

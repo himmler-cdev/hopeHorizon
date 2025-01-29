@@ -60,6 +60,8 @@ export class ForumListComponent {
   searchControl = new FormControl('');
   filterControl = new FormControl('all');
 
+  //TODO: Implement search functionality
+
   ngOnInit() {
     this.filterControl.valueChanges.subscribe(() => {
       this.updateFilteredForumList();

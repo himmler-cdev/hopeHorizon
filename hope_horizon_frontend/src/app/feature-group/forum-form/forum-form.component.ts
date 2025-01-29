@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import {
   AbstractControl,
   FormControl,
@@ -19,8 +19,9 @@ import { ForumEntity } from '../entity/forum.entity';
 import { MatIcon } from '@angular/material/icon';
 import { ForumUserEntity } from '../entity/fourm-user.entity';
 import { ForumUserService } from '../service/forum-user.service';
-import { ForumChipsUserComponent } from '../forum-chips-user/forum-chips-user.component';
 import { MockData } from '../service/mockdata';
+import { ForumUsersDto } from '../dto/forum-user.dto';
+import { ForumUserChipComponent } from '../forum-user-chip/forum-user-chip.component';
 
 @Component({
   selector: 'app-forum-form',
@@ -38,7 +39,7 @@ import { MockData } from '../service/mockdata';
     MatButton,
     RouterLink,
     MatError,
-    ForumChipsUserComponent
+    ForumUserChipComponent,
   ],
   templateUrl: './forum-form.component.html',
   styleUrl: './forum-form.component.scss',
@@ -47,19 +48,22 @@ export class ForumFormComponent implements OnInit {
   forumFormGroup: FormGroup;
   forumId: number | undefined;
   searchControl = new FormControl('');
-  forumUsers: ForumUserEntity[] = [];
-  allUsers: ForumUserEntity[] = [];
+  forumUserNames: string[] = [];
+  updtedForumUserNames: string[] = [];
+  allUserNames: string[] = [];
+  oldForumUsers: ForumUserEntity[] = [];
+  updatedUsers: ForumUserEntity[] = [];
 
   private mockData = new MockData();
   loggedInUser = this.mockData.loggedInUser;
-  
 
   constructor(
     private _forumService: ForumService,
     private _router: Router,
     private _dialog: MatDialog,
     private _forumUserService: ForumUserService,
-    private _route: ActivatedRoute
+    private _route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {
     this.forumFormGroup = new FormGroup({
       id: new FormControl(null),
@@ -79,10 +83,12 @@ export class ForumFormComponent implements OnInit {
     //this.forumId = 1;
     this._route.paramMap.subscribe((params) => {
       this.forumId = Number(params.get('id'));
-    })
+    });
     if (this.forumId) {
       this.loadForumUsers(this.forumId);
       this.loadAllUsers();
+      this.cdr.detectChanges(); // Ensure change detection runs
+      //this.updatedUsers = this.forumUserNames;
       this._forumService.getForum(this.forumId).subscribe((response) => {
         this.forumFormGroup.patchValue({
           id: response.id,
@@ -93,18 +99,11 @@ export class ForumFormComponent implements OnInit {
     }
   }
 
-  loadAllUsers() {
-    this._forumUserService.getAllUsers().subscribe((users) => {
-      users.forum_users.map((user) => {
-        if (user.user_id === this.loggedInUser.id) {
-          return; // Skip the logged in user
-        }
-        if (this.forumUsers.find((u) => u.id === user.user_id)) {
-          return; // Skip users already in the forum
-        }
-        this.allUsers.push(ForumUserEntity.fromDto(user));
-      });
-  })};
+  /*
+  onUsersUpdated(updatedUsers: ForumUserEntity[]): void {
+    this.updatedUsers = updatedUsers;
+  }
+  */
 
   loadForumUsers(forumId: number) {
     this._forumUserService.getForumUsers(forumId).subscribe((users) => {
@@ -112,8 +111,27 @@ export class ForumFormComponent implements OnInit {
         if (user.user_id === this.loggedInUser.id) {
           return; // Skip the logged in user
         }
-        this.forumUsers.push(ForumUserEntity.fromDto(user));
+        if (user.username) {
+          this.forumUserNames.push(user.username);
+          this.oldForumUsers.push(ForumUserEntity.fromDto(user));
+        }
       });
+      console.log('Loaded Forum User Names:', this.forumUserNames);
+    });
+  }
+
+  loadAllUsers() {
+    //TODO: Change to user later on
+    this._forumUserService.getAllUsers().subscribe((users) => {
+      users.forum_users.map((user) => {
+        if (user === this.loggedInUser.username) {
+          return; // Skip the logged in user
+        }
+        if (user) {
+          this.allUserNames.push(user);
+        }
+      });
+      console.log('Loaded All User Names:', this.allUserNames);
     });
   }
 
@@ -141,14 +159,70 @@ export class ForumFormComponent implements OnInit {
 
     if (this.forumId) {
       this._forumService.updateForum(forumEntity.toDto()).subscribe((forum) => {
+        // Update forum users
+        const oldForumUserNames = this.oldForumUsers.map(
+          (user) => user.username
+        );
+        const uniqueUpdatedForumUserNames = [...new Set(this.updtedForumUserNames)];
+        const updatedForumUserNames = uniqueUpdatedForumUserNames.filter(
+          (name) => !oldForumUserNames.includes(name)
+        );
+
+        // Find users to delete (present in old list but not in updated list)
+        const usersToDelete = oldForumUserNames.filter(
+          (name) => name !== undefined && !uniqueUpdatedForumUserNames.includes(name)
+        );
+
+        //create FourmUserEntity objects for each user 
+        //TODO: Change later on after implementing user
+        this.updatedUsers = updatedForumUserNames.map((name) => {
+          const user = new ForumUserEntity();
+          user.username = name;
+          return user;
+        });
+
+        const dtoForumUserList = this.updatedUsers.map((user) => user.toDto());
+        dtoForumUserList.map((user) => {
+          user.forum_id = forum.id;
+          user.username = user.username;
+          user.is_owner = false;
+        });
+
+        const dtoForumUsers: ForumUsersDto = { forum_users: dtoForumUserList };
+
+        this._forumUserService.createForumUsers(dtoForumUsers).subscribe();
+
         this._router.navigate(['/forum/', forum.id]);
       });
     } else {
       this._forumService.createForum(forumEntity.toDto()).subscribe((forum) => {
+        //create FourmUserEntity objects for each user
+        const uniqueUpdatedForumUserNames = [...new Set(this.updtedForumUserNames)];
+
+        const newForumUsers = uniqueUpdatedForumUserNames.map((name) => {
+          const user = new ForumUserEntity();
+          user.username = name;
+          return user;
+        });
+
+        const dtoForumUserList = newForumUsers.map((user) => user.toDto());
+        dtoForumUserList.map((user) => {
+          user.forum_id = forum.id;
+          user.username = user.username;
+          user.is_owner = false;
+        });
+
+        const dtoForumUsers: ForumUsersDto = { forum_users: dtoForumUserList };
+        this._forumUserService.createForumUsers(dtoForumUsers).subscribe();
+
         this.forumFormGroup.reset();
         this._router.navigate(['/forum/', forum.id]);
       });
     }
+  }
+
+  onForumUserNamesChange(updatedForumUserNames: string[]) {
+    this.updtedForumUserNames = updatedForumUserNames;
   }
 
   protected openDeleteDialog() {
@@ -211,3 +285,5 @@ export class ForumFormComponent implements OnInit {
     };
   }
 }
+
+

@@ -1,0 +1,14 @@
+.full-width {
+    width: 100%; /* Make the mat-form-field span the full width of its container */
+  }
+  
+  .example-chip-list {
+    display: flex;         /* Flexbox layout for alignment */
+    flex-wrap: wrap;       /* Allow wrapping of content */
+    gap: 8px;              /* Add spacing between rows */
+  }
+  
+  mat-chip-row {
+    margin-bottom: 8px;    /* Add spacing between rows of chips */
+  }
+  

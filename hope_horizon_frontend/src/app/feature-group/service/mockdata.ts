@@ -3,6 +3,16 @@ import { ForumsDto } from '../dto/forum.dto';
 
 export class MockData {
   loggedInUser = { id: 1, username: 'testuser' };
+  allUsers = [
+    'testuser',
+    'fish2',
+    'fish3',
+    'fish4',
+    'fish5',
+    'fish6',
+    'fish7',
+    'fish8',
+  ];
   forumList: ForumsDto = {
     forums: [
       {
@@ -24,43 +34,42 @@ export class MockData {
   };
 
   forumUserList: ForumUsersDto = {
-      forum_users: [
-        {
-          id: 1,
-          is_owner: true,
-          forum_id: 1,
-          user_id: this.loggedInUser.id,
-          username: this.loggedInUser.username,
-        },
-        {
-          id: 2,
-          is_owner: false,
-          forum_id: 1,
-          user_id: 2,
-          username: 'fish2',
-        },
-        {
-          id: 3,
-          is_owner: true,
-          forum_id: 2,
-          user_id: 3,
-          username: 'fish3',
-        },
-        {
-          id: 4,
-          is_owner: false,
-          forum_id: 2,
-          user_id: 4,
-          username: 'fish4',
-        },
-        {
-            id: 5,
-            is_owner: false,
-            forum_id: 3,
-            user_id: this.loggedInUser.id,
-            username: this.loggedInUser.username,
-          }
-      ],
-    }
-
+    forum_users: [
+      {
+        id: 1,
+        is_owner: true,
+        forum_id: 1,
+        user_id: this.loggedInUser.id,
+        username: this.loggedInUser.username,
+      },
+      {
+        id: 2,
+        is_owner: false,
+        forum_id: 1,
+        user_id: 2,
+        username: 'fish2',
+      },
+      {
+        id: 3,
+        is_owner: true,
+        forum_id: 2,
+        user_id: 3,
+        username: 'fish3',
+      },
+      {
+        id: 4,
+        is_owner: false,
+        forum_id: 2,
+        user_id: 4,
+        username: 'fish4',
+      },
+      {
+        id: 5,
+        is_owner: false,
+        forum_id: 3,
+        user_id: this.loggedInUser.id,
+        username: this.loggedInUser.username,
+      },
+    ],
+  };
 }
