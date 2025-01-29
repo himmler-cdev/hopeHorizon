@@ -1,7 +1,7 @@
-import {Injectable} from '@angular/core';
-import {ForumDto, ForumsDto} from '../dto/forum.dto';
-import {HttpClient} from '@angular/common/http';
-import {Observable, of} from 'rxjs';
+import { Injectable } from '@angular/core';
+import { ForumDto, ForumsDto } from '../dto/forum.dto';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -12,13 +12,11 @@ export class ForumService {
   //loggedInUser = this.mockData.loggedInUser;
   //forumUserList = this.mockData.forumUserList;
 
-  private apiUrl = 'http://127.0.0.1:8000/api/forum';
+  constructor(private _http: HttpClient) {}
 
-  constructor(private _http: HttpClient) {
-  }
+  getForums(owner: boolean): Observable<ForumsDto> {
+    return this._http.get<Readonly<ForumsDto>>('/api/forum?owned=' + owner);
 
-  getForums(): Observable<ForumsDto> {
-    return this._http.get<Readonly<ForumsDto>>('/api/forum?owned=true');
     /*
     // Filter forums based on the logged-in user
     const userForums = this.forumUserList.forum_users
@@ -30,16 +28,21 @@ export class ForumService {
   }
 
   getForum(id: number): Observable<ForumDto> {
-    //return this._http.get<Readonly<ForumDto>>(`/api/forum/${id}/`);
+    return this._http.get<Readonly<ForumDto>>(`/api/forum/${id}/`);
+
+    /*
     const forum = this.forumList.forums.find(forum => forum.id === id);
     if (!forum) {
       throw new Error(`Forum with id ${id} not found`);
     }
     return of(forum);
+    */
   }
 
   createForum(forum: ForumDto): Observable<ForumDto> {
-    //return this._http.post<Readonly<ForumDto>>('/api/forum/', forum);
+    return this._http.post<Readonly<ForumDto>>('/api/forum/', forum);
+    
+    /*
     const newId = this.forumList.forums.length + 1;
     forum.id = newId;
 
@@ -52,6 +55,7 @@ export class ForumService {
       username: this.loggedInUser.username,
     });
     return of(forum);
+    */
   }
 
   updateForum(forum: ForumDto): Observable<ForumDto> {
@@ -59,17 +63,26 @@ export class ForumService {
       throw new Error('Cannot update a blog post without an id');
     }
 
-    //return this._http.put<Readonly<ForumDto>>(`/api/forum/${forum.id}/`, forum);
-    const index = this.forumList.forums.findIndex(forum => forum.id === forum.id);
-    return of(this.forumList.forums[index] = forum);
+    return this._http.put<Readonly<ForumDto>>(`/api/forum/${forum.id}/`, forum);
 
+    /*
+    const index = this.forumList.forums.findIndex(
+      (forum) => forum.id === forum.id
+    );
+    return of((this.forumList.forums[index] = forum));
+    */
   }
 
-  deleteForum(id: number): Observable<void> {
-    //return this._http.delete(`/api/forum/${id}/`);
-    const index = this.forumList.forums.findIndex(forum => forum.id === id);
+  deleteForum(id: number): Observable<ForumDto> {
+    return this._http.delete(`/api/forum/${id}/`);
+    
+    /*
+    const index = this.forumList.forums.findIndex((forum) => forum.id === id);
     this.forumList.forums.splice(index, 1);
-    this.forumUserList.forum_users = this.forumUserList.forum_users.filter(forumUser => forumUser.forum_id !== id);
+    this.forumUserList.forum_users = this.forumUserList.forum_users.filter(
+      (forumUser) => forumUser.forum_id !== id
+    );
     return of(void 0);
+    */
   }
 }

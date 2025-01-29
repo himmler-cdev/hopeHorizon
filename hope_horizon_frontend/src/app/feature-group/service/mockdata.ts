@@ -1,6 +1,8 @@
 import {ForumUsersDto} from '../dto/forum-user.dto';
 import {ForumsDto} from '../dto/forum.dto';
 
+
+
 export class MockData {
   loggedInUser = {id: 1, username: 'testuser'};
   allUsers = [
@@ -13,6 +15,7 @@ export class MockData {
     'fish7',
     'fish8',
   ];
+  /*
   forumList: ForumsDto = {
     forums: [
       {
@@ -72,4 +75,7 @@ export class MockData {
       },
     ],
   };
+}
+
+*/
 }

@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {ForumUsersDto} from '../dto/forum-user.dto';
-import {Observable, of} from 'rxjs';
+import {ForumUserDto, ForumUserPostDto, ForumUsersDto} from '../dto/forum-user.dto';
+import {forkJoin, Observable, of} from 'rxjs';
 import {MockData} from './mockdata';
 
 @Injectable({
@@ -9,29 +9,29 @@ import {MockData} from './mockdata';
 })
 export class ForumUserService {
 
-  private mockData = new MockData();
-  forumList = this.mockData.forumList;
-  loggedInUser = this.mockData.loggedInUser;
-  allUsersList = this.mockData.allUsers;
-  forumUserList = this.mockData.forumUserList;
+  //private mockData = new MockData();
+  //forumList = this.mockData.forumList;
+  //loggedInUser = this.mockData.loggedInUser;
+  //allUsersList = this.mockData.allUsers;
+  //forumUserList = this.mockData.forumUserList;
 
 
   constructor(private _http: HttpClient) {
   }
 
-  getAllUsers() {
-    //return this._http.get<Readonly<ForumUsersDto>>('/api/user'); TODO when Users API is ready
-    return of({forum_users: this.allUsersList});
-  }
-
   getForumUsers(forumId: number): Observable<ForumUsersDto> {
-    //return this._http.get<Readonly<ForumUsersDto>>(`/api/forum-user?forum_id=${forumId}`);
+    return this._http.get<Readonly<ForumUsersDto>>(`/api/forum-user?forum_id=${forumId}`);
+
+    /*
     const forumUsers = this.forumUserList.forum_users.filter(forumUser => forumUser.forum_id === forumId);
     return of({forum_users: forumUsers});
+    */
   }
 
-  createForumUsers(forumUsers: ForumUsersDto): Observable<ForumUsersDto> {
-    //return this._http.post<Readonly<ForumUsersDto>>('/api/forum-user/', forumUsers);
+  createForumUsers(forumUsers: ForumUserPostDto): Observable<ForumUserPostDto> {
+    return this._http.post<Readonly<ForumUserPostDto>>('/api/forum-user/', forumUsers);
+
+    /*
     let newId = this.forumUserList.forum_users.length + 1;
     forumUsers.forum_users?.forEach(user => {
       this.forumUserList.forum_users.push({
@@ -43,6 +43,7 @@ export class ForumUserService {
       });
     });
     return of({forum_users: this.forumUserList.forum_users});
+    */
   }
 
   /* TODO when Users API is ready
@@ -63,7 +64,9 @@ export class ForumUserService {
   */
 
   deleteForumUser(id: number): Observable<ForumUsersDto> {
-    //return this._http.delete(`/api/forum-user/${id}/`);
+    return this._http.delete<ForumUsersDto>(`/api/forum-user/${id}/`);
+
+    /*
     const index = this.forumUserList.forum_users.findIndex(forumUser => forumUser.id === id);
 
     if (index === -1) {
@@ -74,6 +77,12 @@ export class ForumUserService {
     this.forumUserList.forum_users.splice(index, 1);
 
     return of({forum_users: this.forumUserList.forum_users});
+    */
+  }
+
+  deleteForumUsers(userIds: number[]): Observable<ForumUsersDto[]> {
+    const deleteRequests = userIds.map((id) => this.deleteForumUser(id)); // ✅ Create multiple delete requests
+    return forkJoin(deleteRequests); // ✅ Execute them all in parallel
   }
 }
 

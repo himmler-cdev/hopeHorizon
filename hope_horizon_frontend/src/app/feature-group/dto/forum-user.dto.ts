@@ -10,12 +10,20 @@ export interface ForumUsersDto {
   forum_users: ForumUserDto[];
 }
 
-export interface UserIdDto {
+export class UserIdDto {
   user_id: number;
+
+  constructor(user_id: number) {
+    this.user_id = user_id;
+  }
 }
 
-export interface ForumUserPostDto {
+export class ForumUserPostDto {
   forum_id?: number;
   users?: UserIdDto[];
-}
 
+  constructor(forum_id?: number, users?: number[]) {
+    this.forum_id = forum_id;
+    this.users = users ? users.map((id) => new UserIdDto(id)) : [];
+  }
+}

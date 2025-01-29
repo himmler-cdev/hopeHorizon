@@ -46,8 +46,8 @@
 
 
   <!-- Forum Users  -->
-  <app-forum-user-chip [forumUserNames]="forumUserNames" [allUserNames]="allUserNames"
-                       (updatedForumUserNames)="onForumUserNamesChange($event)"></app-forum-user-chip>
+  <app-forum-user-chip [forumUsers]="oldForumUsers" [allUsers]="allUsers"
+                       (updatedForumUsers)="onForumUsersChange($event)"></app-forum-user-chip>
 
 
   <!-- Cancel/Clear and Submit Buttons -->

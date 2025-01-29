@@ -27,10 +27,17 @@ class ForumUserViewSet(viewsets.ModelViewSet):
             return Response({"detail": "You are not a member of the forum"}, status=status.HTTP_403_FORBIDDEN)
         
         forum_user_list = ForumUser.objects.filter(forum_id=forum, is_active=True, is_owner=False)
-        serializer = self.serializer_class(forum_user_list, many=True)
+
+        
+        if not forum_user_list.exists():
+            serializer = self.serializer_class([forum_user], many=True)  # Owner as a list
+        else:
+            serializer = self.serializer_class(forum_user_list, many=True)
+    
         return Response({"forum_users": serializer.data}, status=status.HTTP_200_OK)
 
     def create(self, request):
+        print("Received Forum User Data:", request.data)
         try:
             forum = Forum.objects.get(pk=request.data.get("forum_id"))
         except Forum.DoesNotExist:
@@ -42,25 +49,48 @@ class ForumUserViewSet(viewsets.ModelViewSet):
         
         # check if the users to add, exist, are active and are not already in the forum
         user_ids = request.data.get("users", [])
+       
         if not user_ids:
             return Response({"detail": "No users provided"}, status=status.HTTP_400_BAD_REQUEST)
         # create a new forum user for each user
-        for new_forum_user_id in user_ids:
-            new_forum_user = User.objects.get(pk=new_forum_user_id)
-            if not new_forum_user.is_active:
-                return Response({"detail": "User not found"}, status=status.HTTP_400_BAD_REQUEST)
-            if ForumUser.objects.filter(forum_id=forum, user_id=new_forum_user).exists():
-                return Response({"detail": "User already exists in the forum"}, status=status.HTTP_400_BAD_REQUEST)
-            # add the user to the forum
-            Notification.objects.create(
-                is_read=False,
-                content=f"You have been invited to forum: {forum.name}",
-                user_id=new_forum_user,  # Notify the blog post owner
-                forum_id=forum
-                )
-            ForumUser.objects.create(forum_id=forum, user_id=new_forum_user, is_owner=False, is_active=False)
+        errors = []
+        successfully_added = []
 
-        return Response({"detail": "User(s) added successfully"}, status=status.HTTP_204_NO_CONTENT)
+        for new_forum_user_dict in user_ids:
+            try:
+                new_forum_user_id = new_forum_user_dict.get("user_id")
+                print("Received user ID:", new_forum_user_id)
+                new_forum_user = User.objects.get(pk=new_forum_user_id)
+
+                if not new_forum_user.is_active:
+                    errors.append({"user_id": new_forum_user_id, "detail": "User is inactive"})
+                    continue  # Skip this user and continue with others
+
+                if ForumUser.objects.filter(forum_id=forum, user_id=new_forum_user).exists():
+                    errors.append({"user_id": new_forum_user_id, "detail": "User already exists in the forum"})
+                    continue  # Skip this user and continue with others
+
+                # add the user to the forum
+                Notification.objects.create(
+                    is_read=False,
+                    content=f"You have been invited to forum: {forum.name}",
+                    user_id=new_forum_user,  # Notify the blog post owner
+                    forum_id=forum
+                    )
+                ForumUser.objects.create(forum_id=forum, user_id=new_forum_user, is_owner=False, is_active=True)
+                successfully_added.append(new_forum_user_id)
+
+            except User.DoesNotExist:
+                errors.append({"user_id": new_forum_user_id, "detail": "User not found"})
+
+        # Return response based on success/failure cases
+        if not errors:  
+            return Response(status=status.HTTP_204_NO_CONTENT)  # No content if all users were added successfully
+
+        return Response(
+            {"errors": errors},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     def destroy(self, request, pk=None):
         try:

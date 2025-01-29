@@ -5,5 +5,5 @@ export interface ForumDto {
 }
 
 export interface ForumsDto {
-  forums: ForumDto[];
+  custom_forums: ForumDto[];
 }
