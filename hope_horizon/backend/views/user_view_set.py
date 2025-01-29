@@ -5,7 +5,7 @@ from backend.serializers import (
     UserListSerializer,
     UserDetailsSerializer,
 )
-from backend.models import User
+from backend.models import User, UserRole
 from django.db.models import Q
 
 
@@ -32,7 +32,7 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = self.serializers["create"](data=request.data)
         if not serializer.is_valid():
             return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-        user = serializer.save()
+        user = serializer.save(user_role_id=UserRole.objects.get(role="User"))
         user.set_password(serializer.data["password"])
         user.save()
         serializer = self.serializers["details"](user)

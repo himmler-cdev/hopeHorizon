@@ -10,22 +10,26 @@ class UserListSerializer(serializers.ModelSerializer):
 
 
 class UserDetailsSerializer(serializers.ModelSerializer):
+    user_role = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ["id", "username", "email", "birthdate", "user_role_id"]
-        read_only_fields = ["id", "username", "email", "birthdate", "user_role_id"]
+        fields = ["id", "username", "email", "birthdate", "user_role"]
+        read_only_fields = ["id", "username", "email", "birthdate", "user_role"]
+
+    def get_user_role(self, obj):
+        return obj.user_role_id.role
 
 
 class UserCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["username", "password", "email", "birthdate", "user_role_id"]
+        fields = ["username", "password", "email", "birthdate"]
         extra_kwargs = {
             "username": {"required": True},
             "password": {"required": True},
             "email": {"required": True},
             "birthdate": {"required": True},
-            "user_role_id": {"required": True},
         }
 
     def validate_email(self, value):
