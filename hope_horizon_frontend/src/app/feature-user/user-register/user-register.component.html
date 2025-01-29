@@ -11,20 +11,33 @@
                     <mat-label>Username</mat-label>
                     <input matInput type="text" formControlName="username" name="username" required
                         placeholder="Enter your username">
+                    @if (getErrorMessage("username") !== '') {
+                        <mat-error>{{ getErrorMessage("username") }}</mat-error>
+                    }
                 </mat-form-field>
                 <mat-form-field class="form-group" appearance="fill">
                     <mat-label>Email</mat-label>
                     <input matInput type="email" formControlName="email" name="email" required placeholder="Enter your email">
+                    @if (getErrorMessage("email") !== '') {
+                        <mat-error>{{ getErrorMessage("email") }}</mat-error>
+                    }
+                </mat-form-field>
+                <mat-form-field class="form-group" appearance="fill">
+                    <mat-label>Birthdate</mat-label>
+                    <input matInput [matDatepicker]="picker" formControlName="birthdate" placeholder="Choose your birthdate">
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                    @if (getErrorMessage("birthdate") !== '') {
+                        <mat-error>{{ getErrorMessage("birthdate") }}</mat-error>
+                    }
                 </mat-form-field>
                 <mat-form-field class="form-group" appearance="fill">
                     <mat-label>Password</mat-label>
                     <input matInput type="password" formControlName="password" name="password" required
                         placeholder="Enter your password">
-                </mat-form-field>
-                <mat-form-field class="form-group-last" appearance="fill">
-                    <mat-label>Re-enter Password</mat-label>
-                    <input matInput type="password" formControlName="password2" name="password2" required
-                        placeholder="Re-enter your password">
+                    @if (getErrorMessage("password") !== '') {
+                        <mat-error>{{ getErrorMessage("password") }}</mat-error>
+                    }
                 </mat-form-field>
                 @if (errorMessage.length > 0) {
                     <div class="error-message">{{ errorMessage }}</div>

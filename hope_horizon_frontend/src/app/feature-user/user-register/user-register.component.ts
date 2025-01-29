@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { Router, RouterModule } from '@angular/router';
 import { UserService } from '../user.service';
 import { UserEntity } from '../entity/user.entity';
@@ -14,6 +16,8 @@ import { UserEntity } from '../entity/user.entity';
     MatInputModule,
     MatFormFieldModule,
     MatButtonModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     RouterModule,
     ReactiveFormsModule,
   ],
@@ -29,9 +33,9 @@ export class UserRegisterComponent {
   constructor(private userService: UserService, private router: Router) {
     this.registerForm = new FormGroup({
       username: new FormControl('', [Validators.required]),
-      email : new FormControl('', [Validators.required, Validators.email]),
+      email: new FormControl('', [Validators.required, Validators.email]),
+      birthdate: new FormControl('', [Validators.required]),
       password: new FormControl('', [Validators.required]),
-      password2: new FormControl('', [Validators.required]),
     });
   }
 
@@ -39,20 +43,21 @@ export class UserRegisterComponent {
     if (this.registerForm.valid) {
       this.user.username = this.registerForm.value.username;
       this.user.email = this.registerForm.value.email;
+      this.user.birthdate = this.registerForm.value.birthdate;
       this.user.password = this.registerForm.value.password;
-      this.userService.create(this.user).subscribe(
-        response => {
+      this.userService.create(this.user).subscribe({
+        next: (response: any) => {
           console.log('Registration successful', response);
           this.errorMessage = ''; // Clear any previous error message
           this.router.navigate(['/login']);
         },
-        error => {
+        error: (error) => {
           console.error('Registration failed', error);
           this.errorMessage = 'An error occurred. Please try again later.';
         }
-      );
+      });
     } else {
-      this.errorMessage = 'Please enter your username, email, and password.';
+      this.errorMessage = 'Please enter your username, email, birthdate and password.';
     }
   }
 
@@ -66,7 +71,6 @@ export class UserRegisterComponent {
               return 'This field is required';
             case 'email':
               return 'Please enter a valid email address';
-            // Add more cases as needed for other validators
             default:
               return 'Invalid field';
           }

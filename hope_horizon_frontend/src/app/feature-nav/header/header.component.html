@@ -22,7 +22,11 @@
   </div>
 
   <!-- End/Right Content -->
-  <button mat-icon-button class="me-2" aria-label="Example icon-button with share icon">
+  <button mat-icon-button [matMenuTriggerFor]="menu" class="me-2" aria-label="Account menu">
     <mat-icon class="header__iconSize">account_circle</mat-icon>
   </button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item routerLink="/preferences">Preferences</button>
+    <button mat-menu-item (click)="onLogout()">Logout</button>
+  </mat-menu>
 </mat-toolbar>

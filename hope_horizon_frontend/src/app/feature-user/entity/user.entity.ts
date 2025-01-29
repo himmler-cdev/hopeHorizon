@@ -14,7 +14,7 @@ export class UserEntity {
             username: this.username,
             password: this.password,
             email: this.email,
-            birthdate: this.birthdate?.toISOString(),
+            birthdate: this.birthdate ? this.birthdate.toISOString().split('T')[0] : undefined,
         };
     }
 

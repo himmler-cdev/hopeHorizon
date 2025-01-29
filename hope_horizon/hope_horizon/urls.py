@@ -35,6 +35,7 @@ router.register(r"blog-post-type", BlogPostTypeViewSet, basename="blog-post-type
 router.register(r"blog-post", BlogPostViewSet, basename="blog-post")
 router.register(r'comment', CommentViewSet, basename='comment')
 router.register(r'notification', NotificationViewSet, basename='notification')
+router.register(r'quote', QuoteViewSet, basename='quote')
 
 
 urlpatterns = [

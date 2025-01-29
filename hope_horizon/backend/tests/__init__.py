@@ -7,3 +7,5 @@ from .blog_post_tests import BlogPostTests
 from .blog_post_type_tests import BlogPostTypeTests
 from .comment_tests import CommentTests
 from .notification_tests import NotificationTests
+from .quote_tests import QuoteTests
+

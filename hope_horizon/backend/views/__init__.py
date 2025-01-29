@@ -7,3 +7,4 @@ from .blog_post_type_view_set import BlogPostTypeViewSet
 from .blog_post_view_set import BlogPostViewSet
 from .comment_view_set import CommentViewSet
 from .notification_view_set import NotificationViewSet
+from .quote_view_set import QuoteViewSet
