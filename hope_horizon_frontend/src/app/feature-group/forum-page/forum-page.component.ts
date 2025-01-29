@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import { ForumListComponent } from '../forum-list/forum-list.component';
-import { ForumEntity } from '../entity/forum.entity';
-import { ForumService } from '../service/forum.service';
-import { ForumUserService } from '../service/forum-user.service';
-import { MockData } from '../service/mockdata';
-import { ForumUserEntity } from '../entity/fourm-user.entity';
+import {ForumListComponent} from '../forum-list/forum-list.component';
+import {ForumEntity} from '../entity/forum.entity';
+import {ForumService} from '../service/forum.service';
+import {ForumUserService} from '../service/forum-user.service';
+import {MockData} from '../service/mockdata';
+import {ForumUserEntity} from '../entity/fourm-user.entity';
 
 
 @Component({

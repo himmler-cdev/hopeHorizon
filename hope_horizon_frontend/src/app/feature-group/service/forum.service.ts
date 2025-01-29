@@ -1,8 +1,7 @@
-import { Injectable } from '@angular/core';
-import { ForumDto, ForumsDto } from '../dto/forum.dto';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { MockData } from './mockdata';
+import {Injectable} from '@angular/core';
+import {ForumDto, ForumsDto} from '../dto/forum.dto';
+import {HttpClient} from '@angular/common/http';
+import {Observable, of} from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +14,8 @@ export class ForumService {
 
   private apiUrl = 'http://127.0.0.1:8000/api/forum';
 
-  constructor(private _http: HttpClient) {}
+  constructor(private _http: HttpClient) {
+  }
 
   getForums(): Observable<ForumsDto> {
     return this._http.get<Readonly<ForumsDto>>('/api/forum?owned=true');
@@ -62,10 +62,10 @@ export class ForumService {
     //return this._http.put<Readonly<ForumDto>>(`/api/forum/${forum.id}/`, forum);
     const index = this.forumList.forums.findIndex(forum => forum.id === forum.id);
     return of(this.forumList.forums[index] = forum);
-  
+
   }
 
-  deleteForum(id: number): Observable<void>{
+  deleteForum(id: number): Observable<void> {
     //return this._http.delete(`/api/forum/${id}/`);
     const index = this.forumList.forums.findIndex(forum => forum.id === id);
     this.forumList.forums.splice(index, 1);

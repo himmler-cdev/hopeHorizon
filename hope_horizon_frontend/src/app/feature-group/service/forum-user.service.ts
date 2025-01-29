@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { ForumUsersDto, ForumUserPostDto } from '../dto/forum-user.dto';
-import { Observable, of, tap } from 'rxjs';
-import { MockData } from './mockdata';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {ForumUsersDto} from '../dto/forum-user.dto';
+import {Observable, of} from 'rxjs';
+import {MockData} from './mockdata';
 
 @Injectable({
   providedIn: 'root',
@@ -16,18 +16,18 @@ export class ForumUserService {
   forumUserList = this.mockData.forumUserList;
 
 
-
-  constructor(private _http: HttpClient) {}
+  constructor(private _http: HttpClient) {
+  }
 
   getAllUsers() {
     //return this._http.get<Readonly<ForumUsersDto>>('/api/user'); TODO when Users API is ready
-    return of({ forum_users: this.allUsersList });
+    return of({forum_users: this.allUsersList});
   }
 
   getForumUsers(forumId: number): Observable<ForumUsersDto> {
     //return this._http.get<Readonly<ForumUsersDto>>(`/api/forum-user?forum_id=${forumId}`);
     const forumUsers = this.forumUserList.forum_users.filter(forumUser => forumUser.forum_id === forumId);
-    return of({ forum_users: forumUsers });
+    return of({forum_users: forumUsers});
   }
 
   createForumUsers(forumUsers: ForumUsersDto): Observable<ForumUsersDto> {
@@ -42,7 +42,7 @@ export class ForumUserService {
         username: user.username,
       });
     });
-    return of({ forum_users: this.forumUserList.forum_users });
+    return of({forum_users: this.forumUserList.forum_users});
   }
 
   /* TODO when Users API is ready
@@ -66,14 +66,14 @@ export class ForumUserService {
     //return this._http.delete(`/api/forum-user/${id}/`);
     const index = this.forumUserList.forum_users.findIndex(forumUser => forumUser.id === id);
 
-  if (index === -1) {
-    console.warn(`User with ID ${id} not found.`);
-    return of({ forum_users: this.forumUserList.forum_users }); // Return unchanged list
-  }
+    if (index === -1) {
+      console.warn(`User with ID ${id} not found.`);
+      return of({forum_users: this.forumUserList.forum_users}); // Return unchanged list
+    }
 
-  this.forumUserList.forum_users.splice(index, 1);
+    this.forumUserList.forum_users.splice(index, 1);
 
-    return of({ forum_users: this.forumUserList.forum_users });
+    return of({forum_users: this.forumUserList.forum_users});
   }
 }
 

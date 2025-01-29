@@ -1,4 +1,4 @@
-import { ForumUserDto } from '../dto/forum-user.dto';
+import {ForumUserDto} from '../dto/forum-user.dto';
 
 export class ForumUserEntity {
   id?: number;

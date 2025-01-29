@@ -4,18 +4,21 @@
     <div class="title-field">
       <mat-form-field class="w-100" appearance="outline">
         <mat-label>Title</mat-label>
-        <input matInput formControlName="name" />
+        <input matInput formControlName="name"/>
 
         <!-- Error Message -->
         @if (forumFormGroup.controls['name'].hasError('required')) {
-        <mat-error>Name is required</mat-error>
-        } @if (forumFormGroup.controls['name'].hasError('maxlength')) {
-        <mat-error>Name cannot be more than 250 characters</mat-error>
-        } @if (forumFormGroup.controls['name'].hasError('whitespace')) {
-        <mat-error
+          <mat-error>Name is required</mat-error>
+        }
+        @if (forumFormGroup.controls['name'].hasError('maxlength')) {
+          <mat-error>Name cannot be more than 250 characters</mat-error>
+        }
+        @if (forumFormGroup.controls['name'].hasError('whitespace')) {
+          <mat-error
           >Name cannot be all whitespace. It must contain at least one
-          non-whitespace character</mat-error
-        >
+            non-whitespace character
+          </mat-error
+          >
         }
       </mat-form-field>
     </div>
@@ -29,75 +32,78 @@
 
       <!-- Error Message -->
       @if (forumFormGroup.controls['description'].hasError('required')) {
-      <mat-error>Description is required</mat-error>
-      } @if (forumFormGroup.controls['description'].hasError('whitespace')) {
-      <mat-error
+        <mat-error>Description is required</mat-error>
+      }
+      @if (forumFormGroup.controls['description'].hasError('whitespace')) {
+        <mat-error
         >Description cannot be all whitespace. It must contain at least one
-        non-whitespace character</mat-error
-      >
+          non-whitespace character
+        </mat-error
+        >
       }
     </mat-form-field>
   </div>
 
 
   <!-- Forum Users  -->
-  <app-forum-user-chip [forumUserNames]="forumUserNames" [allUserNames]="allUserNames" (updatedForumUserNames)="onForumUserNamesChange($event)"></app-forum-user-chip>
-  
-  
+  <app-forum-user-chip [forumUserNames]="forumUserNames" [allUserNames]="allUserNames"
+                       (updatedForumUserNames)="onForumUserNamesChange($event)"></app-forum-user-chip>
+
+
   <!-- Cancel/Clear and Submit Buttons -->
   <div class="mt-2">
     @if (forumId) {
-    <!-- Edit Mode -->
-    <div>
-      <button
-        mat-raised-button
-        color="primary"
-        class="deny-button mat-elevation-z3 me-3"
-        (click)="openDeleteDialog()"
-      >
-        Delete Forum
-      </button>
-    </div>
-    <div class="d-flex justify-content-end align-items-end">
-      <button
-        mat-raised-button
-        color="primary"
-        class="deny-button mat-elevation-z3 me-3"
-        (click)="openCancelDialog()"
-      >
-        Cancel
-      </button>
-      <button
-        mat-raised-button
-        color="primary"
-        class="save-button mat-elevation-z3"
-        [disabled]="!forumFormGroup.valid"
-        (click)="createOrUpdate()"
-      >
-        Update Forum
-      </button>
-    </div>
+      <!-- Edit Mode -->
+      <div>
+        <button
+          mat-raised-button
+          color="primary"
+          class="deny-button mat-elevation-z3 me-3"
+          (click)="openDeleteDialog()"
+        >
+          Delete Forum
+        </button>
+      </div>
+      <div class="d-flex justify-content-end align-items-end">
+        <button
+          mat-raised-button
+          color="primary"
+          class="deny-button mat-elevation-z3 me-3"
+          (click)="openCancelDialog()"
+        >
+          Cancel
+        </button>
+        <button
+          mat-raised-button
+          color="primary"
+          class="save-button mat-elevation-z3"
+          [disabled]="!forumFormGroup.valid"
+          (click)="createOrUpdate()"
+        >
+          Update Forum
+        </button>
+      </div>
     } @else {
-    <!-- Create Mode -->
-    <div class="d-flex justify-content-end align-items-end">
-      <button
-        mat-raised-button
-        color="primary"
-        class="deny-button mat-elevation-z3 me-3"
-        (click)="openCancelDialog()"
-      >
-        Clear
-      </button>
-      <button
-        mat-raised-button
-        color="primary"
-        class="save-button mat-elevation-z3"
-        [disabled]="!forumFormGroup.valid"
-        (click)="createOrUpdate()"
-      >
-        Create Forum
-      </button>
-    </div>
+      <!-- Create Mode -->
+      <div class="d-flex justify-content-end align-items-end">
+        <button
+          mat-raised-button
+          color="primary"
+          class="deny-button mat-elevation-z3 me-3"
+          (click)="openCancelDialog()"
+        >
+          Clear
+        </button>
+        <button
+          mat-raised-button
+          color="primary"
+          class="save-button mat-elevation-z3"
+          [disabled]="!forumFormGroup.valid"
+          (click)="createOrUpdate()"
+        >
+          Create Forum
+        </button>
+      </div>
     }
   </div>
 </form>

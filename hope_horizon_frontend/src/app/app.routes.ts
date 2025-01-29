@@ -8,9 +8,9 @@ import {BlogJournalComponent} from './feature-blog/blog-journal/blog-journal.com
 import {BlogFormComponent} from './feature-blog/blog-form/blog-form.component';
 import {BlogDetailComponent} from './feature-blog/blog-detail/blog-detail.component';
 import {NotFoundComponent} from './feature-not-found/not-found/not-found.component';
-import {HomePageComponent} from './feature-home/home-page/home-page.component';
-import { ForumPageComponent } from './feature-group/forum-page/forum-page.component';
-import { ForumFormComponent } from './feature-group/forum-form/forum-form.component';
+import {HomePageComponent} from './feature-home/home-page/home-page.component';+
+import {ForumPageComponent} from './feature-group/forum-page/forum-page.component';
+import {ForumFormComponent} from './feature-group/forum-form/forum-form.component';
 
 export const routes: Routes = [
   /**

@@ -1,27 +1,20 @@
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import {
-  AbstractControl,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  ValidatorFn,
-  Validators,
-} from '@angular/forms';
-import { Router, RouterLink, ActivatedRoute } from '@angular/router';
-import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
-import { MatOption, MatSelect } from '@angular/material/select';
-import { MatButton, MatIconButton } from '@angular/material/button';
-import { MatDialog } from '@angular/material/dialog';
-import { ConfirmDialogComponent } from '../../../shared/dialogs/confirm-dialog/confirm-dialog.component';
-import { ForumService } from '../service/forum.service';
-import { ForumEntity } from '../entity/forum.entity';
-import { MatIcon } from '@angular/material/icon';
-import { ForumUserEntity } from '../entity/fourm-user.entity';
-import { ForumUserService } from '../service/forum-user.service';
-import { MockData } from '../service/mockdata';
-import { ForumUsersDto } from '../dto/forum-user.dto';
-import { ForumUserChipComponent } from '../forum-user-chip/forum-user-chip.component';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, Validators,} from '@angular/forms';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {MatError, MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatInput} from '@angular/material/input';
+import {MatOption, MatSelect} from '@angular/material/select';
+import {MatButton, MatIconButton} from '@angular/material/button';
+import {MatDialog} from '@angular/material/dialog';
+import {ConfirmDialogComponent} from '../../../shared/dialogs/confirm-dialog/confirm-dialog.component';
+import {ForumService} from '../service/forum.service';
+import {ForumEntity} from '../entity/forum.entity';
+import {MatIcon} from '@angular/material/icon';
+import {ForumUserEntity} from '../entity/fourm-user.entity';
+import {ForumUserService} from '../service/forum-user.service';
+import {MockData} from '../service/mockdata';
+import {ForumUsersDto} from '../dto/forum-user.dto';
+import {ForumUserChipComponent} from '../forum-user-chip/forum-user-chip.component';
 
 @Component({
   selector: 'app-forum-form',
@@ -173,7 +166,7 @@ export class ForumFormComponent implements OnInit {
           (name) => name !== undefined && !uniqueUpdatedForumUserNames.includes(name)
         );
 
-        //create FourmUserEntity objects for each user 
+        //create FourmUserEntity objects for each user
         //TODO: Change later on after implementing user
         this.updatedUsers = updatedForumUserNames.map((name) => {
           const user = new ForumUserEntity();
@@ -188,7 +181,7 @@ export class ForumFormComponent implements OnInit {
           user.is_owner = false;
         });
 
-        const dtoForumUsers: ForumUsersDto = { forum_users: dtoForumUserList };
+        const dtoForumUsers: ForumUsersDto = {forum_users: dtoForumUserList};
 
         this._forumUserService.createForumUsers(dtoForumUsers).subscribe();
 
@@ -212,7 +205,7 @@ export class ForumFormComponent implements OnInit {
           user.is_owner = false;
         });
 
-        const dtoForumUsers: ForumUsersDto = { forum_users: dtoForumUserList };
+        const dtoForumUsers: ForumUsersDto = {forum_users: dtoForumUserList};
         this._forumUserService.createForumUsers(dtoForumUsers).subscribe();
 
         this.forumFormGroup.reset();
@@ -281,7 +274,7 @@ export class ForumFormComponent implements OnInit {
       }
       const isWhitespace = (control.value || '').trim().length === 0;
       const isValid = !isWhitespace;
-      return isValid ? null : { whitespace: true };
+      return isValid ? null : {whitespace: true};
     };
   }
 }

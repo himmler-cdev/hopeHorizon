@@ -1,8 +1,8 @@
-import { ForumUsersDto } from '../dto/forum-user.dto';
-import { ForumsDto } from '../dto/forum.dto';
+import {ForumUsersDto} from '../dto/forum-user.dto';
+import {ForumsDto} from '../dto/forum.dto';
 
 export class MockData {
-  loggedInUser = { id: 1, username: 'testuser' };
+  loggedInUser = {id: 1, username: 'testuser'};
   allUsers = [
     'testuser',
     'fish2',

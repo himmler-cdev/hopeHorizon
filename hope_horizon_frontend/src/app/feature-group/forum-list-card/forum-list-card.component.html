@@ -8,19 +8,19 @@
         <p>{{ forum.description }}</p>
       </mat-card-content>
     </div>
-    @if(forumUser.is_owner) {
-    <div class="d-flex align-items-center">
-      <button mat-icon-button class="me-2" (click)="openForum()">
-        <mat-icon>edit</mat-icon>
-      </button>
-    </div>
+    @if (forumUser.is_owner) {
+      <div class="d-flex align-items-center">
+        <button mat-icon-button class="me-2" (click)="openForum()">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </div>
     } @else {
       <div class="d-flex align-items-center">
         <button mat-icon-button class="me-2" (click)="leaveForum()">
           <mat-icon>exit_to_app</mat-icon>
         </button>
-    </div>
+      </div>
     }
-    </div>
+  </div>
 </mat-card>
 

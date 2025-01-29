@@ -1,46 +1,18 @@
-import { NgClass } from '@angular/common';
-import {
-  Component,
-  computed,
-  EventEmitter,
-  inject,
-  Input,
-  model,
-  Output,
-  signal,
-} from '@angular/core';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatIconButton, MatButton } from '@angular/material/button';
-import {
-  MatCard,
-  MatCardTitle,
-  MatCardHeader,
-  MatCardContent,
-} from '@angular/material/card';
-import {
-  MatChip,
-  MatChipInputEvent,
-  MatChipOption,
-  MatChipsModule,
-} from '@angular/material/chips';
-import { MatOption } from '@angular/material/core';
-import {
-  MatFormField,
-  MatFormFieldModule,
-  MatLabel,
-  MatSuffix,
-} from '@angular/material/form-field';
-import { MatIcon, MatIconModule } from '@angular/material/icon';
-import { MatInput } from '@angular/material/input';
-import { MatSelect } from '@angular/material/select';
-import { RouterLink } from '@angular/router';
-import { ForumUserEntity } from '../entity/fourm-user.entity';
-import {
-  MatAutocompleteModule,
-  MatAutocompleteSelectedEvent,
-} from '@angular/material/autocomplete';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
+import {NgClass} from '@angular/common';
+import {Component, computed, EventEmitter, inject, Input, model, Output, signal,} from '@angular/core';
+import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatButton, MatIconButton} from '@angular/material/button';
+import {MatCard, MatCardContent, MatCardHeader, MatCardTitle,} from '@angular/material/card';
+import {MatChip, MatChipInputEvent, MatChipOption, MatChipsModule,} from '@angular/material/chips';
+import {MatOption} from '@angular/material/core';
+import {MatFormField, MatFormFieldModule, MatLabel, MatSuffix,} from '@angular/material/form-field';
+import {MatIcon, MatIconModule} from '@angular/material/icon';
+import {MatInput} from '@angular/material/input';
+import {MatSelect} from '@angular/material/select';
+import {RouterLink} from '@angular/router';
+import {MatAutocompleteModule, MatAutocompleteSelectedEvent,} from '@angular/material/autocomplete';
+import {COMMA, ENTER} from '@angular/cdk/keycodes';
+import {LiveAnnouncer} from '@angular/cdk/a11y';
 
 @Component({
   selector: 'app-forum-user-chip',
@@ -76,8 +48,8 @@ import { LiveAnnouncer } from '@angular/cdk/a11y';
   styleUrl: './forum-user-chip.component.scss',
 })
 export class ForumUserChipComponent {
-  @Input({ required: true }) forumUserNames!: string[];
-  @Input({ required: true }) allUserNames!: string[];
+  @Input({required: true}) forumUserNames!: string[];
+  @Input({required: true}) allUserNames!: string[];
   @Output() updatedForumUserNames = new EventEmitter<string[]>();
 
   searchControl = new FormControl('');
@@ -92,13 +64,13 @@ export class ForumUserChipComponent {
     const currentUser = this.currentUser().toLowerCase();
     return currentUser
       ? this.allUserNames.filter(
-          (user) =>
-            user.toLowerCase().includes(currentUser) &&
-            !this.actualUserNames().includes(user) // Exclude already selected users
-        )
+        (user) =>
+          user.toLowerCase().includes(currentUser) &&
+          !this.actualUserNames().includes(user) // Exclude already selected users
+      )
       : this.allUserNames.filter(
-          (user) => !this.actualUserNames().includes(user)
-        ); // Exclude already selected users
+        (user) => !this.actualUserNames().includes(user)
+      ); // Exclude already selected users
   });
 
   readonly announcer = inject(LiveAnnouncer);

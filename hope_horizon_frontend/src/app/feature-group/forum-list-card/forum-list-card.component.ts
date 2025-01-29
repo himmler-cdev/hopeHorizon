@@ -3,12 +3,11 @@ import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/mat
 import {MatIcon} from "@angular/material/icon";
 import {MatIconButton} from "@angular/material/button";
 import {ForumEntity} from '../entity/forum.entity';
-import {Router, RouterLink} from '@angular/router';
-import { ForumUserEntity } from '../entity/fourm-user.entity';
-import { ForumService } from '../service/forum.service';
-import { ForumUserService } from '../service/forum-user.service';
-import { MatDialog } from '@angular/material/dialog';
-import { ConfirmDialogComponent } from '../../../shared/dialogs/confirm-dialog/confirm-dialog.component';
+import {Router} from '@angular/router';
+import {ForumUserEntity} from '../entity/fourm-user.entity';
+import {ForumUserService} from '../service/forum-user.service';
+import {MatDialog} from '@angular/material/dialog';
+import {ConfirmDialogComponent} from '../../../shared/dialogs/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-forum-list-card',
@@ -29,9 +28,10 @@ export class ForumListCardComponent {
   @Input({required: true}) forumUser!: ForumUserEntity;
 
   @Output() forumUserLeft = new EventEmitter<number>();
-  
 
-  constructor(private _router: Router, private _forumUserService: ForumUserService, private _dialog: MatDialog) {}
+
+  constructor(private _router: Router, private _forumUserService: ForumUserService, private _dialog: MatDialog) {
+  }
 
   openForum() {
     this._router.navigate(['/forum/', this.forum.id]);

@@ -25,7 +25,8 @@
     </div>
   }
   <div class="add-new-forum mb-3">
-    <button mat-raised-button color="primary" class="w-100 new-forum-button mat-elevation-z3" routerLink="/forum/create">
+    <button mat-raised-button color="primary" class="w-100 new-forum-button mat-elevation-z3"
+            routerLink="/forum/create">
       Add New Forum
     </button>
   </div>
@@ -35,7 +36,8 @@
 @for (forum of filteredForumList; track $index) {
   @for (forumUser of forumUsersOfUser; track $index) {
     @if (forumUser.forum_id === forum.id) {
-      <app-forum-list-card [forum]="forum" [forumUser]="forumUser" (forumUserLeft)="handleForumUserLeft($event)"></app-forum-list-card>
+      <app-forum-list-card [forum]="forum" [forumUser]="forumUser"
+                           (forumUserLeft)="handleForumUserLeft($event)"></app-forum-list-card>
     }
   }
 }
