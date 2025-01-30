@@ -11,3 +11,4 @@ from .forum_serializer import ForumSerializer
 from .forum_user_serializer import ForumUserSerializer
 from .comment_serializer import CommentSerializer
 from .notification_serializer import NotificationSerializer
+from .quote_serializer import QuoteSerializer

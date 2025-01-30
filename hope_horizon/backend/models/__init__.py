@@ -8,3 +8,4 @@ from .blog_post import BlogPost
 from .forum import Forum
 from .forum_user import ForumUser
 from .notification import Notification
+from .quote import Quote

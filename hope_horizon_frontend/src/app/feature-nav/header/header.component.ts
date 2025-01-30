@@ -3,6 +3,8 @@ import {MatToolbar} from '@angular/material/toolbar';
 import {MatIcon} from '@angular/material/icon';
 import {MatAnchor, MatButton, MatIconButton} from '@angular/material/button';
 import {NgOptimizedImage} from '@angular/common';
+import { MatMenu, MatMenuModule } from '@angular/material/menu';
+import { UserService } from '../../feature-user/user.service';
 
 @Component({
   selector: 'app-header',
@@ -13,11 +15,19 @@ import {NgOptimizedImage} from '@angular/common';
     MatIconButton,
     NgOptimizedImage,
     MatButton,
-    MatAnchor
+    MatAnchor,
+    MatMenu,
+    MatMenuModule
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
+
+  constructor(private userService: UserService) {}
+
+  onLogout() {
+    this.userService.logout();
+  }
 
 }
