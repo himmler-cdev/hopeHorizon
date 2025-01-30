@@ -10,6 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { TrackerEntity } from '../../feature-settings/entity/tracker.entity';
 import { TrackerDto } from '../../feature-settings/dto/tracker.dto';
 import { UserStatusService } from '../service/user-status.service';
+import { NotificationSectionComponent } from "../../feature-notification/notification-section/notification-section.component";
 
 @Component({
   selector: 'app-home-page',
@@ -17,8 +18,9 @@ import { UserStatusService } from '../service/user-status.service';
   imports: [
     MatDivider,
     MatButton,
-    RouterLink
-  ],
+    RouterLink,
+    NotificationSectionComponent
+],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss'
 })
@@ -68,5 +70,4 @@ export class HomePageComponent implements OnInit {
       }
     });
   }
-
 }
