@@ -18,7 +18,7 @@
       <mat-form-field class="w-100" appearance="outline">
         <mat-select placeholder="Select an Option" [formControl]="filterControl">
           <mat-option [value]="null">All</mat-option>
-          @for (option of filterOptions; track $index) {
+          @for (option of blogPostTypes; track $index) {
             <mat-option value="{{ option.id }}">{{ option.type }}</mat-option>
           }
         </mat-select>
@@ -34,5 +34,5 @@
 
 <!-- Blogs -->
 @for (blog of blogPostList; track $index) {
-  <app-blog-list-card [blog]="blog"></app-blog-list-card>
+  <app-blog-list-card [blog]="blog" [blogPostTypes]="blogPostTypes"></app-blog-list-card>
 }

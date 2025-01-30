@@ -1,0 +1,122 @@
+.quote-container {
+  height: 20vh;
+  background: linear-gradient(to bottom, #fffde7, #fff176);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-direction: column;
+}
+
+.quote-container h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  position: relative;
+}
+
+.quote-container p {
+  margin: 0;
+  font-size: 1rem;
+  color: #666;
+  font-family: 'Arial', sans-serif;
+}
+
+.left-animation, .right-animation {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  background: #9e7bf7;
+  clip-path: polygon(25% 6.7%, 75% 6.7%, 100% 50%, 75% 93.3%, 25% 93.3%, 0% 50%);
+  animation: pulse 2s infinite;
+  top: 10%;
+}
+
+.left-animation-1 {
+  left: 20%;
+}
+
+.left-animation-2 {
+  left: 25%;
+}
+
+.left-animation-3 {
+  left: 30%;
+}
+
+.right-animation-1 {
+  right: 20%;
+}
+
+.right-animation-2 {
+  right: 25%;
+}
+
+.right-animation-3 {
+  right: 30%;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 1200px) {
+  .left-animation-3, .right-animation-3 {
+    display: none;
+  }
+}
+
+@media (max-width: 992px) {
+  .left-animation-2, .right-animation-2 {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .left-animation-1, .right-animation-1 {
+    display: none;
+  }
+}
+
+.quote-container {
+  background: linear-gradient(to bottom, #fffde7, #fff176);
+  position: relative;
+}
+
+.quote-container h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+.quote-container .quote-text {
+  margin: 0;
+  font-size: 1rem;
+  color: #666;
+  font-family: 'Arial', sans-serif;
+  word-wrap: break-word;
+  text-align: center;
+}
+
+.new-blog-button {
+  background-color: #4c9a64;
+  color: white;
+  min-width: 200px;
+  transition: background-color 0.3s ease;
+
+  &:hover,
+  &:focus {
+    background-color: #3a7a4d;
+  }
+}
+
