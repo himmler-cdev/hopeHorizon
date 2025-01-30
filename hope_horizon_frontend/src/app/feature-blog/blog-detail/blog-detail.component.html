@@ -1,0 +1,38 @@
+<div class="mx-2 me-2">
+  <div class="row align-items-center">
+    <!-- Input field for title -->
+    <div class="col-md flex-grow-1">
+      <mat-form-field class="w-100 mt-3" appearance="outline">
+        <mat-label>Title</mat-label>
+        <input matInput readonly [value]="blogPost?.title"/>
+      </mat-form-field>
+    </div>
+
+    <!-- Edit Button -->
+    @if (userId === blogPost?.userId) {
+      <div class="col-md-auto add-new-blog d-flex justify-content-md-end justify-content-center mt-2 mt-md-0">
+        <button
+          mat-raised-button
+          color="primary"
+          class="new-blog-button mat-elevation-z3"
+          [routerLink]="['/blog/edit', blogPost?.id]"
+        >
+          Edit Blog
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Content -->
+  <div class="mt-2 me-2">
+    <mat-form-field class="w-100" appearance="outline">
+      <mat-label>Content</mat-label>
+      <textarea matInput cdkTextareaAutosize [cdkAutosizeMinRows]="5"
+                [value]="blogPost?.content" spellcheck="false">
+      </textarea>
+    </mat-form-field>
+  </div>
+
+  <!-- Comment Section -->
+  <!-- TODO: Add @David -->
+</div>

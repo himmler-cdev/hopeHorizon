@@ -1,52 +1,52 @@
 <div class="register-container">
-    <div class="register-page">
-        <div class="register-form">
-            <div class="register-title">REGISTER NOW</div>
-            <div class="login-link">
-                <div class="login-text">Already have an account?</div>
-                <div class="login-action" [routerLink]="['/login']" role="button">Login here</div>
-            </div>
-            <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
-                <mat-form-field class="form-group" appearance="fill">
-                    <mat-label>Username</mat-label>
-                    <input matInput type="text" formControlName="username" name="username" required
-                        placeholder="Enter your username">
-                    @if (getErrorMessage("username") !== '') {
-                        <mat-error>{{ getErrorMessage("username") }}</mat-error>
-                    }
-                </mat-form-field>
-                <mat-form-field class="form-group" appearance="fill">
-                    <mat-label>Email</mat-label>
-                    <input matInput type="email" formControlName="email" name="email" required placeholder="Enter your email">
-                    @if (getErrorMessage("email") !== '') {
-                        <mat-error>{{ getErrorMessage("email") }}</mat-error>
-                    }
-                </mat-form-field>
-                <mat-form-field class="form-group" appearance="fill">
-                    <mat-label>Birthdate</mat-label>
-                    <input matInput [matDatepicker]="picker" formControlName="birthdate" placeholder="Choose your birthdate">
-                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                    <mat-datepicker #picker></mat-datepicker>
-                    @if (getErrorMessage("birthdate") !== '') {
-                        <mat-error>{{ getErrorMessage("birthdate") }}</mat-error>
-                    }
-                </mat-form-field>
-                <mat-form-field class="form-group" appearance="fill">
-                    <mat-label>Password</mat-label>
-                    <input matInput type="password" formControlName="password" name="password" required
-                        placeholder="Enter your password">
-                    @if (getErrorMessage("password") !== '') {
-                        <mat-error>{{ getErrorMessage("password") }}</mat-error>
-                    }
-                </mat-form-field>
-                @if (errorMessage.length > 0) {
-                    <div class="error-message">{{ errorMessage }}</div>
-                }
-                <div class="form-button">
-                    <button mat-raised-button color="primary" type="submit" title="Click to register">REGISTER</button>
-                </div>
-            </form>
+  <div class="register-page">
+    <div class="register-form">
+      <div class="register-title">REGISTER NOW</div>
+      <div class="login-link">
+        <div class="login-text">Already have an account?</div>
+        <div class="login-action" [routerLink]="['/login']" role="button">Login here</div>
+      </div>
+      <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+        <mat-form-field class="form-group" appearance="fill">
+          <mat-label>Username</mat-label>
+          <input matInput type="text" formControlName="username" name="username" required
+                 placeholder="Enter your username">
+          @if (getErrorMessage("username") !== '') {
+            <mat-error>{{ getErrorMessage("username") }}</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field class="form-group" appearance="fill">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" name="email" required placeholder="Enter your email">
+          @if (getErrorMessage("email") !== '') {
+            <mat-error>{{ getErrorMessage("email") }}</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field class="form-group" appearance="fill">
+          <mat-label>Birthdate</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="birthdate" placeholder="Choose your birthdate">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          @if (getErrorMessage("birthdate") !== '') {
+            <mat-error>{{ getErrorMessage("birthdate") }}</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field class="form-group" appearance="fill">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="password" name="password" required
+                 placeholder="Enter your password">
+          @if (getErrorMessage("password") !== '') {
+            <mat-error>{{ getErrorMessage("password") }}</mat-error>
+          }
+        </mat-form-field>
+        @if (errorMessage.length > 0) {
+          <div class="error-message">{{ errorMessage }}</div>
+        }
+        <div class="form-button">
+          <button mat-raised-button color="primary" type="submit" title="Click to register">REGISTER</button>
         </div>
-        <div class="register-image"></div>
+      </form>
     </div>
+    <div class="register-image"></div>
+  </div>
 </div>

@@ -1,36 +1,36 @@
 <div class="login-container mat-elevation-z3">
-    <div class="login-page">
-        <div class="login-form">
-            <div class="login-title">LOGIN NOW</div>
-            <div class="register-link">
-                <div class="register-text">Don't have an account?</div>
-                <div class="register-action" [routerLink]="['/register']" role="button">Register here</div>
-            </div>
-            <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
-                <mat-form-field class="form-group" appearance="fill">
-                    <mat-label>Username</mat-label>
-                    <input matInput type="text" formControlName="username" name="username" required
-                        placeholder="Enter your username">
-                    @if (getErrorMessage("username") !== '') {
-                        <mat-error>{{ getErrorMessage("username") }}</mat-error>
-                    }
-                </mat-form-field>
-                <mat-form-field class="form-group" appearance="fill">
-                    <mat-label>Password</mat-label>
-                    <input matInput type="password" formControlName="password" name="password" required
-                        placeholder="Enter your password">
-                    @if (getErrorMessage("password") !== '') {
-                        <mat-error>{{ getErrorMessage("password") }}</mat-error>
-                    }
-                </mat-form-field>
-                @if (errorMessage.length > 0) {
-                    <mat-error class="error-message">{{ errorMessage }}</mat-error>
-                }
-                <div class="form-button">
-                    <button mat-raised-button color="primary" type="submit" title="Click to login">LOGIN</button>
-                </div>
-            </form>
+  <div class="login-page">
+    <div class="login-form">
+      <div class="login-title">LOGIN NOW</div>
+      <div class="register-link">
+        <div class="register-text">Don't have an account?</div>
+        <div class="register-action" [routerLink]="['/register']" role="button">Register here</div>
+      </div>
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+        <mat-form-field class="form-group" appearance="fill">
+          <mat-label>Username</mat-label>
+          <input matInput type="text" formControlName="username" name="username" required
+                 placeholder="Enter your username">
+          @if (getErrorMessage("username") !== '') {
+            <mat-error>{{ getErrorMessage("username") }}</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field class="form-group" appearance="fill">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="password" name="password" required
+                 placeholder="Enter your password">
+          @if (getErrorMessage("password") !== '') {
+            <mat-error>{{ getErrorMessage("password") }}</mat-error>
+          }
+        </mat-form-field>
+        @if (errorMessage.length > 0) {
+          <mat-error class="error-message">{{ errorMessage }}</mat-error>
+        }
+        <div class="form-button">
+          <button mat-raised-button color="primary" type="submit" title="Click to login">LOGIN</button>
         </div>
-        <div class="login-image"></div>
+      </form>
     </div>
+    <div class="login-image"></div>
+  </div>
 </div>

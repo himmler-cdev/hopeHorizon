@@ -1,0 +1,49 @@
+.title-field {
+  flex: 0.8;
+}
+
+.type-field {
+  flex: 0.2;
+  min-width: 200px;
+}
+
+.save-button {
+  background-color: #4c9a64;
+  color: white;
+  min-width: 180px;
+  transition: background-color 0.3s ease;
+
+  &:hover,
+  &:focus {
+    background-color: #3a7a4d;
+  }
+}
+
+.save-button:disabled {
+  background-color: #88a68f;
+  color: white;
+}
+
+.deny-button {
+  background-color: #5e636e;
+  color: white;
+  min-width: 180px;
+  transition: background-color 0.3s ease;
+
+  &:hover,
+  &:focus {
+    background-color: #4a4f58;
+  }
+}
+
+.delete-button {
+  background-color: #d9534f;
+  color: white;
+  min-width: 180px;
+  transition: background-color 0.3s ease;
+
+  &:hover,
+  &:focus {
+    background-color: #b03a37;
+  }
+}

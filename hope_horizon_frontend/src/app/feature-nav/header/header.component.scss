@@ -1,15 +1,16 @@
-.header__toolbar {
+.header-toolbar {
   position: sticky;
   top: 0;
   width: 100%;
-  background: #d5bffa;
+  background: #9e7bf7;
+  z-index: 100;
 }
 
-.header__link {
+.header-link {
   font-size: 1.15rem;
 }
 
-.header__iconSize {
+.header-iconSize {
   font-size: 40px;
   height: 40px;
   width: 40px;

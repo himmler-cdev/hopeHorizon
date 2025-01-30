@@ -1,1 +1,38 @@
-<p>blog-list works!</p>
+<!-- Search, Filter and Create -->
+<div class="d-flex flex-row search-filter">
+  <div class="search-bar">
+    <mat-form-field class="w-100" appearance="outline">
+      <mat-label>Search for a Blog ...</mat-label>
+      <input matInput [formControl]="searchControl"/>
+      @if (searchControl.value === '') {
+        <mat-icon matSuffix class="me-1">search</mat-icon>
+      } @else {
+        <button mat-icon-button matSuffix class="me-1" (click)="clearSearchFilter()">
+          <mat-icon>clear</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+  </div>
+  @if (showFilter) {
+    <div class="dropdown">
+      <mat-form-field class="w-100" appearance="outline">
+        <mat-select placeholder="Select an Option" [formControl]="filterControl">
+          <mat-option [value]="null">All</mat-option>
+          @for (option of filterOptions; track $index) {
+            <mat-option value="{{ option.id }}">{{ option.type }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+  }
+  <div class="add-new-blog mb-3">
+    <button mat-raised-button color="primary" class="w-100 new-blog-button mat-elevation-z3" routerLink="/blog/create">
+      Add New Blog
+    </button>
+  </div>
+</div>
+
+<!-- Blogs -->
+@for (blog of blogPostList; track $index) {
+  <app-blog-list-card [blog]="blog"></app-blog-list-card>
+}

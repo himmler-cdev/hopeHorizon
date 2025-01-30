@@ -82,14 +82,14 @@ class BlogPostViewSet(viewsets.ModelViewSet):
             blog_posts = blog_posts.order_by('-date')
         
         offset = (page - 1) * page_size
+        total_posts = blog_posts.count()
         blog_posts = blog_posts[offset:offset + page_size]
-        totalPosts = blog_posts.count()
 
         data = {
             "page": page,
             "page_size": page_size,
-            "actualSize": totalPosts,
-            "blog_posts": blog_posts
+            "total_size": total_posts,
+            "blog_posts": blog_posts,
         }
 
         serializer = self.serializers["list"](data)
@@ -133,7 +133,7 @@ class BlogPostViewSet(viewsets.ModelViewSet):
             serializer.save(user_id=request.user, forum_id_id=request.data.get('forum_id'))
         else:
             serializer.save(user_id=request.user, forum_id=None)
-
+        
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk):

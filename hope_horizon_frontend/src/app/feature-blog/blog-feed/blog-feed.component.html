@@ -1,0 +1,10 @@
+<div class="mx-2">
+    <app-blog-list [blogPostList]="blogPostList" [showFilter]="false"
+                   (searchChange)="onSearchChange($event)"></app-blog-list>
+    <mat-paginator [length]="blogListLength"
+                   [pageSize]="pageSize"
+                   [pageSizeOptions]="pageSizeOptions"
+                   (page)="onPageChange($event)"
+                   aria-label="Select page">
+    </mat-paginator>
+</div>

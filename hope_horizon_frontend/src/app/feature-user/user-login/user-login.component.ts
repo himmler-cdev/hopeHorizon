@@ -1,11 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { RouterModule } from '@angular/router';
-import { UserService } from '../user.service';
-import { Router } from "@angular/router"
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {Component} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {Router, RouterModule} from '@angular/router';
+import {UserService} from '../user.service';
+import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 
 @Component({
   selector: 'app-user-login',
@@ -37,7 +36,7 @@ export class UserLoginComponent {
       let res = this.userService.login(this.loginForm.value)
       if (!res) {
         this.errorMessage = 'Invalid username or password';
-      } 
+      }
     } else {
       this.errorMessage = '';
     }

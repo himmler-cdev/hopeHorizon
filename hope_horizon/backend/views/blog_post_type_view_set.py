@@ -12,4 +12,4 @@ class BlogPostTypeViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         serializer = BlogPostTypeSerializer(self.queryset, many=True)
-        return Response({"detail": serializer.data}, status=status.HTTP_200_OK)
+        return Response({"blog_post_types": serializer.data}, status=status.HTTP_200_OK)

@@ -1,0 +1,16 @@
+.add-new-blog {
+  flex: 0 0 auto;
+}
+
+.new-blog-button {
+  background-color: #4c9a64;
+  color: white;
+  min-width: 200px;
+  margin-bottom: 4px;
+  transition: background-color 0.3s ease;
+
+  &:hover,
+  &:focus {
+    background-color: #3a7a4d;
+  }
+}

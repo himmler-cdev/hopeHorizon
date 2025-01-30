@@ -412,7 +412,6 @@ class BlogPostTests(APITestCase):
         response = self.client.get("/api/blog-post?page=40&page_size=10&owned=true", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 0)
-        self.assertEqual(response.data["page_information"]["actualSize"], 0)
     
     # Test if blog post list is retrived with page number smaller than 1
     def test_list_blog_post_pagination_negative_page_number(self):
@@ -677,7 +676,6 @@ class BlogPostTests(APITestCase):
         # Validate page information
         self.assertEqual(data["page_information"]["page"], page)
         self.assertEqual(data["page_information"]["page_size"], page_size)
-        self.assertEqual(data["page_information"]["actualSize"], len(data["blog_posts"]))
 
         # Validate blog posts
         start_index = (page - 1) * page_size
