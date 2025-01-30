@@ -11,7 +11,9 @@ import {TrackerEntity} from '../../feature-settings/entity/tracker.entity';
 import {UserStatusService} from '../service/user-status.service';
 import {UserStatusEntity} from '../entity/user-status.entity';
 import {NgxChartsModule} from '@swimlane/ngx-charts';
-import { NotificationSectionComponent } from "../../feature-notification/notification-section/notification-section.component";
+import {
+  NotificationSectionComponent
+} from "../../feature-notification/notification-section/notification-section.component";
 
 
 @Component({
@@ -23,7 +25,7 @@ import { NotificationSectionComponent } from "../../feature-notification/notific
     RouterLink,
     NotificationSectionComponent,
     NgxChartsModule
-],
+  ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss'
 })
@@ -43,7 +45,16 @@ export class HomePageComponent implements OnInit {
     this._quoteService.getRandomQuote().subscribe((quote) => {
       this.quote = QuoteEntity.fromDto(quote);
     });
+
     this.openStatusDialog();
+
+    this.userData = [
+      new UserStatusEntity(new Date('2023-10-01'), 5, 7, 6, 4, 8, 'Content 1'),
+      new UserStatusEntity(new Date('2023-10-02'), 6, 6, 7, 3, 7, 'Content 2'),
+      new UserStatusEntity(new Date('2023-10-03'), 7, 5, 8, 2, 6, 'Content 3'),
+      new UserStatusEntity(new Date('2023-10-04'), 8, 4, 5, 1, 5, 'Content 4'),
+      new UserStatusEntity(new Date('2023-10-05'), 4, 8, 6, 5, 9, 'Content 5'),
+    ];
 
     this._userStatusService.getUserStatus(new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)).subscribe({
       next: (userStatusesDto) => {

@@ -1,7 +1,7 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
-import { NotificationEntity } from '../entity/notification.entity';
-import { MatList, MatListItem } from '@angular/material/list';
-import { NotificationListCardComponent } from '../notification-list-card/notification-list-card.component';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {NotificationEntity} from '../entity/notification.entity';
+import {MatList, MatListItem} from '@angular/material/list';
+import {NotificationListCardComponent} from '../notification-list-card/notification-list-card.component';
 
 @Component({
   selector: 'app-notification-list',
@@ -15,9 +15,10 @@ export class NotificationListComponent {
   @Input() notifications: NotificationEntity[] = [];
   @Output() notificationDeleted = new EventEmitter<NotificationEntity>();
 
-  constructor() {}
+  constructor() {
+  }
 
   onNotificationDeleted() {
     this.notificationDeleted.emit();
-    }
+  }
 }

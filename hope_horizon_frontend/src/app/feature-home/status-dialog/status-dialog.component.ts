@@ -1,12 +1,19 @@
-import { Component, inject } from '@angular/core';
-import { TrackerEntity } from '../../feature-settings/entity/tracker.entity';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
-import { MatSlider, MatSliderModule } from '@angular/material/slider';
-import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
-import { MatButton } from '@angular/material/button';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { UserStatusEntity } from '../entity/user-status.entity';
-import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import {Component, inject} from '@angular/core';
+import {TrackerEntity} from '../../feature-settings/entity/tracker.entity';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogActions,
+  MatDialogClose,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle
+} from '@angular/material/dialog';
+import {MatSliderModule} from '@angular/material/slider';
+import {MatFormField, MatInput, MatLabel} from '@angular/material/input';
+import {MatButton} from '@angular/material/button';
+import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {UserStatusEntity} from '../entity/user-status.entity';
+import {CdkTextareaAutosize} from '@angular/cdk/text-field';
 
 @Component({
   selector: 'app-status-dialog',

@@ -1,9 +1,10 @@
 <mat-list class="notification-list">
   @for (notification of notifications; track $index) {
-  <app-notification-list-card [notification]="notification" (notificationDeleted)="onNotificationDeleted()"></app-notification-list-card>
+    <app-notification-list-card [notification]="notification"
+                                (notificationDeleted)="onNotificationDeleted()"></app-notification-list-card>
   } @empty {
-  <mat-list-item>
-    <p class="text-muted">No notifications available.</p>
-  </mat-list-item>
+    <mat-list-item>
+      <p class="text-muted">No notifications available.</p>
+    </mat-list-item>
   }
 </mat-list>

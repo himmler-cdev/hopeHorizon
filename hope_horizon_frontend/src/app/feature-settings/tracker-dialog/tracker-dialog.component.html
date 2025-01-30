@@ -1,17 +1,36 @@
 <div class="p-2">
-    <h2 mat-dialog-title>Tracker Settings</h2>
-    <mat-dialog-content style="height: 300px; width: 300px;">
-        <mat-checkbox [checked]="data.isEnabled" (change)="data.isEnabled = $event.checked">Enabled</mat-checkbox><br>
-        <hr>
-        <mat-checkbox [checked]="data.trackMood" [disabled]="!data.isEnabled" (change)="data.trackMood = $event.checked">Mood</mat-checkbox><br>
-        <mat-checkbox [checked]="data.trackEnergyLevel" [disabled]="!data.isEnabled" (change)="data.trackEnergyLevel = $event.checked">Anxiety Level</mat-checkbox><br>
-        <mat-checkbox [checked]="data.trackSleepQuality" [disabled]="!data.isEnabled" (change)="data.trackSleepQuality = $event.checked">Energy Level</mat-checkbox><br>
-        <mat-checkbox [checked]="data.trackAnxietyLevel" [disabled]="!data.isEnabled" (change)="data.trackAnxietyLevel = $event.checked">Appetite</mat-checkbox><br>
-        <mat-checkbox [checked]="data.trackAppetite" [disabled]="!data.isEnabled" (change)="data.trackAppetite = $event.checked">Sleep Quality</mat-checkbox><br>
-        <mat-checkbox [checked]="data.trackContent" [disabled]="!data.isEnabled" (change)="data.trackContent = $event.checked">Content</mat-checkbox><br>
-    </mat-dialog-content>
-    <mat-dialog-actions>
-        <button mat-raised-button (click)="onCancel()" cdkFocusInitial>Cancel</button>
-        <button mat-raised-button (click)="onConfirm()">Confirm</button>
-    </mat-dialog-actions>
+  <h2 mat-dialog-title>Tracker Settings</h2>
+  <mat-dialog-content style="height: 300px; width: 300px;">
+    <mat-checkbox [checked]="data.isEnabled" (change)="data.isEnabled = $event.checked">Enabled</mat-checkbox>
+    <br>
+    <hr>
+    <mat-checkbox [checked]="data.trackMood" [disabled]="!data.isEnabled" (change)="data.trackMood = $event.checked">
+      Mood
+    </mat-checkbox>
+    <br>
+    <mat-checkbox [checked]="data.trackEnergyLevel" [disabled]="!data.isEnabled"
+                  (change)="data.trackEnergyLevel = $event.checked">Anxiety Level
+    </mat-checkbox>
+    <br>
+    <mat-checkbox [checked]="data.trackSleepQuality" [disabled]="!data.isEnabled"
+                  (change)="data.trackSleepQuality = $event.checked">Energy Level
+    </mat-checkbox>
+    <br>
+    <mat-checkbox [checked]="data.trackAnxietyLevel" [disabled]="!data.isEnabled"
+                  (change)="data.trackAnxietyLevel = $event.checked">Appetite
+    </mat-checkbox>
+    <br>
+    <mat-checkbox [checked]="data.trackAppetite" [disabled]="!data.isEnabled"
+                  (change)="data.trackAppetite = $event.checked">Sleep Quality
+    </mat-checkbox>
+    <br>
+    <mat-checkbox [checked]="data.trackContent" [disabled]="!data.isEnabled"
+                  (change)="data.trackContent = $event.checked">Content
+    </mat-checkbox>
+    <br>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-raised-button (click)="onCancel()" cdkFocusInitial>Cancel</button>
+    <button mat-raised-button (click)="onConfirm()">Confirm</button>
+  </mat-dialog-actions>
 </div>

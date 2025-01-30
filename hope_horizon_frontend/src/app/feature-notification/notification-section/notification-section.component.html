@@ -1,5 +1,6 @@
 <mat-card class="notification-section py-2 mat-elevation-z5">
   <h2 class="ms-3 mb-3">Notifications</h2>
 
-  <app-notification-list [notifications]="notifications" (notificationDeleted)="onNotificationDeleted()"></app-notification-list>
+  <app-notification-list [notifications]="notifications"
+                         (notificationDeleted)="onNotificationDeleted()"></app-notification-list>
 </mat-card>
