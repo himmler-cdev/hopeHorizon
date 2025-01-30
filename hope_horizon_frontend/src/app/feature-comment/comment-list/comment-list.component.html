@@ -1,0 +1,9 @@
+<mat-list class="comment-list">
+  @for (comment of comments; track $index) {
+    <app-comment-card [comment]="comment" (commentDeleted)="removeComment($event)"></app-comment-card>
+  } @empty {
+    <mat-list-item>
+      <p class="text-muted">No comments available.</p>
+    </mat-list-item>
+  }
+</mat-list>

@@ -1,0 +1,20 @@
+<form [formGroup]="commentForm" (ngSubmit)="submitComment()" class="m-3">
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Write a comment</mat-label>
+    <textarea matInput formControlName="content" rows="3"></textarea>
+
+    @if (commentForm.controls['content'].hasError('maxlength')) {
+      <mat-error>Comment cannot exceed 500 characters</mat-error>
+    }
+    @if (commentForm.controls['content'].hasError('whitespace')) {
+      <mat-error>Comment cannot be empty or only spaces</mat-error>
+    }
+  </mat-form-field>
+
+  <div class="text-end mt-2">
+    <button mat-raised-button color="primary" type="submit"
+            [disabled]="submitting || commentForm.invalid">
+      {{ submitting ? 'Posting...' : 'Comment' }}
+    </button>
+  </div>
+</form>

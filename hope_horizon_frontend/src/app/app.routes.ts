@@ -7,6 +7,7 @@ import {BlogFeedComponent} from './feature-blog/blog-feed/blog-feed.component';
 import {BlogJournalComponent} from './feature-blog/blog-journal/blog-journal.component';
 import {BlogFormComponent} from './feature-blog/blog-form/blog-form.component';
 import {BlogDetailComponent} from './feature-blog/blog-detail/blog-detail.component';
+import { CommentSectionComponent } from './feature-comment/comment-section/comment-section.component';
 
 export const routes: Routes = [
   /**
@@ -21,7 +22,7 @@ export const routes: Routes = [
   {path: 'journal', component: BlogJournalComponent, canActivate: [authGuard]},
   {path: 'blog/create', component: BlogFormComponent, canActivate: [authGuard]},
   {path: 'blog/edit/:id', component: BlogFormComponent, canActivate: [authGuard]},
-  {path: 'blog/:id', component: BlogDetailComponent, canActivate: [authGuard]}
+  {path: 'blog/:id', component: BlogDetailComponent, canActivate: [authGuard]},
 
   /**
    * TODO: YOUR ROUTES @Kamilo, @David

@@ -8,5 +8,5 @@ class Notification(models.Model):
     date = models.DateField(auto_now_add=True)
     content = models.TextField()
     user_id = models.ForeignKey(User, on_delete=models.PROTECT)
-    comment_id = models.ForeignKey(Comment, null=True, on_delete=models.PROTECT)
+    comment_id = models.ForeignKey(Comment, null=True, on_delete=models.CASCADE)
     forum_id = models.ForeignKey(Forum, null=True, on_delete=models.PROTECT)
