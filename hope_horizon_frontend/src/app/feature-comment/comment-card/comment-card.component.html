@@ -6,7 +6,7 @@
         <button mat-icon-button color="blue" (click)="startEdit()">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button color="warn" (click)="deleteComment()">
+        <button mat-icon-button color="warn" (click)="openDeleteDialog()" [disabled]="isEditing">
           <mat-icon>delete</mat-icon>
         </button>
       }
@@ -17,11 +17,19 @@
     @if (!isEditing) {
       <div class="comment-content">{{ comment.content }}</div>
     } @else {
-      <form [formGroup]="editForm">
-        <textarea formControlName="content" class="edit-textarea"></textarea>
-        <div class="edit-actions">
-          <button mat-button color="primary" (click)="confirmEdit()">Confirm</button>
-          <button mat-button color="warn" (click)="cancelEdit()">Cancel</button>
+      <form [formGroup]="editForm" class="m-3">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Edit your comment</mat-label>
+          <textarea matInput formControlName="content" rows="3"></textarea>
+        </mat-form-field>
+
+        <div class="text-end mt-2">
+          <button mat-raised-button color="primary" class="me-2" (click)="confirmEdit()" [disabled]="editForm.invalid">
+            Confirm
+          </button>
+          <button mat-raised-button color="warn" (click)="cancelEdit()">
+            Cancel
+          </button>
         </div>
       </form>
     }

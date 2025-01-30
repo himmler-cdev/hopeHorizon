@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import { FormControl, FormGroup, Validators, ValidatorFn, AbstractControl, ReactiveFormsModule } from '@angular/forms';
 import { CommentEntity } from '../entity/comment.entity';
 import { CommentService } from '../service/comment.service';
@@ -23,6 +23,7 @@ import { MatButton } from '@angular/material/button';
   styleUrl: './comment-form.component.scss'
 })
 export class CommentFormComponent {
+  @Input() blogPostId!: number;
   @Output() commentAdded = new EventEmitter<CommentEntity>();
   submitting = false;
 
@@ -44,7 +45,7 @@ export class CommentFormComponent {
     // Create CommentEntity from form data
     const newCommentEntity = new CommentEntity({
       content: this.commentForm.value.content as string,
-      blog_post_id: 1 // Ensure this ID is dynamically set
+      blog_post_id: this.blogPostId // Ensure this ID is dynamically set
     });
 
     this.commentService.createComment(newCommentEntity.toDto()).subscribe(

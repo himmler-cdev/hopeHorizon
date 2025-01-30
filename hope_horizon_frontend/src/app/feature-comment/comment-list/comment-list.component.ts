@@ -1,6 +1,5 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import { CommentCardComponent } from '../comment-card/comment-card.component';
-import {CommentDto} from '../dto/comment.dto';
 import {MatList, MatListItem} from '@angular/material/list';
 import {CommentEntity} from '../entity/comment.entity';
 
@@ -13,4 +12,10 @@ import {CommentEntity} from '../entity/comment.entity';
 })
 export class CommentListComponent {
   @Input() comments: CommentEntity[] = [];
+  @Output() commentDeleted = new EventEmitter<number>();
+
+  removeComment(commentId: number): void {
+    this.comments = this.comments.filter(comment => comment.id !== commentId);
+    this.commentDeleted.emit(commentId);
+  }
 }

@@ -23,14 +23,16 @@ export class CommentService {
     return this._http.post<Readonly<CommentDto>>(this.API_URL, comment);
   }
 
-  updateComment(comment: CommentDto): Observable<CommentDto> {
+  updateComment(comment: CommentDto) {
     if (comment.id === undefined) {
         throw new Error('Cannot update a comment without an id');
       }
     return this._http.put<Readonly<CommentDto>>(`${this.API_URL}${comment.id}/`, comment);
   }
 
-  deleteComment(commentId: number) {
-    return this._http.delete<Readonly<CommentDto>>(`${this.API_URL}${commentId}/`);
+  deleteComment(comment: CommentDto) {
+    console.log('Deleting comment:', comment);
+    console.log('URL:', `${this.API_URL}${comment.id}/`);
+    return this._http.delete(`${this.API_URL}${comment.id}/`);
   }
 }

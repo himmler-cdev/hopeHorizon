@@ -3,7 +3,6 @@
     <mat-label>Write a comment</mat-label>
     <textarea matInput formControlName="content" rows="3"></textarea>
 
-    <!-- Error Messages using @if syntax -->
     @if (commentForm.controls['content'].hasError('maxlength')) {
       <mat-error>Comment cannot exceed 500 characters</mat-error>
     }

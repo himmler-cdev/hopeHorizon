@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {CommentDto} from '../dto/comment.dto';
 import {MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
 import {MatDivider} from '@angular/material/divider';
 import {MatIcon} from '@angular/material/icon';
@@ -10,6 +9,10 @@ import {CommentEntity} from '../entity/comment.entity';
 import {AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators} from '@angular/forms';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {CommentService} from '../service/comment.service';
+import {ConfirmDialogComponent} from '../../../shared/dialogs/confirm-dialog/confirm-dialog.component';
+import {MatDialog} from '@angular/material/dialog';
+import {UserService} from '../../feature-user/user.service';
+import {MatInput} from '@angular/material/input';
 
 @Component({
   selector: 'app-comment-card',
@@ -27,7 +30,8 @@ import {CommentService} from '../service/comment.service';
     MatFormField,
     MatLabel,
     ReactiveFormsModule,
-    MatButton
+    MatButton,
+    MatInput
   ],
   templateUrl: './comment-card.component.html',
   styleUrl: './comment-card.component.scss'
@@ -40,13 +44,15 @@ export class CommentCardComponent implements OnInit {
   editForm!: FormGroup;
 
   constructor(
-    private fb: FormBuilder,
-    private commentService: CommentService,
-    private snackBar: MatSnackBar
+    private _fb: FormBuilder,
+    private _commentService: CommentService,
+    private _userService: UserService,
+    private _snackBar: MatSnackBar,
+    private _dialog: MatDialog,
   ) {}
 
   ngOnInit(): void {
-    this.editForm = this.fb.group({
+    this.editForm = this._fb.group({
       content: [this.comment.content, [Validators.required, Validators.maxLength(500), this.whitespaceValidator()]]
     });
   }
@@ -56,9 +62,9 @@ export class CommentCardComponent implements OnInit {
   }
 
   canEditComment(): boolean {
-    // Implement logic to check if the current user can edit this comment
-    // For example, check if the current user is the author of the comment
-    return true; // Replace with actual logic
+    const user = this._userService.getUserDataImmediate();
+    return user?.id === this.comment.userId || user?.user_role === 'Moderator';
+
   }
 
   startEdit(): void {
@@ -68,25 +74,35 @@ export class CommentCardComponent implements OnInit {
 
   confirmEdit(): void {
     if (this.editForm.invalid) {
+      this.editForm.markAllAsTouched(); // ✅ Mark all fields as touched to show validation errors
+      this._snackBar.open('Comment must be between 1 and 500 characters.', 'Close', { duration: 3000 });
       return;
     }
 
     const updatedComment = new CommentEntity({
       ...this.comment,
       content: this.editForm.value.content,
-      blog_post_id: this.editForm.value.blog_post_id,
-      date: Date.now().toString()
+      user_id: this.comment.userId,
+      blog_post_id: this.comment.blogPostId,
+      date: new Date().toDateString()
     });
 
-    this.commentService.updateComment(updatedComment.toDto()).subscribe({
+    this._commentService.updateComment(updatedComment.toDto()).subscribe({
       next: (commentDto) => {
-        const updatedCommentEntity = CommentEntity.fromDto(commentDto);
-        this.comment = updatedCommentEntity;
+        this.comment = CommentEntity.fromDto(commentDto);
+
+        // ✅ Ensure ID and other essential fields are not lost
+        this.comment.id = updatedComment.id;
+        this.comment.blogPostId = updatedComment.blogPostId;
+        this.comment.userId = updatedComment.userId;
+        this.comment.username = updatedComment.username;
+        this.comment.date = updatedComment.date;
+
         this.isEditing = false;
-        this.snackBar.open('Comment updated successfully', 'Close', { duration: 3000 });
+        this._snackBar.open('Comment updated successfully', 'Close', { duration: 3000 });
       },
       error: (err) => {
-        this.snackBar.open('Failed to update comment', 'Close', { duration: 3000 });
+        this._snackBar.open('Failed to update comment', 'Close', { duration: 3000 });
         console.error(err);
       }
     });
@@ -96,19 +112,25 @@ export class CommentCardComponent implements OnInit {
     this.isEditing = false;
   }
 
-  deleteComment(): void {
-    if (confirm('Are you sure you want to delete this comment?')) {
-      this.commentService.deleteComment(this.comment.id!).subscribe({
-        next: () => {
-          this.snackBar.open('Comment deleted successfully', 'Close', { duration: 3000 });
-          this.commentDeleted.emit(this.comment.id); // Notify parent component
-        },
-        error: (err) => {
-          this.snackBar.open('Failed to delete comment', 'Close', { duration: 3000 });
-          console.error(err);
-        }
-      });
-    }
+  protected openDeleteDialog() {
+    const dialogRef = this._dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Delete Comment',
+        message: 'Are you sure you want to delete this comment?',
+        confirmText: 'Delete',
+        cancelText: 'Cancel'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        const commentDto = this.comment.toDto();
+        this._commentService.deleteComment(commentDto).subscribe(() => {
+          this.commentDeleted.emit(this.comment.id);
+        })
+        this._snackBar.open('Comment deleted successfully', 'Close', { duration: 3000 });
+      }
+    });
   }
 
   private whitespaceValidator(): ValidatorFn {

@@ -30,7 +30,7 @@ export class CommentSectionComponent implements OnInit {
   }
 
   loadComments(): void {
-    this.commentService.getComments({ page: this.page, blog: 1 }) //this.blogId
+    this.commentService.getComments({ page: this.page, blog: this.blogId }) //
       .subscribe(response => {
         const newComments = response.comments.map(CommentEntity.fromDto);
 
@@ -52,14 +52,24 @@ export class CommentSectionComponent implements OnInit {
   }
 
   onCommentAdded(comment: CommentEntity): void {
-    this.comments.unshift(comment);
+    this.comments = [comment, ...this.comments];
     this.totalComments = (this.totalComments ?? 0) + 1; // Ensure it's never undefined
+
+    this.comments = [...this.comments]; // Reassigning forces Angular to detect changes
+    this.cdr.detectChanges();
 
     // Check if the number of comments exceeds the page size
     if (this.comments.length > this.pageSize) {
       this.comments = this.comments.slice(0, this.pageSize); // Keep only the first pageSize comments
     }
 
+    this.updateShowLoadMore();
+  }
+
+  onCommentDeleted(commentId: number): void {
+    this.comments = this.comments.filter(comment => comment.id !== commentId);
+    this.totalComments = (this.totalComments ?? 0) - 1; // Ensure it's never undefined
+    this.cdr.detectChanges();
     this.updateShowLoadMore();
   }
 

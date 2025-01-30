@@ -27,5 +27,4 @@ export const routes: Routes = [
   /**
    * TODO: YOUR ROUTES @Kamilo, @David
    */
-  {path: 'comment', component: CommentSectionComponent, canActivate: [authGuard]}
 ];
