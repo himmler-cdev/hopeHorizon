@@ -45,8 +45,8 @@ class CommentViewSet(viewsets.ModelViewSet):
         return Response({
             "pageInformation": {
                 "page": page,
-                "pageSize": 10,
-                "actualSize": page_obj.paginator.count
+                "page_size": 10,
+                "actual_size": page_obj.paginator.count
             },
             "comments": serializer.data
         })

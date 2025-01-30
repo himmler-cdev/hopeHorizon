@@ -1,0 +1,20 @@
+.comment-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+}
+
+.header-content mat-icon {
+  font-size: 20px; /* Adjust the size as needed */
+}
+
+.comment-card {
+  .comment-content {
+    white-space: pre-wrap; /* Preserve whitespace and wrap text */
+    word-wrap: break-word; /* Break long words */
+  }
+}
