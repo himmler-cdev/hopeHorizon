@@ -170,15 +170,16 @@ class ForumTests(APITestCase):
         response = self.client.put("/api/forum/1/", {"name": "testforum3", "description": "testdescription"}, follow=True)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    # test when name is not given
     def test_forum_update_no_name(self):
-        response = self.client.put("/api/forum/1/", {"description": "testdescription"}, follow=True)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.client.login(username="testuser1", password="testpassword")
+        response = self.client.put(f"/api/forum/{self.test_forum.id}/", {"description": "testdescription"}, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     # test when description is not given
     def test_forum_update_no_description(self):
-        response = self.client.put("/api/forum/1/", {"name": "testforum3"}, follow=True)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.client.login(username="testuser1", password="testpassword")
+        response = self.client.put(f"/api/forum/{self.test_forum.id}/", {"name": "testforum3"}, follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     # test when forum does not exist
     def test_forum_update_forum_not_exist(self):

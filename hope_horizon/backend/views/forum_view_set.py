@@ -63,12 +63,9 @@ class ForumViewSet(viewsets.ModelViewSet):
         if not forum_user.exists():
             return Response({"detail": "User not authorized"}, status=status.HTTP_403_FORBIDDEN)
 
-        # ✅ Pass instance to serializer to avoid duplicate name validation issue
+
         serializer = ForumSerializer(instance=forum, data=request.data, partial=True)
         
-        if not serializer.is_valid():
-            return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
         forum = serializer.save()  # ✅ Use `serializer.save()` to update safely
         return Response(serializer.data, status=status.HTTP_200_OK)
 

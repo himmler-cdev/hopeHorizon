@@ -20,10 +20,10 @@ export class UserIdDto {
 
 export class ForumUserPostDto {
   forum_id?: number;
-  users?: UserIdDto[];
+  users?: number[];  // Ensure users is an array of numbers
 
   constructor(forum_id?: number, users?: number[]) {
     this.forum_id = forum_id;
-    this.users = users ? users.map((id) => new UserIdDto(id)) : [];
+    this.users = users ?? [];  // Keep users as an array of numbers
   }
 }

@@ -1,3 +1,4 @@
+import json
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from backend.models.notification import Notification
@@ -37,53 +38,46 @@ class ForumUserViewSet(viewsets.ModelViewSet):
         return Response({"forum_users": serializer.data}, status=status.HTTP_200_OK)
 
     def create(self, request):
-        print("Received Forum User Data:", request.data)
+        user = request.user
+        forum_id = request.data.get("forum_id")
+        user_ids = request.data.get("users", [])
+
         try:
-            forum = Forum.objects.get(pk=request.data.get("forum_id"))
+            forum = Forum.objects.get(pk=forum_id)
         except Forum.DoesNotExist:
-            return Response({"detail": "Forum not found"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Forum not found"}, status=status.HTTP_404_NOT_FOUND)
+
         if not forum.is_active:
             return Response({"detail": "Forum not found"}, status=status.HTTP_400_BAD_REQUEST)
-        if not ForumUser.objects.filter(forum_id=forum, user_id=request.user, is_owner=True).exists():
+
+        if not ForumUser.objects.filter(forum_id=forum, user_id=user, is_owner=True).exists():
             return Response({"detail": "You are not authorized to add forum users"}, status=status.HTTP_403_FORBIDDEN)
-        
-        # check if the users to add, exist, are active and are not already in the forum
-        user_ids = request.data.get("users", [])
-       
+
         if not user_ids:
             return Response({"detail": "No users provided"}, status=status.HTTP_400_BAD_REQUEST)
-        # create a new forum user for each user
+
         errors = []
         successfully_added = []
 
-        for new_forum_user_dict in user_ids:
-            try:
-                new_forum_user_id = new_forum_user_dict.get("user_id")
-                print("Received user ID:", new_forum_user_id)
+        for new_forum_user_id in user_ids:
+            try: 
+                #user_id = json.loads(new_forum_user_id)
                 new_forum_user = User.objects.get(pk=new_forum_user_id)
 
                 if not new_forum_user.is_active:
                     errors.append({"user_id": new_forum_user_id, "detail": "User is inactive"})
-                    continue  # Skip this user and continue with others
+                    continue
 
                 existing_forum_user = ForumUser.objects.filter(forum_id=forum, user_id=new_forum_user).first()
 
-
-                if ForumUser.objects.filter(forum_id=forum, user_id=new_forum_user, is_active=True).exists():
-                    errors.append({"user_id": new_forum_user_id, "detail": "User already exists in the forum"})
-                    continue  # Skip this user and continue with others
                 if existing_forum_user:
                     if existing_forum_user.is_active:
                         errors.append({"user_id": new_forum_user_id, "detail": "User already exists in the forum"})
                     else:
-                        # If user exists but is inactive, reactivate them
                         existing_forum_user.is_active = True
                         existing_forum_user.save()
                         successfully_added.append(new_forum_user_id)
-                        print(f"Reactivated user {new_forum_user_id} in forum {forum.id}")
-
                 else:
-                    # Add the new user to the forum
                     Notification.objects.create(
                         is_read=False,
                         content=f"You have been invited to forum: {forum.name}",
@@ -96,15 +90,10 @@ class ForumUserViewSet(viewsets.ModelViewSet):
             except User.DoesNotExist:
                 errors.append({"user_id": new_forum_user_id, "detail": "User not found"})
 
+        if not errors:
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
-        # Return response based on success/failure cases
-        if not errors:  
-            return Response(status=status.HTTP_204_NO_CONTENT)  # No content if all users were added successfully
-
-        return Response(
-            {"errors": errors},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
         try:
