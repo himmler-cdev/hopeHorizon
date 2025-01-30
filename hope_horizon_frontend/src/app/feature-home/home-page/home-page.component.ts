@@ -1,16 +1,18 @@
-import { Component, OnInit } from '@angular/core';
-import { MatDivider } from '@angular/material/divider';
-import { QuoteService } from '../service/quote.service';
-import { QuoteEntity } from '../entity/quote.entity';
-import { MatButton } from '@angular/material/button';
-import { RouterLink } from '@angular/router';
-import { TrackerService } from '../../feature-settings/tracker-service';
-import { StatusDialogComponent } from '../status-dialog/status-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
-import { TrackerEntity } from '../../feature-settings/entity/tracker.entity';
-import { TrackerDto } from '../../feature-settings/dto/tracker.dto';
-import { UserStatusService } from '../service/user-status.service';
+import {Component, OnInit} from '@angular/core';
+import {MatDivider} from '@angular/material/divider';
+import {QuoteService} from '../service/quote.service';
+import {QuoteEntity} from '../entity/quote.entity';
+import {MatButton} from '@angular/material/button';
+import {RouterLink} from '@angular/router';
+import {TrackerService} from '../../feature-settings/tracker-service';
+import {StatusDialogComponent} from '../status-dialog/status-dialog.component';
+import {MatDialog} from '@angular/material/dialog';
+import {TrackerEntity} from '../../feature-settings/entity/tracker.entity';
+import {UserStatusService} from '../service/user-status.service';
+import {UserStatusEntity} from '../entity/user-status.entity';
+import {NgxChartsModule} from '@swimlane/ngx-charts';
 import { NotificationSectionComponent } from "../../feature-notification/notification-section/notification-section.component";
+
 
 @Component({
   selector: 'app-home-page',
@@ -19,33 +21,96 @@ import { NotificationSectionComponent } from "../../feature-notification/notific
     MatDivider,
     MatButton,
     RouterLink,
-    NotificationSectionComponent
+    NotificationSectionComponent,
+    NgxChartsModule
 ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss'
 })
 export class HomePageComponent implements OnInit {
   quote?: QuoteEntity;
+  userData: UserStatusEntity[] | undefined = [];
+  multiLineData: any[] = [];
 
   constructor(
-    private quoteService: QuoteService,
-    private trackerService: TrackerService,
-    private userStatusService: UserStatusService,
+    private _quoteService: QuoteService,
+    private _trackerService: TrackerService,
+    private _userStatusService: UserStatusService,
     private _dialog: MatDialog) {
   }
 
   ngOnInit() {
-    this.quoteService.getRandomQuote().subscribe((quote) => {
+    this._quoteService.getRandomQuote().subscribe((quote) => {
       this.quote = QuoteEntity.fromDto(quote);
     });
     this.openStatusDialog();
+
+    this._userStatusService.getUserStatus(new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)).subscribe({
+      next: (userStatusesDto) => {
+        this.userData = userStatusesDto?.user_statuses?.map(UserStatusEntity.fromDto);
+
+        this._trackerService.getUserTracker().subscribe((tracker) => {
+          const trackerEntity = TrackerEntity.fromDto(tracker);
+
+
+        });
+
+        this.multiLineData = [
+          {
+            name: 'Mood',
+            series: this.userData?.map((data) => {
+              return {
+                name: data.date,
+                value: data.mood,
+              };
+            }),
+          },
+          {
+            name: 'Energy Level',
+            series: this.userData?.map((data) => {
+              return {
+                name: data.date,
+                value: data.energyLevel,
+              };
+            }),
+          },
+          {
+            name: 'Sleep Quality',
+            series: this.userData?.map((data) => {
+              return {
+                name: data.date,
+                value: data.sleepQuality,
+              };
+            }),
+          },
+          {
+            name: 'Anxiety Level',
+            series: this.userData?.map((data) => {
+              return {
+                name: data.date,
+                value: data.anxietyLevel,
+              };
+            }),
+          },
+          {
+            name: 'Appetite',
+            series: this.userData?.map((data) => {
+              return {
+                name: data.date,
+                value: data.appetite,
+              };
+            }),
+          },
+        ];
+      }
+    });
   }
 
   protected openStatusDialog() {
-    this.userStatusService.getUserStatus(new Date()).subscribe({
+    this._userStatusService.getUserStatus(new Date()).subscribe({
       next: (userStatusesDto) => {
         if ((userStatusesDto.user_statuses?.length ?? 0) == 0) {
-          this.trackerService.getUserTracker().subscribe({
+          this._trackerService.getUserTracker().subscribe({
             next: (tracker) => {
               if (tracker.is_enabled && (
                 tracker.track_mood ||
@@ -60,7 +125,7 @@ export class HomePageComponent implements OnInit {
                 });
                 dialogRef.afterClosed().subscribe((result: TrackerEntity) => {
                   if (result) {
-                    this.userStatusService.createUserStatus(result.toDto()).subscribe({});
+                    this._userStatusService.createUserStatus(result.toDto()).subscribe({});
                   }
                 });
               }

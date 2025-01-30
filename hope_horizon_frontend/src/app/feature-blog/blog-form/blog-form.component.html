@@ -50,7 +50,7 @@
             }
           </mat-select>
 
-          @if (blogFormGroup.controls['forumId']?.hasError('required')) {
+          @if (blogFormGroup.controls['forumId'].hasError('required')) {
             <mat-error>Forum selection is required</mat-error>
           }
         </mat-form-field>
