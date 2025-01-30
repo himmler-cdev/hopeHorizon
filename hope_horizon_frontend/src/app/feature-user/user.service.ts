@@ -31,35 +31,46 @@ export class UserService {
   }
 
   getUserDataImmediate(): UserEntity | null {
+    if (localStorage.getItem('user')) {
+      this.loggedInUser = UserEntity.fromDto(
+        JSON.parse(localStorage.getItem('user') as string),
+      );
+    }
     return this.loggedInUser;
   }
 
-  login(userData: { username: string; password: string }): boolean {
-    let loggedInSuccessfully = false;
-    this._http.post('/api/login/', userData).subscribe({
-      next: (res: any) => {
-        this.isLoggedInSignal.set(true);
-        localStorage.setItem('access_token', res.access);
-        this.router.navigate(['blog-list']); // TODO: home page
-        loggedInSuccessfully = true;
-        this._http.get<UserDto>(`/api/user/${userData.username}`).subscribe({
-          next: (user) => {
-            this.loggedInUser = UserEntity.fromDto(user);
-          }
-        });
-      },
-    });
+  login(userData: { username: string; password: string }): Observable<UserDto> {
+    return this._http.post('/api/login/', userData);
+  }
 
-    return loggedInSuccessfully;
+  loginCallback(username: string, accessToken: string): void {
+    this.isLoggedInSignal.set(true);
+    localStorage.setItem('access_token', accessToken);
+    this.router.navigate(['blog-list']);
+    this._http.get<UserDto>(`/api/user/${username}`).subscribe({
+      next: (user) => {
+        this.loggedInUser = UserEntity.fromDto(user);
+        localStorage.setItem('user', JSON.stringify(user));
+      }
+    });
   }
 
   logout(): void {
     localStorage.removeItem(this.accessTokenLocalStorageKey);
+    localStorage.removeItem('user');
     this.isLoggedInSignal.set(false);
     this.router.navigate(['/login']);
   }
 
   create(user: UserEntity): Observable<UserDto> {
     return this._http.post<UserDto>('/api/user/', user.toDto());
+  }
+
+  update(user: UserEntity): Observable<UserDto> {
+    return this._http.put<UserDto>(`/api/user/${user.id}/`, user.toDto());
+  }
+
+  delete(user: UserEntity): Observable<any> {
+    return this._http.delete<any>(`/api/user/${user.id}/`);
   }
 }

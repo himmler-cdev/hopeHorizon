@@ -1,19 +1,20 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from backend.serializers import (
-    UserCreateUpdateSerializer,
+    UserCreateSerializer,
+    UserUpdateSerializer,
     UserListSerializer,
     UserDetailsSerializer,
 )
-from backend.models import User, UserRole
+from backend.models import User, UserRole, UserTracker
 from django.db.models import Q
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializers = {
-        "create": UserCreateUpdateSerializer,
-        "update": UserCreateUpdateSerializer,
+        "create": UserCreateSerializer,
+        "update": UserUpdateSerializer,
         "list": UserListSerializer,
         "details": UserDetailsSerializer,
     }
@@ -36,6 +37,16 @@ class UserViewSet(viewsets.ModelViewSet):
         user.set_password(serializer.data["password"])
         user.save()
         serializer = self.serializers["details"](user)
+        UserTracker.objects.create(
+            user_id=user,
+            is_enabled=True,
+            track_mood=True,
+            track_energy_level=True,
+            track_sleep_quality=True,
+            track_anxiety_level=True,
+            track_appetite=True,
+            track_content=True,
+        )
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk):
@@ -65,7 +76,6 @@ class UserViewSet(viewsets.ModelViewSet):
         if not serializer.is_valid():
             return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         user = serializer.save()
-        user.set_password(serializer.data["password"])
         user.save()
         serializer = self.serializers["details"](user)
         return Response(serializer.data, status=status.HTTP_200_OK)

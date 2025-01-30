@@ -1,0 +1,29 @@
+<div class="p-2">
+    <h2 mat-dialog-title>User Setings</h2>
+    <form [formGroup]="updateForm" (ngSubmit)="onUpdate()">
+        <mat-dialog-content style="height: 300px; width: 300px;">
+            <mat-form-field class="form-group" appearance="fill">
+                <mat-label>Username</mat-label>
+                <input matInput type="text" formControlName="username" name="username" required
+                    placeholder="Update your username">
+                @if (getErrorMessage("username") !== '') {
+                <mat-error>{{ getErrorMessage("username") }}</mat-error>
+                }
+            </mat-form-field>
+            <mat-form-field class="form-group" appearance="fill">
+                <mat-label>Email</mat-label>
+                <input matInput type="email" formControlName="email" name="email" required
+                    placeholder="Update your email">
+                @if (getErrorMessage("email") !== '') {
+                <mat-error>{{ getErrorMessage("email") }}</mat-error>
+                }
+            </mat-form-field>
+            <hr>
+            <mat-checkbox formControlName="deactivate">Deactivate</mat-checkbox>
+        </mat-dialog-content>
+        <mat-dialog-actions>
+            <button mat-raised-button (click)="onCancel()" type="button" cdkFocusInitial>Cancel</button>
+            <button mat-raised-button type="submit">Confirm</button>
+        </mat-dialog-actions>
+    </form>
+</div>
