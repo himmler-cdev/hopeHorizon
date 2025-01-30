@@ -1,0 +1,29 @@
+<mat-card class="notification-list-card mb-4 mat-elevation-z4 p-4">
+  <mat-card-content class="notification-content-row">
+    <div class="notification-text">
+      {{ content }}
+    </div>
+
+    <div class="button-group">
+      @if (forumId) {
+        <button
+          mat-raised-button
+          color="warn"
+          class="deny-button"
+          (click)="leaveForum()"
+        >
+          Leave Forum
+        </button>
+      }
+
+      <button
+        mat-raised-button
+        color="primary"
+        class="dismiss-button me-3"
+        (click)="deleteNotification()"
+      >
+        Dismiss
+      </button>
+    </div>
+  </mat-card-content>
+</mat-card>
