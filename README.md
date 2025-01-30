@@ -1,7 +1,9 @@
 # Hope Horizon
 
 ## Introduction
-Hope Horizon is a Django-based web application.
+Hope Horizon is a Django and Angular based web application.
+
+# Backend
 
 ## Prerequisites
 - Python 3.x
@@ -63,3 +65,22 @@ To generate the code coverage report, use the following command:
 ```sh
 coverage report -m
 ```
+
+# Frontend
+Switch to correct directory
+```sh
+cd hopeHorizon/hope_horizon_frontend
+```
+
+## Install dependencies
+```sh
+npm install
+```
+
+## Start server
+```sh
+ng serve or npm start
+```
+
+## Usage
+Open your web browser and go to `http://localhost:4200/` to access the application.
