@@ -7,6 +7,7 @@ import requests
 from backend import models
 from django.db import migrations
 from django.contrib.auth.hashers import make_password
+from freezegun import freeze_time
 
 class Command(BaseCommand):
     '''
@@ -23,11 +24,9 @@ class Command(BaseCommand):
         create_user_statuse()
 
         # Create a few blog posts
-        posts = create_blog_posts()
+        public_posts = create_blog_posts()
 
-        print("Posts: ", posts)
-
-        create_blog_post_comments(posts)
+        create_blog_post_comments(public_posts)
 
 def create_users():
     admin_role = models.UserRole.objects.last()  # Ensure at least one role exists
@@ -105,6 +104,8 @@ def create_user_statuse():
         user = models.User.objects.get(username='user{}'.format(i))
         numOfStatuses = random.randint(20, 100)
         startDate = datetime.date.today()
+        freezer = freeze_time(startDate)
+        freezer.start()
         for j in range(1,numOfStatuses):
             models.UserStatus.objects.create(
                 user_id=user,
@@ -114,35 +115,38 @@ def create_user_statuse():
                 anxiety_level=random.randint(0, 10),
                 appetite=random.randint(0, 10),
                 content=random.randint(0, 10),
-                date=startDate.strftime('%Y-%m-%d'),
+                date=datetime.date.today().strftime('%Y-%m-%d'),
             )
-            startDate = startDate - datetime.timedelta(days=1)
+            freezer.stop()
+            freezer = freeze_time(startDate - datetime.timedelta(days=j))
+            freezer.start()
 
 def create_blog_posts():
-    posts = 0
+    public_posts = []
     for i in range(1, 6):
         user = models.User.objects.get(username='user{}'.format(i))
         numOfPosts = random.randint(5, 15)
-        posts += numOfPosts-1
         for j in range(1, numOfPosts):
             words = random.randint(10, 100)
-            models.BlogPost.objects.create(
+            blog_post_type_id = models.BlogPostType.objects.get(id=random.randint(1, 3))
+            post = models.BlogPost.objects.create(
                 user_id=user,
                 title='Post Title {}'.format(j),
-                blog_post_type_id=models.BlogPostType.objects.get(id=random.randint(1, 3)),
+                blog_post_type_id=blog_post_type_id,
                 content=fetch_random_words(words),
                 date=datetime.date.today().strftime('%Y-%m-%d'),
             )
+            if blog_post_type_id.type == 'Public':
+                public_posts.append(post.id)
 
-    return posts
+    return public_posts
 
-def create_blog_post_comments(posts):
-    for i in range(1, posts):
-        user = models.User.objects.get(username='user{}'.format(random.randint(1, 5)))
+def create_blog_post_comments(public_posts):
+    for i in public_posts:
         post = models.BlogPost.objects.get(id=i)
-        print(post.id)
         numOfComments = random.randint(1, 10)
         for j in range(1, numOfComments):
+            user = models.User.objects.get(username='user{}'.format(random.randint(1, 5)))
             words = random.randint(5, 20)
             models.Comment.objects.create(
                 user_id=user,
