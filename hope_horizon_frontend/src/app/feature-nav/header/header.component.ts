@@ -4,8 +4,8 @@ import {MatIcon} from '@angular/material/icon';
 import {MatAnchor, MatButton, MatIconButton} from '@angular/material/button';
 import {NgOptimizedImage} from '@angular/common';
 import {RouterLink} from '@angular/router';
-import { MatMenu, MatMenuModule } from '@angular/material/menu';
-import { UserService } from '../../feature-user/user.service';
+import {MatMenu, MatMenuModule} from '@angular/material/menu';
+import {UserService} from '../../feature-user/user.service';
 
 @Component({
   selector: 'app-header',
@@ -27,7 +27,8 @@ import { UserService } from '../../feature-user/user.service';
 })
 export class HeaderComponent {
 
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService) {
+  }
 
   onLogout() {
     this.userService.logout();

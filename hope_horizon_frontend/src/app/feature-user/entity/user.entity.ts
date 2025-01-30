@@ -9,13 +9,13 @@ export class UserEntity {
   user_role?: string;
 
   toDto(): UserDto {
-      return {
-          id: this.id,
-          username: this.username,
-          password: this.password,
-          email: this.email,
-          birthdate: this.birthdate ? this.birthdate.toISOString().split('T')[0] : undefined,
-      };
+    return {
+      id: this.id,
+      username: this.username,
+      password: this.password,
+      email: this.email,
+      birthdate: this.birthdate ? this.birthdate.toISOString().split('T')[0] : undefined,
+    };
   }
 
   static fromDto(dto: UserDto): UserEntity {
