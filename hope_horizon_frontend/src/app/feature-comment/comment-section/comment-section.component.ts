@@ -1,11 +1,11 @@
-import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
-import { CommentListComponent } from '../comment-list/comment-list.component';
-import { CommentFormComponent } from '../comment-form/comment-form.component';
-import { CommentService } from '../service/comment.service';
-import { MatCard } from '@angular/material/card';
-import { MatButton } from '@angular/material/button';
-import { MatDivider } from '@angular/material/divider';
-import { CommentEntity } from '../entity/comment.entity';
+import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
+import {CommentListComponent} from '../comment-list/comment-list.component';
+import {CommentFormComponent} from '../comment-form/comment-form.component';
+import {CommentService} from '../service/comment.service';
+import {MatCard} from '@angular/material/card';
+import {MatButton} from '@angular/material/button';
+import {MatDivider} from '@angular/material/divider';
+import {CommentEntity} from '../entity/comment.entity';
 
 @Component({
   selector: 'app-comment-section',
@@ -21,16 +21,17 @@ export class CommentSectionComponent implements OnInit {
   totalComments!: number; // Initialize as undefined to avoid overwriting
   pageSize = 10; // Define the page size
 
-  @Input({ required: true }) blogId!: number;
+  @Input({required: true}) blogId!: number;
 
-  constructor(private commentService: CommentService, private cdr: ChangeDetectorRef) {}
+  constructor(private commentService: CommentService, private cdr: ChangeDetectorRef) {
+  }
 
   ngOnInit(): void {
     this.loadComments();
   }
 
   loadComments(): void {
-    this.commentService.getComments({ page: this.page, blog: this.blogId }) //
+    this.commentService.getComments({page: this.page, blog: this.blogId}) //
       .subscribe(response => {
         const newComments = response.comments.map(CommentEntity.fromDto);
 

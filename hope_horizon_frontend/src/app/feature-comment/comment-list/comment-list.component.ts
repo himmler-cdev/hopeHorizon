@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import { CommentCardComponent } from '../comment-card/comment-card.component';
+import {CommentCardComponent} from '../comment-card/comment-card.component';
 import {MatList, MatListItem} from '@angular/material/list';
 import {CommentEntity} from '../entity/comment.entity';
 

@@ -1,11 +1,11 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import { FormControl, FormGroup, Validators, ValidatorFn, AbstractControl, ReactiveFormsModule } from '@angular/forms';
-import { CommentEntity } from '../entity/comment.entity';
-import { CommentService } from '../service/comment.service';
-import { MatCard } from '@angular/material/card';
-import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
-import { MatButton } from '@angular/material/button';
+import {AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, Validators} from '@angular/forms';
+import {CommentEntity} from '../entity/comment.entity';
+import {CommentService} from '../service/comment.service';
+import {MatCard} from '@angular/material/card';
+import {MatError, MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatInput} from '@angular/material/input';
+import {MatButton} from '@angular/material/button';
 
 @Component({
   selector: 'app-comment-form',
@@ -35,7 +35,8 @@ export class CommentFormComponent {
     ])
   });
 
-  constructor(private commentService: CommentService) {}
+  constructor(private commentService: CommentService) {
+  }
 
   submitComment(): void {
     if (this.commentForm.invalid) return;
@@ -73,7 +74,7 @@ export class CommentFormComponent {
     return (control: AbstractControl) => {
       if (!control.value) return null;
       const isWhitespace = (control.value || '').trim().length === 0;
-      return isWhitespace ? { whitespace: true } : null;
+      return isWhitespace ? {whitespace: true} : null;
     };
   }
 }

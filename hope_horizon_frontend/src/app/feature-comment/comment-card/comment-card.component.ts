@@ -49,7 +49,8 @@ export class CommentCardComponent implements OnInit {
     private _userService: UserService,
     private _snackBar: MatSnackBar,
     private _dialog: MatDialog,
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.editForm = this._fb.group({
@@ -69,13 +70,13 @@ export class CommentCardComponent implements OnInit {
 
   startEdit(): void {
     this.isEditing = true;
-    this.editForm.setValue({ content: this.comment.content });
+    this.editForm.setValue({content: this.comment.content});
   }
 
   confirmEdit(): void {
     if (this.editForm.invalid) {
-      this.editForm.markAllAsTouched(); // ✅ Mark all fields as touched to show validation errors
-      this._snackBar.open('Comment must be between 1 and 500 characters.', 'Close', { duration: 3000 });
+      this.editForm.markAllAsTouched();
+      this._snackBar.open('Comment must be between 1 and 500 characters.', 'Close', {duration: 3000});
       return;
     }
 
@@ -99,10 +100,10 @@ export class CommentCardComponent implements OnInit {
         this.comment.date = updatedComment.date;
 
         this.isEditing = false;
-        this._snackBar.open('Comment updated successfully', 'Close', { duration: 3000 });
+        this._snackBar.open('Comment updated successfully', 'Close', {duration: 3000});
       },
       error: (err) => {
-        this._snackBar.open('Failed to update comment', 'Close', { duration: 3000 });
+        this._snackBar.open('Failed to update comment', 'Close', {duration: 3000});
         console.error(err);
       }
     });
@@ -128,7 +129,7 @@ export class CommentCardComponent implements OnInit {
         this._commentService.deleteComment(commentDto).subscribe(() => {
           this.commentDeleted.emit(this.comment.id);
         })
-        this._snackBar.open('Comment deleted successfully', 'Close', { duration: 3000 });
+        this._snackBar.open('Comment deleted successfully', 'Close', {duration: 3000});
       }
     });
   }
@@ -137,7 +138,7 @@ export class CommentCardComponent implements OnInit {
     return (control: AbstractControl) => {
       if (!control.value) return null;
       const isWhitespace = (control.value || '').trim().length === 0;
-      return isWhitespace ? { whitespace: true } : null;
+      return isWhitespace ? {whitespace: true} : null;
     };
   }
 }
