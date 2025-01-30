@@ -89,7 +89,7 @@ export class ForumListComponent {
     if (changes['forumList'] || changes['forumUsersOfUser']) {
       //console.log('Data changed:', this.forumList, this.forumUsersOfUser);
       this.updateFilteredForumList();
-      this.cdr.detectChanges(); // ✅ Ensure UI updates
+      this.cdr.detectChanges();
     }
   }
 
@@ -138,6 +138,6 @@ export class ForumListComponent {
     }
 
     this.filteredForumList = filteredList;
-    this.cdr.detectChanges(); // ✅ Ensure UI updates
+    this.cdr.detectChanges();
   }
 }

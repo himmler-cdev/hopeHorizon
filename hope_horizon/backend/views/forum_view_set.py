@@ -62,34 +62,11 @@ class ForumViewSet(viewsets.ModelViewSet):
         forum_user = ForumUser.objects.filter(user_id=user, forum_id=forum, is_active=True, is_owner=True)
         if not forum_user.exists():
             return Response({"detail": "User not authorized"}, status=status.HTTP_403_FORBIDDEN)
-
-
         serializer = ForumSerializer(instance=forum, data=request.data, partial=True)
-        
-        forum = serializer.save()  # ✅ Use `serializer.save()` to update safely
+        if not serializer.is_valid():
+            return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        forum = serializer.save() 
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-#    def update(self, request, pk=None):
-#        user = request.user
-#
-#        if not serializer.is_valid():
-#            return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-#        try:
-#            forum = Forum.objects.get(pk=pk)
-#        except Forum.DoesNotExist:
-#            return Response({"detail": "Forum not found"}, status=status.HTTP_404_NOT_FOUND)
-#        if not forum.is_active:
-#            return Response({"detail": "Forum not found"}, status=status.HTTP_404_NOT_FOUND)
-#        forum_user = ForumUser.objects.filter(user_id=user, forum_id=forum, is_active=True, is_owner=True)
-#        if not forum_user.exists():
-#            return Response({"detail": "User not authorized"}, status=status.HTTP_403_FORBIDDEN)
-#        
-#        forum.name = request.data.get("name")
-#        forum.description = request.data.get("description")
-#        forum.save()
-#        serializer = self.get_serializer(forum)
-#        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def destroy(self, request, pk=None):
         user = request.user

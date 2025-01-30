@@ -16,7 +16,3 @@ export interface BlogPostsDto {
     total_size: number;
   }
 }
-
-export interface BlogPostsDto {
-  blog_posts: BlogPostDto[];
-}

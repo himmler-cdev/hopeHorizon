@@ -17,9 +17,7 @@ export class ForumPageComponent implements OnInit {
   forumList: ForumEntity[] = [];
   forumUsersOfUser: ForumUserEntity[] = [];
   filterOptions = ['owned', 'member', 'all'];
-  loggedInUser = new UserEntity;
-  
-  
+  loggedInUser = new UserEntity();
 
   constructor(
     private _forumService: ForumService,
@@ -35,12 +33,10 @@ export class ForumPageComponent implements OnInit {
       console.error('User data is null');
     }
     this.loadForums();
-    console.log('UserID:', this.loggedInUser.id);
-
+    //console.log('UserID:', this.loggedInUser.id);
   }
 
   loadForums() {
-    
     this._forumService.getForums(true).subscribe((response) => {
       this.forumList = response.custom_forums.map((forum) =>
         ForumEntity.fromDto(forum)
@@ -78,20 +74,22 @@ export class ForumPageComponent implements OnInit {
         // Filter users whose user_id matches this.userId
         const users = response.forum_users
           .map(ForumUserEntity.fromDto)
-          .filter(user => user.user_id === this.loggedInUser.id);
-  
+          .filter((user) => user.user_id === this.loggedInUser.id);
+
         // Append only the filtered users
         this.forumUsersOfUser = [...this.forumUsersOfUser, ...users];
-  
+
         //console.log(`Filtered Forum Users for forum ${forumId}:`, users);
         //console.log('Updated Forum Users list:', this.forumUsersOfUser);
       },
       (error) => {
-        console.error(`Error fetching forum users for forum ${forumId}:`, error);
+        console.error(
+          `Error fetching forum users for forum ${forumId}:`,
+          error
+        );
       }
     );
   }
-  
 
   handleForumUserLeft(forumId: number) {
     this.forumUsersOfUser = this.forumUsersOfUser.filter(
