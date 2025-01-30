@@ -20,9 +20,9 @@ import { MatIcon } from '@angular/material/icon';
 import { ForumUserEntity } from '../entity/fourm-user.entity';
 import { ForumUserService } from '../service/forum-user.service';
 import { ForumUserPostDto } from '../dto/forum-user.dto';
-import { ForumUserChipComponent } from '../forum-user-chip/forum-user-chip.component';
 import { UserService } from '../../feature-user/user.service';
 import { UserEntity } from '../../feature-user/entity/user.entity';
+import { setThrowInvalidWriteToSignalError } from '@angular/core/primitives/signals';
 
 @Component({
   selector: 'app-forum-form',
@@ -40,24 +40,20 @@ import { UserEntity } from '../../feature-user/entity/user.entity';
     MatButton,
     RouterLink,
     MatError,
-    ForumUserChipComponent,
   ],
   templateUrl: './forum-form.component.html',
   styleUrl: './forum-form.component.scss',
 })
 export class ForumFormComponent implements OnInit {
+  userSelectForm = new FormControl();
   forumFormGroup: FormGroup;
   forumId: number | undefined;
   searchControl = new FormControl('');
-  forumUserNames: string[] = [];
-  updatedForumUsers: ForumUserEntity[] = [];
-  allUserNames: string[] = [];
   allUsers: UserEntity[] = [];
   oldForumUsers: ForumUserEntity[] = [];
-  newForumUsers: UserEntity[] = [];
   userId = -1;
   oldForumUsersAsUsers: UserEntity[] = [];
-
+  newForumUsers: UserEntity[] = [];
 
   constructor(
     private _forumService: ForumService,
@@ -90,8 +86,6 @@ export class ForumFormComponent implements OnInit {
     if (this.forumId) {
       this.loadForumUsers(this.forumId);
       this.loadAllUsers();
-      this.cdr.detectChanges(); // Ensure change detection runs
-      //this.updatedUsers = this.forumUserNames;
       this._forumService.getForum(this.forumId).subscribe((response) => {
         this.forumFormGroup.patchValue({
           id: response.id,
@@ -102,21 +96,13 @@ export class ForumFormComponent implements OnInit {
     }
   }
 
-  /*
-  onUsersUpdated(updatedUsers: ForumUserEntity[]): void {
-    this.updatedUsers = updatedUsers;
-  }
-  */
-
   loadForumUsers(forumId: number) {
     this._forumUserService.getForumUsers(forumId).subscribe((users) => {
       users.forum_users.map((user) => {
         if (user.username && user.id !== this.userId) {
-          this.forumUserNames.push(user.username);
           this.oldForumUsers.push(ForumUserEntity.fromDto(user));
         }
       });
-      //console.log('Loaded Forum User Names:', this.forumUserNames);
     });
   }
 
@@ -124,19 +110,32 @@ export class ForumFormComponent implements OnInit {
     this._userService.getAllUsers().subscribe(
       (users) => {
         if (users && users.length > 0) {
-          this.allUsers = users.map((user) => UserEntity.fromDto(user));
-          this.allUserNames = users
-            .map((user) => user.username)
-            .filter((username): username is string => !!username);
-        } else {
-          this.allUserNames = [];
+          this.allUsers = users
+            .map((user) => UserEntity.fromDto(user))
+            .filter((user) => user.id !== this.userId);
+
+          this.oldForumUsersAsUsers = this.mapForumUsersToUserEntities(
+            this.allUsers
+          );
+          this.preselectUsers();
         }
-        //console.log('Loaded All User Names:', this.allUserNames);
       },
       (error) => {
         console.error('Error loading users:', error);
       }
     );
+  }
+
+  mapForumUsersToUserEntities(forumUsers: ForumUserEntity[]): UserEntity[] {
+    return forumUsers
+      .map((forumUser) => {
+        return this.allUsers.find((user) => user.id === forumUser.user_id);
+      })
+      .filter((user): user is UserEntity => !!user);
+  }
+
+  preselectUsers() {
+    this.userSelectForm.setValue(this.oldForumUsersAsUsers);
   }
 
   private persistForm(): ForumEntity {
@@ -162,111 +161,17 @@ export class ForumFormComponent implements OnInit {
     const forumEntity = this.persistForm();
 
     if (this.forumId) {
-      this._forumService.updateForum(forumEntity.toDto()).subscribe((forum) => {
-        if (!forum.id) {
-          console.error('Forum ID is undefined. Skipping user assignment.');
-          return;
-        }
+      this._forumService.updateForum(forumEntity).subscribe(() => {
 
-        //console.log('Forum updated successfully with ID:', forum.id);
-        //console.log('Updated ForumUSers:', this.newForumUsers);
+        
 
-        const userIds = [...new Set(this.newForumUsers.map((user) => user.id))];
-
-        const newForumUserDTO = new ForumUserPostDto(
-          this.forumId,
-          userIds
-            .filter((id): id is number => id !== undefined)
-            .filter(
-              (id) =>
-                !this.oldForumUsers.some((oldUser) => oldUser.user_id === id)
-            )
-        );
-
-        // ✅ Extract usernames from `UserEntity[]` (New users to be added)
-        const newForumUserNames = [
-          ...new Set(this.newForumUsers.map((user) => user.username)),
-        ];
-
-        const usersToDelete = this.oldForumUsers.filter(
-          (forumUser) =>
-            forumUser.user_id !== this.userId && // Skip the current user
-            !this.updatedForumUsers.some(
-              (updatedUser) => updatedUser.user_id === forumUser.user_id
-            )
-        );
-        console.log('Old Users:', this.oldForumUsers);
-        console.log('Users to Add:', newForumUserNames);
-        console.log('Users to Delete:', usersToDelete);
-
-        if ((newForumUserDTO.users ?? []).length > 0) {
-          this._forumUserService.createForumUsers(newForumUserDTO).subscribe({
-            next: () => console.log('New forum users added successfully'),
-            error: (err) => console.error('Error adding forum users:', err),
-          });
-        } else {
-          console.log('No new users to add, skipping API call.');
-        }
-
-        // ✅ Handle user deletions (Optional API call)
-        if (usersToDelete.length > 0) {
-          this._forumUserService
-            .deleteForumUsers(
-              usersToDelete
-                .map((user) => user.id)
-                .filter((id): id is number => id !== undefined)
-            )
-            .subscribe({
-              next: () => console.log('All users deleted successfully'),
-              error: (err) => console.error('Error deleting users:', err),
-            });
-        }
-
-        this._router.navigate(['/forum/']);
+        this._router.navigate(['/forum']);
       });
     } else {
-      this._forumService.createForum(forumEntity.toDto()).subscribe((forum) => {
-        // ✅ Ensure new users are unique
-        const userIds = [...new Set(this.newForumUsers.map((user) => user.id))];
-
-        const newForumUserDTO = new ForumUserPostDto(
-          this.forumId,
-          userIds.filter((id): id is number => id !== undefined)
-        );
-
-        // ✅ Extract usernames from `UserEntity[]` (New users to be added)
-        const newForumUserNames = [
-          ...new Set(this.newForumUsers.map((user) => user.username)),
-        ];
-
-        if ((newForumUserDTO.users ?? []).length > 0) {
-          this._forumUserService.createForumUsers(newForumUserDTO).subscribe({
-            next: () => console.log('New forum users added successfully'),
-            error: (err) => console.error('Error adding forum users:', err),
-          });
-        } else {
-          console.log('No new users to add, skipping API call.');
-        }
-
-        // Reset form and navigate
-        this.forumFormGroup.reset();
-        this._router.navigate(['/forum/']);
+      this._forumService.createForum(forumEntity).subscribe((response) => {
+        this._router.navigate(['/forum']);
       });
     }
-  }
-
-  onForumUsersChange(updatedForumUsers: (UserEntity | ForumUserEntity)[]) {
-    // Separate new users (UserEntity) from existing forum users (ForumUserEntity)
-    this.newForumUsers = updatedForumUsers.filter(
-      (user): user is UserEntity => !('forum_id' in user) // UserEntity doesn't have `forum_id`
-    );
-
-    this.updatedForumUsers = updatedForumUsers.filter(
-      (user): user is ForumUserEntity => 'forum_id' in user // ForumUserEntity has `forum_id`
-    );
-
-    console.log('New Users:', this.newForumUsers);
-    console.log('Existing Forum Users:', this.updatedForumUsers);
   }
 
   protected openDeleteDialog() {
