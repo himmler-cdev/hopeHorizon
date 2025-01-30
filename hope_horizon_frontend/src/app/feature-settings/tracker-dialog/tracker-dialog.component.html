@@ -1,14 +1,14 @@
 <div class="p-2">
     <h2 mat-dialog-title>Tracker Settings</h2>
     <mat-dialog-content style="height: 300px; width: 300px;">
-        <mat-checkbox [checked]="data.is_enabled" (change)="data.is_enabled = $event.checked">Enabled</mat-checkbox><br>
+        <mat-checkbox [checked]="data.isEnabled" (change)="data.isEnabled = $event.checked">Enabled</mat-checkbox><br>
         <hr>
-        <mat-checkbox [checked]="data.track_mood" [disabled]="!data.is_enabled" (change)="data.track_mood = $event.checked">Mood</mat-checkbox><br>
-        <mat-checkbox [checked]="data.track_energy_level" [disabled]="!data.is_enabled" (change)="data.track_energy_level = $event.checked">Anxiety Level</mat-checkbox><br>
-        <mat-checkbox [checked]="data.track_sleep_quality" [disabled]="!data.is_enabled" (change)="data.track_sleep_quality = $event.checked">Energy Level</mat-checkbox><br>
-        <mat-checkbox [checked]="data.track_anxiety_level" [disabled]="!data.is_enabled" (change)="data.track_anxiety_level = $event.checked">Appetite</mat-checkbox><br>
-        <mat-checkbox [checked]="data.track_appetite" [disabled]="!data.is_enabled" (change)="data.track_appetite = $event.checked">Sleep Quality</mat-checkbox><br>
-        <mat-checkbox [checked]="data.track_content" [disabled]="!data.is_enabled" (change)="data.track_content = $event.checked">Content</mat-checkbox><br>
+        <mat-checkbox [checked]="data.trackMood" [disabled]="!data.isEnabled" (change)="data.trackMood = $event.checked">Mood</mat-checkbox><br>
+        <mat-checkbox [checked]="data.trackEnergyLevel" [disabled]="!data.isEnabled" (change)="data.trackEnergyLevel = $event.checked">Anxiety Level</mat-checkbox><br>
+        <mat-checkbox [checked]="data.trackSleepQuality" [disabled]="!data.isEnabled" (change)="data.trackSleepQuality = $event.checked">Energy Level</mat-checkbox><br>
+        <mat-checkbox [checked]="data.trackAnxietyLevel" [disabled]="!data.isEnabled" (change)="data.trackAnxietyLevel = $event.checked">Appetite</mat-checkbox><br>
+        <mat-checkbox [checked]="data.trackAppetite" [disabled]="!data.isEnabled" (change)="data.trackAppetite = $event.checked">Sleep Quality</mat-checkbox><br>
+        <mat-checkbox [checked]="data.trackContent" [disabled]="!data.isEnabled" (change)="data.trackContent = $event.checked">Content</mat-checkbox><br>
     </mat-dialog-content>
     <mat-dialog-actions>
         <button mat-raised-button (click)="onCancel()" cdkFocusInitial>Cancel</button>

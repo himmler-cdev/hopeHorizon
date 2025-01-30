@@ -4,6 +4,7 @@ from django.contrib.auth.hashers import make_password
 def create_users(apps, schema_editor):
     User = apps.get_model('backend', 'User')  # Adjust based on your app name
     UserRole = apps.get_model('backend', 'UserRole')  # Get the role model
+    UserTracker = apps.get_model('backend', 'UserTracker')  # Get the user tracker model
 
     admin_role = UserRole.objects.last()  # Ensure at least one role exists
     user_role = UserRole.objects.first()  # Assume another role exists for regular users
@@ -61,6 +62,18 @@ def create_users(apps, schema_editor):
             is_staff=False,
             birthdate='1995-06-15',  # Example birthdate, modify as needed
             user_role_id=user_role,  # Assigning last role found
+        )
+
+    for i in range(1, 9):
+        UserTracker.objects.create(
+            user_id=User.objects.get(id=i),
+            is_enabled=True,
+            track_mood=True,
+            track_energy_level=True,
+            track_sleep_quality=True,
+            track_anxiety_level=True,
+            track_appetite=True,
+            track_content=True,
         )
 
 class Migration(migrations.Migration):
