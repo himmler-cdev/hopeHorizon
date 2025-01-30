@@ -2,12 +2,14 @@ import csv
 import os
 from django.core.management.base import BaseCommand, CommandError
 from backend import models
+from django.db import migrations
+from django.contrib.auth.hashers import make_password
 
 class Command(BaseCommand):
     '''
-    Imports IMDB CSV sample file. Existing rows will be updated.
+    Imports our our quotes.
     '''
-    help = 'Imports IMDB CSV sample file. Existing rows will be updated.'
+    help = 'Imports our our quotes.'
 
     def add_arguments(self, parser):
         parser.add_argument('filename', type=str, help='The name of the CSV file to process')
@@ -23,9 +25,10 @@ class Command(BaseCommand):
         with open(filename, encoding='utf-8') as file:
             reader = csv.DictReader(file, delimiter=';')
             for row in reader:
-                print(row)
                 models.Quote.objects.update_or_create(
                     quote=row['quote'],
                     author=row['author'],
-                )       
+                )
 
+
+        
