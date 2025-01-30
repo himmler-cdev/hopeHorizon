@@ -19,10 +19,9 @@ import { ForumEntity } from '../entity/forum.entity';
 import { MatIcon } from '@angular/material/icon';
 import { ForumUserEntity } from '../entity/fourm-user.entity';
 import { ForumUserService } from '../service/forum-user.service';
-import { ForumUserPostDto } from '../dto/forum-user.dto';
 import { UserService } from '../../feature-user/user.service';
 import { UserEntity } from '../../feature-user/entity/user.entity';
-import { setThrowInvalidWriteToSignalError } from '@angular/core/primitives/signals';
+import { ForumUserPostDto } from '../dto/forum-user.dto';
 
 @Component({
   selector: 'app-forum-form',
@@ -51,7 +50,7 @@ export class ForumFormComponent implements OnInit {
   searchControl = new FormControl('');
   allUsers: UserEntity[] = [];
   oldForumUsers: ForumUserEntity[] = [];
-  userId = -1;
+  loggedInUser = new UserEntity();
   oldForumUsersAsUsers: UserEntity[] = [];
   newForumUsers: UserEntity[] = [];
 
@@ -79,13 +78,18 @@ export class ForumFormComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.userId = this._userService.getUserId();
+    const userData = this._userService.getUserDataImmediate();
+    if (userData) {
+      this.loggedInUser = userData;
+    } else {
+      console.error('User data is null');
+    }
     this._route.paramMap.subscribe((params) => {
       this.forumId = Number(params.get('id'));
     });
     if (this.forumId) {
       this.loadForumUsers(this.forumId);
-      this.loadAllUsers();
+
       this._forumService.getForum(this.forumId).subscribe((response) => {
         this.forumFormGroup.patchValue({
           id: response.id,
@@ -99,10 +103,11 @@ export class ForumFormComponent implements OnInit {
   loadForumUsers(forumId: number) {
     this._forumUserService.getForumUsers(forumId).subscribe((users) => {
       users.forum_users.map((user) => {
-        if (user.username && user.id !== this.userId) {
+        if (user.username) {
           this.oldForumUsers.push(ForumUserEntity.fromDto(user));
         }
       });
+      this.loadAllUsers();
     });
   }
 
@@ -112,10 +117,10 @@ export class ForumFormComponent implements OnInit {
         if (users && users.length > 0) {
           this.allUsers = users
             .map((user) => UserEntity.fromDto(user))
-            .filter((user) => user.id !== this.userId);
+            .filter((user) => user.id !== this.loggedInUser.id);
 
           this.oldForumUsersAsUsers = this.mapForumUsersToUserEntities(
-            this.allUsers
+            this.oldForumUsers
           );
           this.preselectUsers();
         }
@@ -135,7 +140,12 @@ export class ForumFormComponent implements OnInit {
   }
 
   preselectUsers() {
-    this.userSelectForm.setValue(this.oldForumUsersAsUsers);
+    if (this.oldForumUsersAsUsers.length > 0) {
+      const selectedUserIds = this.oldForumUsersAsUsers.map((user) => user.id); // Extract IDs
+      console.log('Preselecting users:', selectedUserIds);
+
+      this.userSelectForm.setValue(selectedUserIds); // Set IDs instead of objects
+    }
   }
 
   private persistForm(): ForumEntity {
@@ -162,15 +172,71 @@ export class ForumFormComponent implements OnInit {
 
     if (this.forumId) {
       this._forumService.updateForum(forumEntity).subscribe(() => {
+        this.userSelectForm.value.map((userId: Number) => {
+          const user = this.allUsers.find((user) => user.id === userId);
+
+          if (user && !this.oldForumUsersAsUsers.includes(user)) {
+            this.newForumUsers.push(user);
+          }
+        });
+
+        const userIds = [...new Set(this.newForumUsers.map((user) => user.id))];
+
+        const newForumUserDTO = new ForumUserPostDto(
+          this.forumId,
+          userIds
+            .filter((id): id is number => id !== undefined)
+            .filter(
+              (id) =>
+                !this.oldForumUsersAsUsers.some((oldUser) => oldUser.id === id)
+            )
+        );
+
+        if (newForumUserDTO.users && newForumUserDTO.users.length > 0) {
+          this._forumUserService.createForumUsers(newForumUserDTO).subscribe({
+            next: () => console.log('New forum users added successfully'),
+            error: (err) => console.error('Error adding forum users:', err),
+          });
+        } else {
+          console.log('No new users to add, skipping API call.');
+        }
+
+        const selectedUserIds = this.userSelectForm.value as number[]; // Get selected IDs
+
+        /*
+        Not implemented correctly in backend, TODO for v2
+        +++++++++++++++++++++++++++++++++++++++++++++++
 
         
+        const usersToDelete = this.oldForumUsersAsUsers.filter(
+          (oldUser) =>
+            oldUser.id !== this.loggedInUser.id && // Exclude logged-in user
+            !selectedUserIds.includes(oldUser.id!) // Compare IDs, not objects
+        );
+        
+        // Extract only the IDs
+        const userIdsToDelete = usersToDelete
+          .map((user) => user.id) // Get only IDs
+          .filter((id): id is number => id !== undefined); // Ensure IDs are valid
+        
+        if (userIdsToDelete.length > 0) {
+          console.log("Deleting users:", userIdsToDelete); // Debugging log
+        
+          this._forumUserService.deleteForumUsers(userIdsToDelete).subscribe({
+            next: () => console.log("Users deleted successfully"),
+            error: (err) => console.error("Error deleting users:", err),
+          });
+        }
+          */
 
         this._router.navigate(['/forum']);
       });
     } else {
-      this._forumService.createForum(forumEntity).subscribe((response) => {
-        this._router.navigate(['/forum']);
-      });
+      this._forumService
+        .createForum(forumEntity.toDto())
+        .subscribe((response) => {
+          this._router.navigate(['/forum']);
+        });
     }
   }
 
@@ -194,9 +260,9 @@ export class ForumFormComponent implements OnInit {
   protected openCancelDialog() {
     const dialogRef = this._dialog.open(ConfirmDialogComponent, {
       data: {
-        title: 'Cancel Cahnges made to Forum',
+        title: 'Cancel Changes made to Forum',
         message: 'Are you sure you want to go back?',
-        confirmText: 'Cancel',
+        confirmText: 'Go Back',
         cancelText: 'Stay',
       },
     });

@@ -20,7 +20,7 @@ class ForumUserViewSet(viewsets.ModelViewSet):
         if not forum.is_active:
             return Response({"detail": "The forum does not exist"}, status=status.HTTP_404_NOT_FOUND)
         try:
-            forum_user = ForumUser.objects.filter(forum_id=forum, user_id=user).get()
+            forum_user = ForumUser.objects.filter(forum_id=forum, user_id=user, is_active=True).get()
             if not forum_user.is_owner:
                 serializer = self.serializer_class([forum_user], many=True)
                 return Response({"forum_users": serializer.data}, status=status.HTTP_200_OK)

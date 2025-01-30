@@ -37,8 +37,9 @@ export class ForumListCardComponent {
     this._router.navigate(['/forum/', this.forum.id]);
   }
 
-  openBlogs() {
-    //TODO: Implement navigation to blogs in this group
+  openJournal() {
+    //TODO: Himmler
+    this._router.navigate(['/journal/']);
   }
 
   leaveForum() {

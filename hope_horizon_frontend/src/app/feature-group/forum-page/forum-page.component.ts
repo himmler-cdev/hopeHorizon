@@ -5,6 +5,7 @@ import { ForumService } from '../service/forum.service';
 import { ForumUserService } from '../service/forum-user.service';
 import { ForumUserEntity } from '../entity/fourm-user.entity';
 import { UserService } from '../../feature-user/user.service';
+import { UserEntity } from '../../feature-user/entity/user.entity';
 
 @Component({
   selector: 'app-forum-page',
@@ -16,7 +17,7 @@ export class ForumPageComponent implements OnInit {
   forumList: ForumEntity[] = [];
   forumUsersOfUser: ForumUserEntity[] = [];
   filterOptions = ['owned', 'member', 'all'];
-  userId = -1;
+  loggedInUser = new UserEntity;
   
   
 
@@ -27,9 +28,14 @@ export class ForumPageComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.userId = this._userSerivce.getUserId();
+    const userData = this._userSerivce.getUserDataImmediate();
+    if (userData) {
+      this.loggedInUser = userData;
+    } else {
+      console.error('User data is null');
+    }
     this.loadForums();
-    console.log('UserID:', this.userId);
+    console.log('UserID:', this.loggedInUser.id);
 
   }
 
@@ -72,7 +78,7 @@ export class ForumPageComponent implements OnInit {
         // Filter users whose user_id matches this.userId
         const users = response.forum_users
           .map(ForumUserEntity.fromDto)
-          .filter(user => user.user_id === this.userId);
+          .filter(user => user.user_id === this.loggedInUser.id);
   
         // Append only the filtered users
         this.forumUsersOfUser = [...this.forumUsersOfUser, ...users];
