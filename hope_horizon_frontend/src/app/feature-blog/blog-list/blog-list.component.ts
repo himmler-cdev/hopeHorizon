@@ -12,6 +12,7 @@ import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {MatChip} from '@angular/material/chips';
 import {BlogPostTypeEntity} from '../entity/blog-post-type.entity';
 import {RouterLink} from '@angular/router';
+import {BlogPostTypeService} from '../service/blog-post-type.service';
 
 @Component({
   selector: 'app-blog-list',
@@ -43,21 +44,32 @@ import {RouterLink} from '@angular/router';
 export class BlogListComponent {
   @Input({required: true}) blogPostList!: BlogPostEntity[];
   @Input() showFilter = true;
-  @Input() filterOptions: BlogPostTypeEntity[] = [];
 
   @Output() searchChange = new EventEmitter<string | null>();
   @Output() filterChange = new EventEmitter<number | null>();
 
   searchControl = new FormControl('');
   filterControl = new FormControl(null);
+  blogPostTypes: BlogPostTypeEntity[] = [];
 
-  constructor() {
+  constructor(private _blogPostTypeService: BlogPostTypeService) {
+  }
+
+  ngOnInit() {
     this.searchControl.valueChanges.subscribe(value => {
       this.searchChange.emit(value);
     });
 
     this.filterControl.valueChanges.subscribe(value => {
       this.filterChange.emit(value);
+    });
+
+    this._blogPostTypeService.getBlogPostTypes().subscribe((response) => {
+      response.blog_post_types
+        .filter((blogPostType) => blogPostType.type?.toLowerCase() !== 'forum')
+        .map((blogPostType) => {
+          this.blogPostTypes.push(BlogPostTypeEntity.fromDto(blogPostType));
+        });
     });
   }
 

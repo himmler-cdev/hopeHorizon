@@ -13,6 +13,8 @@ import {MatDialog} from '@angular/material/dialog';
 import {ConfirmDialogComponent} from '../../../shared/dialogs/confirm-dialog/confirm-dialog.component';
 import {Location} from '@angular/common';
 import {CdkTextareaAutosize} from '@angular/cdk/text-field';
+import {UserEntity} from '../../feature-user/entity/user.entity';
+import {UserService} from '../../feature-user/user.service';
 
 @Component({
   selector: 'app-blog-form',
@@ -146,7 +148,6 @@ export class BlogFormComponent implements OnInit {
   }
 
   private _clearForm() {
-    // TODO: Discuss clear strategy with team
     this.blogFormGroup.reset();
   }
 

@@ -69,6 +69,10 @@ export class CommentCardComponent implements OnInit {
   }
 
   startEdit(): void {
+    if (this.isEditing) {
+      this.cancelEdit();
+    }
+
     this.isEditing = true;
     this.editForm.setValue({content: this.comment.content});
   }
@@ -92,7 +96,6 @@ export class CommentCardComponent implements OnInit {
       next: (commentDto) => {
         this.comment = CommentEntity.fromDto(commentDto);
 
-        // ✅ Ensure ID and other essential fields are not lost
         this.comment.id = updatedComment.id;
         this.comment.blogPostId = updatedComment.blogPostId;
         this.comment.userId = updatedComment.userId;
@@ -110,7 +113,20 @@ export class CommentCardComponent implements OnInit {
   }
 
   cancelEdit(): void {
-    this.isEditing = false;
+    const dialogRef = this._dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Cancel Edit',
+        message: 'Are you sure you want to cancel editing this comment?',
+        confirmText: 'Yes',
+        cancelText: 'No'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.isEditing = false;
+      }
+    });
   }
 
   protected openDeleteDialog() {

@@ -1,5 +1,5 @@
 <div class="mx-2">
-  <app-blog-list [blogPostList]="blogPostList" [showFilter]="true" [filterOptions]="filterOptions"
+  <app-blog-list [blogPostList]="blogPostList" [showFilter]="true"
                  (searchChange)="onSearchChange($event)" (filterChange)="onFilterChange($event)"></app-blog-list>
   <mat-paginator [length]="blogListLength"
                  [pageSize]="pageSize"
