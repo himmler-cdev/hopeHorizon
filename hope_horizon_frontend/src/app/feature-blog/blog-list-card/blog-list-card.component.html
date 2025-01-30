@@ -3,7 +3,10 @@
     <div>
       <mat-card-header>
         <mat-card-title class="fw-bold">
-          {{ blog.title }} - <span class="blog-post-type">{{ blogPostTypeName }}</span>
+          {{ blog.title }}  <span class="blog-post-type">- {{ blogPostType }}</span>
+          @if (forumName) {
+            <span class="forum-name"> - {{ forumName }}</span>
+          }
         </mat-card-title>
       </mat-card-header>
       <mat-card-content class="card-content">

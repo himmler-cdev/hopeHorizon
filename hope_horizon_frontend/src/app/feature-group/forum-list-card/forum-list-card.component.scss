@@ -4,10 +4,22 @@
   background-color: rgba(218, 218, 218, 0.4);
   display: flex;
   flex-direction: column;
+  position: relative;
+  transition: background-color 0.3s ease;
 
   &:hover {
     background-color: rgba(160, 160, 160, 0.6);
     cursor: pointer;
+  }
+
+  &:has(button:hover) {
+    background-color: rgba(218, 218, 218, 0.4);
+    cursor: pointer;
+  }
+
+  button {
+    z-index: 2;
+    position: relative;
   }
 }
 
@@ -19,6 +31,31 @@
   text-overflow: ellipsis;
 }
 
-.mat-card-header, .mat-card-content {
+.mat-card-header,
+.mat-card-content {
   flex-grow: 1;
+}
+
+.edit-button {
+  background-color: #4c9a64;
+  color: white;
+  min-width: 100px;
+  transition: background-color 0.3s ease;
+
+  &:hover,
+  &:focus {
+    background-color: #3a7a4d;
+  }
+}
+
+.leave-button {
+  background-color: #d9534f;
+  color: white;
+  min-width: 100px;
+  transition: background-color 0.3s ease;
+
+  &:hover,
+  &:focus {
+    background-color: #b03a37;
+  }
 }

@@ -10,13 +10,15 @@
     </div>
     @if (forumUser.is_owner) {
       <div class="d-flex align-items-center">
-        <button mat-icon-button class="me-2" (click)="openForum()">
+        <button mat-raised-button class="me-3 edit-button mat-elevation-z3" (click)="openForum($event)">
+          Edit
           <mat-icon>edit</mat-icon>
         </button>
       </div>
     } @else {
       <div class="d-flex align-items-center">
-        <button mat-icon-button class="me-2" (click)="leaveForum()">
+        <button mat-raised-button class="me-3 leave-button mat-elevation-z3" (click)="leaveForum($event)">
+          Leave
           <mat-icon>exit_to_app</mat-icon>
         </button>
       </div>

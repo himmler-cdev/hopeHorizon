@@ -1,4 +1,4 @@
-import { CommentDto } from '../dto/comment.dto';
+import {CommentDto} from '../dto/comment.dto';
 
 export class CommentEntity {
   id?: number;

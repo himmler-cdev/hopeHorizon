@@ -1,7 +1,6 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { CommentDto, CommentsDto } from '../dto/comment.dto';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {CommentDto, CommentsDto} from '../dto/comment.dto';
 
 @Injectable({
   providedIn: 'root',
@@ -9,10 +8,11 @@ import { CommentDto, CommentsDto } from '../dto/comment.dto';
 export class CommentService {
   private readonly API_URL = '/api/comment/';
 
-  constructor(private _http: HttpClient) {}
+  constructor(private _http: HttpClient) {
+  }
 
   getComments(queryParams?: Record<string, string | number>) {
-    return this._http.get<Readonly<CommentsDto>>(this.API_URL, { params: queryParams });
+    return this._http.get<Readonly<CommentsDto>>(this.API_URL, {params: queryParams});
   }
 
   getComment(comment: CommentDto) {
@@ -25,8 +25,8 @@ export class CommentService {
 
   updateComment(comment: CommentDto) {
     if (comment.id === undefined) {
-        throw new Error('Cannot update a comment without an id');
-      }
+      throw new Error('Cannot update a comment without an id');
+    }
     return this._http.put<Readonly<CommentDto>>(`${this.API_URL}${comment.id}/`, comment);
   }
 

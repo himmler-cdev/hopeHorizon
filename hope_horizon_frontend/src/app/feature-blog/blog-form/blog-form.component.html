@@ -1,12 +1,12 @@
 <form [formGroup]="blogFormGroup" class="m-3">
   <!-- Title and Select -->
-  <div class="d-flex flex-column flex-md-row">
-    <div class="title-field me-md-4">
+  <div class="d-flex flex-column flex-md-row align-items-start">
+    <!-- Title Field -->
+    <div class="title-field me-md-3">
       <mat-form-field class="w-100" appearance="outline">
         <mat-label>Title</mat-label>
         <input matInput formControlName="title"/>
 
-        <!-- Error Message -->
         @if (blogFormGroup.controls['title'].hasError('required')) {
           <mat-error>Title is required</mat-error>
         }
@@ -18,21 +18,44 @@
         }
       </mat-form-field>
     </div>
-    <div class="type-field">
+
+    <!-- Type Field -->
+    <div class="type-field me-md-3">
       <mat-form-field class="w-100" appearance="outline">
         <mat-label>Type</mat-label>
-        <mat-select formControlName="blogPostTypeId">
+        <mat-select formControlName="blogPostTypeId" (selectionChange)="onTypeChange($event)">
           @for (option of blogPostTypes; track $index) {
+            @if (option.id === forumTypeId && formus.length > 0) {
+              <mat-option [value]="option.id">{{ option.type }}</mat-option>
+            } @else if (option.id !== forumTypeId) {
             <mat-option [value]="option.id">{{ option.type }}</mat-option>
+              }
           }
         </mat-select>
 
-        <!-- Error Message -->
         @if (blogFormGroup.controls['blogPostTypeId'].hasError('required')) {
           <mat-error>Type is required</mat-error>
         }
       </mat-form-field>
     </div>
+
+    <!-- Forum Selection (Only Shows if Forum is Selected) -->
+    @if (isForumTypeSelected) {
+      <div class="forum-field">
+        <mat-form-field class="w-100" appearance="outline">
+          <mat-label>Select Forum</mat-label>
+          <mat-select formControlName="forumId" (selectionChange)="onForumTypeChange($event)">
+            @for (forum of formus; track $index) {
+              <mat-option [value]="forum.id">{{ forum.name }}</mat-option>
+            }
+          </mat-select>
+
+          @if (blogFormGroup.controls['forumId']?.hasError('required')) {
+            <mat-error>Forum selection is required</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    }
   </div>
 
   <!-- Content -->

@@ -77,7 +77,7 @@ export class UserService {
 
   getAllUsers(): Observable<UserDto[]> {
     return this._http
-      .get<{ users: UserDto[] }>('/api/user/', { withCredentials: true })
+      .get<{ users: UserDto[] }>('/api/user/', {withCredentials: true})
       .pipe(
         tap((response) => console.log('API Response:', response)),
         map((response) => response.users)

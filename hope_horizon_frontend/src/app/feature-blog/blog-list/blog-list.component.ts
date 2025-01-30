@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {BlogPostEntity} from '../entity/blog-post.entity';
 import {DatePipe, NgClass} from '@angular/common';
 import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
@@ -13,6 +13,8 @@ import {MatChip} from '@angular/material/chips';
 import {BlogPostTypeEntity} from '../entity/blog-post-type.entity';
 import {RouterLink} from '@angular/router';
 import {BlogPostTypeService} from '../service/blog-post-type.service';
+import {ForumService} from '../../feature-group/service/forum.service';
+import {ForumEntity} from '../../feature-group/entity/forum.entity';
 
 @Component({
   selector: 'app-blog-list',
@@ -41,18 +43,21 @@ import {BlogPostTypeService} from '../service/blog-post-type.service';
   templateUrl: './blog-list.component.html',
   styleUrl: './blog-list.component.scss'
 })
-export class BlogListComponent {
+export class BlogListComponent implements OnInit {
   @Input({required: true}) blogPostList!: BlogPostEntity[];
   @Input() showFilter = true;
+  @Input() filterForum: boolean = false;
 
   @Output() searchChange = new EventEmitter<string | null>();
   @Output() filterChange = new EventEmitter<number | null>();
 
   searchControl = new FormControl('');
-  filterControl = new FormControl(null);
+  filterControl = new FormControl(0);
   blogPostTypes: BlogPostTypeEntity[] = [];
+  forums: ForumEntity[] = [];
+  forumId: number | undefined;
 
-  constructor(private _blogPostTypeService: BlogPostTypeService) {
+  constructor(private _blogPostTypeService: BlogPostTypeService, private _forumService: ForumService) {
   }
 
   ngOnInit() {
@@ -65,15 +70,38 @@ export class BlogListComponent {
     });
 
     this._blogPostTypeService.getBlogPostTypes().subscribe((response) => {
-      response.blog_post_types
-        .filter((blogPostType) => blogPostType.type?.toLowerCase() !== 'forum')
-        .map((blogPostType) => {
-          this.blogPostTypes.push(BlogPostTypeEntity.fromDto(blogPostType));
-        });
+      response.blog_post_types.map((blogPostType) => {
+        this.blogPostTypes.push(BlogPostTypeEntity.fromDto(blogPostType));
+        this.forumId = this.blogPostTypes.find(type => type.type === 'Forum')?.id;
+
+        if (this.filterForum && this.forumId) {
+          this.filterControl.setValue(this.forumId);
+        }
+      });
+    });
+
+    this._forumService.getForums(true).subscribe((response) => {
+      response.custom_forums.forEach((forum) => {
+        this.forums.push(ForumEntity.fromDto(forum));
+      });
+    });
+
+    this._forumService.getForums(false).subscribe((response) => {
+      response.custom_forums.forEach((forum) => {
+        this.forums.push(ForumEntity.fromDto(forum));
+      });
     });
   }
 
   clearSearchFilter() {
     this.searchControl.setValue('');
+  }
+
+  getBlogPostTypeById(id: number | undefined): string {
+    return this.blogPostTypes.find(type => type.id === id)?.type || '';
+  }
+
+  getForumNameByBlogPostId(id: number | undefined): string {
+    return this.forums.find(forum => forum.id === id)?.name || '';
   }
 }

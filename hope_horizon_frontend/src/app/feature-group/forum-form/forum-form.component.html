@@ -1,110 +1,113 @@
 <form [formGroup]="forumFormGroup" class="m-3 px-3 me-5">
-  <!-- Title and Select -->
-  <div class="d-flex flex-column flex-md-row">
-    <div class="title-field">
-      <mat-form-field class="w-100" appearance="outline">
-        <mat-label>Title</mat-label>
-        <input matInput formControlName="name" />
+    <!-- Title and Select -->
+    <div class="d-flex flex-column flex-md-row">
+        <div class="title-field">
+            <mat-form-field class="w-100" appearance="outline">
+                <mat-label>Title</mat-label>
+                <input matInput formControlName="name"/>
 
-        <!-- Error Message -->
-        @if (forumFormGroup.controls['name'].hasError('required')) {
-        <mat-error>Name is required</mat-error>
-        } @if (forumFormGroup.controls['name'].hasError('maxlength')) {
-        <mat-error>Name cannot be more than 250 characters</mat-error>
-        } @if (forumFormGroup.controls['name'].hasError('whitespace')) {
-        <mat-error
-          >Name cannot be all whitespace. It must contain at least one
-          non-whitespace character
-        </mat-error>
-        }
-      </mat-form-field>
+                <!-- Error Message -->
+                @if (forumFormGroup.controls['name'].hasError('required')) {
+                    <mat-error>Name is required</mat-error>
+                }
+                @if (forumFormGroup.controls['name'].hasError('maxlength')) {
+                    <mat-error>Name cannot be more than 250 characters</mat-error>
+                }
+                @if (forumFormGroup.controls['name'].hasError('whitespace')) {
+                    <mat-error
+                    >Name cannot be all whitespace. It must contain at least one
+                        non-whitespace character
+                    </mat-error>
+                }
+            </mat-form-field>
+        </div>
     </div>
-  </div>
 
-  <!-- Content -->
-  <div class="mt-2">
-    <mat-form-field class="w-100" appearance="outline">
-      <mat-label>Description</mat-label>
-      <textarea matInput formControlName="description" rows="10"> </textarea>
+    <!-- Content -->
+    <div class="mt-2">
+        <mat-form-field class="w-100" appearance="outline">
+            <mat-label>Description</mat-label>
+            <textarea matInput formControlName="description" rows="10"> </textarea>
 
-      <!-- Error Message -->
-      @if (forumFormGroup.controls['description'].hasError('required')) {
-      <mat-error>Description is required</mat-error>
-      } @if (forumFormGroup.controls['description'].hasError('whitespace')) {
-      <mat-error
-        >Description cannot be all whitespace. It must contain at least one
-        non-whitespace character
-      </mat-error>
-      }
-    </mat-form-field>
-  </div>
+            <!-- Error Message -->
+            @if (forumFormGroup.controls['description'].hasError('required')) {
+                <mat-error>Description is required</mat-error>
+            }
+            @if (forumFormGroup.controls['description'].hasError('whitespace')) {
+                <mat-error
+                >Description cannot be all whitespace. It must contain at least one
+                    non-whitespace character
+                </mat-error>
+            }
+        </mat-form-field>
+    </div>
 
-  <!-- Forum Users  -->
-  @if (forumId) {
-  <mat-form-field class="w-100" appearance="outline">
-    <mat-label>Users</mat-label>
-    <mat-select [formControl]="userSelectForm" multiple>
-      @for (user of allUsers; track $index) {
-      <mat-option [value]="user.id">{{ user.username }}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
-  }
-
-  <!-- Cancel/Clear and Submit Buttons -->
-  <div class="mt-5">
+    <!-- Forum Users  -->
     @if (forumId) {
-    <!-- Edit Mode -->
-    <div class="d-flex justify-content-between align-items-center">
-      <button
-        mat-raised-button
-        color="primary"
-        class="deny-button mat-elevation-z3"
-        (click)="openDeleteDialog()"
-      >
-        Delete Forum
-      </button>
-      <div class="d-flex justify-content-end align-items-center">
-        <button
-          mat-raised-button
-          color="primary"
-          class="deny-button mat-elevation-z3 me-3"
-          (click)="openCancelDialog()"
-        >
-          Cancel
-        </button>
-        <button
-          mat-raised-button
-          color="primary"
-          class="save-button mat-elevation-z3"
-          [disabled]="!forumFormGroup.valid"
-          (click)="createOrUpdate()"
-        >
-          Update Forum
-        </button>
-      </div>
-    </div>
-    } @else {
-    <!-- Create Mode -->
-    <div class="d-flex justify-content-end align-items-end">
-      <button
-        mat-raised-button
-        color="primary"
-        class="deny-button mat-elevation-z3 me-3"
-        (click)="openCancelDialog()"
-      >
-        Clear
-      </button>
-      <button
-        mat-raised-button
-        color="primary"
-        class="save-button mat-elevation-z3"
-        [disabled]="!forumFormGroup.valid"
-        (click)="createOrUpdate()"
-      >
-        Create Forum
-      </button>
-    </div>
+        <mat-form-field class="w-100" appearance="outline">
+            <mat-label>Users</mat-label>
+            <mat-select [formControl]="userSelectForm" multiple>
+                @for (user of allUsers; track $index) {
+                    <mat-option [value]="user.id">{{ user.username }}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
     }
-  </div>
+
+    <!-- Cancel/Clear and Submit Buttons -->
+    <div class="mt-5">
+        @if (forumId) {
+            <!-- Edit Mode -->
+            <div class="d-flex justify-content-between align-items-center">
+                <button
+                        mat-raised-button
+                        color="primary"
+                        class="deny-button mat-elevation-z3"
+                        (click)="openDeleteDialog()"
+                >
+                    Delete Forum
+                </button>
+                <div class="d-flex justify-content-end align-items-center">
+                    <button
+                            mat-raised-button
+                            color="primary"
+                            class="deny-button mat-elevation-z3 me-3"
+                            (click)="openCancelDialog()"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                            mat-raised-button
+                            color="primary"
+                            class="save-button mat-elevation-z3"
+                            [disabled]="!forumFormGroup.valid"
+                            (click)="createOrUpdate()"
+                    >
+                        Update Forum
+                    </button>
+                </div>
+            </div>
+        } @else {
+            <!-- Create Mode -->
+            <div class="d-flex justify-content-end align-items-end">
+                <button
+                        mat-raised-button
+                        color="primary"
+                        class="deny-button mat-elevation-z3 me-3"
+                        (click)="openCancelDialog()"
+                >
+                    Clear
+                </button>
+                <button
+                        mat-raised-button
+                        color="primary"
+                        class="save-button mat-elevation-z3"
+                        [disabled]="!forumFormGroup.valid"
+                        (click)="createOrUpdate()"
+                >
+                    Create Forum
+                </button>
+            </div>
+        }
+    </div>
 </form>

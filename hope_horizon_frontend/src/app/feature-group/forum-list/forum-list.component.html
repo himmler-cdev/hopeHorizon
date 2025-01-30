@@ -18,7 +18,7 @@
       <mat-form-field class="w-100" appearance="outline">
         <mat-select [formControl]="filterControl" placeholder="Select an Option">
           @for (option of filterOptions; track $index) {
-            <mat-option value="{{ option }}">{{ option }}</mat-option>
+            <mat-option value="{{ option }}">{{ option | titlecase }}</mat-option>
           }
         </mat-select>
       </mat-form-field>

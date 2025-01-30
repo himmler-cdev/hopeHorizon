@@ -20,22 +20,16 @@ import {BlogPostTypeEntity} from '../entity/blog-post-type.entity';
   templateUrl: './blog-list-card.component.html',
   styleUrl: './blog-list-card.component.scss'
 })
-export class BlogListCardComponent implements OnInit {
+export class BlogListCardComponent {
   @Input({required: true}) blog!: BlogPostEntity;
   @Input({required: true}) blogPostTypes!: BlogPostTypeEntity[];
-  blogPostTypeName: string | undefined;
+  @Input({required: true}) blogPostType!: string;
+  @Input() forumName: string | null = null;
 
   constructor(private _router: Router) {
-  }
-
-  ngOnInit() {
-    const type = this.blogPostTypes.find(t => t.id === this.blog.blogPostTypeId);
-    this.blogPostTypeName = type ? type.type : 'Unknown';
   }
 
   openBlogPost() {
     this._router.navigate(['/blog/', this.blog.id]);
   }
-
-
 }

@@ -1,29 +1,31 @@
 <div id="home">
-  <!-- Yellow Quote Section -->
-  <div class="quote-container d-flex align-items-center justify-content-center">
-    <div class="left-animation left-animation-1"></div>
-    <div class="left-animation left-animation-2"></div>
-    <div class="left-animation left-animation-3"></div>
-    <div class="text-center">
-      <h2 class="mb-5 w-100">QUOTE OF THE DAY</h2>
+    <!-- Yellow Quote Section -->
+    <div class="quote-container d-flex align-items-center justify-content-center">
+        <div class="left-animation left-animation-1"></div>
+        <div class="left-animation left-animation-2"></div>
+        <div class="left-animation left-animation-3"></div>
+        <div class="text-center">
+            <h2 class="mb-5 w-100">QUOTE OF THE DAY</h2>
+        </div>
+        <mat-divider class="w-75"></mat-divider>
+        <p class="mt-3 quote-text">{{ quote?.quote }} <em>~ {{ quote?.author }}</em></p>
+        <div class="right-animation right-animation-1"></div>
+        <div class="right-animation right-animation-2"></div>
+        <div class="right-animation right-animation-3"></div>
     </div>
-    <mat-divider class="w-75"></mat-divider>
-    <p class="mt-3 quote-text">{{ quote?.quote }} <em>~ {{ quote?.author }}</em></p>
-    <div class="right-animation right-animation-1"></div>
-    <div class="right-animation right-animation-2"></div>
-    <div class="right-animation right-animation-3"></div>
-  </div>
 
-  <!-- Create Blog -->
-  <div class="mt-3 mx-3">
-    <h2>Write About your Day</h2>
-    <button mat-flat-button color="primary" class="w-100 new-blog-button" [routerLink]="['/blog/create']">Create Blog</button>
-  </div>
+    <!-- Create Blog -->
+    <div class="mt-3 mx-3">
+        <h2>Write About your Day</h2>
+        <button mat-flat-button color="primary" class="w-100 new-blog-button" [routerLink]="['/blog/create']">Create
+            Blog
+        </button>
+    </div>
 
-  <!-- Notifications -->
-  <div class="mt-3 mx-3">
-    <!-- TODO: Add Notifications -->
-  </div>
+    <!-- Notifications -->
+    <div class="mt-3 mx-3">
+        <!-- TODO: Add Notifications -->
+    </div>
 
-  <!-- Your Progress -->
+    <!-- Your Progress -->
 </div>
