@@ -1,20 +1,53 @@
-import {NgClass} from '@angular/common';
-import {Component, computed, EventEmitter, inject, Input, model, OnChanges, Output, signal, SimpleChanges,} from '@angular/core';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {MatButton, MatIconButton} from '@angular/material/button';
-import {MatCard, MatCardContent, MatCardHeader, MatCardTitle,} from '@angular/material/card';
-import {MatChip, MatChipInputEvent, MatChipOption, MatChipsModule,} from '@angular/material/chips';
-import {MatOption} from '@angular/material/core';
-import {MatFormField, MatFormFieldModule, MatLabel, MatSuffix,} from '@angular/material/form-field';
-import {MatIcon, MatIconModule} from '@angular/material/icon';
-import {MatInput} from '@angular/material/input';
-import {MatSelect} from '@angular/material/select';
-import {RouterLink} from '@angular/router';
-import {MatAutocompleteModule, MatAutocompleteSelectedEvent,} from '@angular/material/autocomplete';
-import {COMMA, ENTER} from '@angular/cdk/keycodes';
-import {LiveAnnouncer} from '@angular/cdk/a11y';
+import { NgClass } from '@angular/common';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  computed,
+  EventEmitter,
+  inject,
+  Input,
+  model,
+  OnChanges,
+  OnInit,
+  Output,
+  signal,
+  SimpleChanges,
+} from '@angular/core';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import {
+  MatCard,
+  MatCardContent,
+  MatCardHeader,
+  MatCardTitle,
+} from '@angular/material/card';
+import {
+  MatChip,
+  MatChipInputEvent,
+  MatChipOption,
+  MatChipsModule,
+} from '@angular/material/chips';
+import { MatOption } from '@angular/material/core';
+import {
+  MatFormField,
+  MatFormFieldModule,
+  MatLabel,
+  MatSuffix,
+} from '@angular/material/form-field';
+import { MatIcon, MatIconModule } from '@angular/material/icon';
+import { MatInput } from '@angular/material/input';
+import { MatSelect } from '@angular/material/select';
+import { RouterLink } from '@angular/router';
+import {
+  MatAutocompleteModule,
+  MatAutocompleteSelectedEvent,
+} from '@angular/material/autocomplete';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { UserEntity } from '../../feature-user/entity/user.entity';
 import { ForumUserEntity } from '../entity/fourm-user.entity';
+import { UserService } from '../../feature-user/user.service';
 
 @Component({
   selector: 'app-forum-user-chip',
@@ -49,38 +82,71 @@ import { ForumUserEntity } from '../entity/fourm-user.entity';
   templateUrl: './forum-user-chip.component.html',
   styleUrl: './forum-user-chip.component.scss',
 })
-export class ForumUserChipComponent implements OnChanges {
+export class ForumUserChipComponent implements OnInit, OnChanges {
+  private cdr = inject(ChangeDetectorRef);
+
   @Input({ required: true }) forumUsers!: ForumUserEntity[];
   @Input({ required: true }) allUsers!: UserEntity[];
-  @Output() updatedForumUsers = new EventEmitter<(UserEntity | ForumUserEntity)[]>();
-
-  
+  currentUserId = -1;
+  @Output() updatedForumUsers = new EventEmitter<
+    (UserEntity | ForumUserEntity)[]
+  >();
 
   searchControl = new FormControl('');
+  combinedUsers: (UserEntity | ForumUserEntity)[] = [];
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
   readonly currentUser = model('');
   readonly selectedUsers = signal<UserEntity[]>([]);
 
   readonly filteredUsers = computed(() => {
     const currentUser = this.currentUser().toLowerCase();
+    
     return currentUser
-      ? this.allUsers.filter(
-          (user) =>
+      ? this.allUsers.filter((user) => {
+          const userId = user.id; //Always compare `id` from `UserEntity`
+          
+          return (
             user.username!.toLowerCase().includes(currentUser) &&
-            !this.selectedUsers().some((selected) => selected.id === user.id) // Exclude already selected users
-        )
-      : this.allUsers.filter(
-          (user) => !this.selectedUsers().some((selected) => selected.id === user.id)
-        ); // Exclude already selected users
+            userId !== this.currentUserId && // Exclude the current user
+            !this.selectedUsers().some((selected) => {
+              const selectedUserId = 'user_id' in selected ? selected.user_id : selected.id; //Handle ForumUserEntity
+              return selectedUserId === userId;
+            })
+          );
+        })
+      : this.allUsers.filter((user) => {
+          const userId = user.id;
+  
+          return (
+            userId !== this.currentUserId &&
+            !this.selectedUsers().some((selected) => {
+              const selectedUserId = 'user_id' in selected ? selected.user_id : selected.id;
+              return selectedUserId === userId;
+            })
+          );
+        });
   });
+  
 
   readonly announcer = inject(LiveAnnouncer);
+
+
+  constructor(private _userService: UserService) {}
+
+  ngOnInit() {
+    this.currentUserId = this._userService.getUserId();
+    console.log('Current User ID:', this.currentUserId);
+    this.updateForumUsers();
+  }
+  
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['forumUsers'] && this.forumUsers) {
       this.selectedUsers.set(this.forumUsers);
-      this.updateNames();
+      this.combinedUsers = [...this.forumUsers];
+      this.updateForumUsers();
     }
+    
   }
 
   add(event: MatChipInputEvent): void {
@@ -89,13 +155,12 @@ export class ForumUserChipComponent implements OnChanges {
 
     if (user && !this.selectedUsers().some((u) => u.id === user.id)) {
       this.selectedUsers.update((users) => [...users, user]);
-      this.updateNames();
+      this.updateForumUsers();
     } else {
       console.warn('Invalid input or user not in the list.');
     }
 
     // Clear the input
-    console.log('Clearing input field');
     this.currentUser.set('');
     event.chipInput!.clear();
   }
@@ -106,7 +171,7 @@ export class ForumUserChipComponent implements OnChanges {
 
     if (user && !this.selectedUsers().some((u) => u.id === user.id)) {
       this.selectedUsers.update((users) => [...users, user]);
-      this.updateNames();
+      this.updateForumUsers();
     }
 
     // Clear the input
@@ -121,111 +186,15 @@ export class ForumUserChipComponent implements OnChanges {
     });
 
     this.announcer.announce(`Removed ${user.username}`);
+    this.updateForumUsers();
   }
 
   // Send updated list of forum users to parent component
-  updateNames() {
-    // ✅ Merge `forumUsers` (existing) with `selectedUsers()` (new)
-    const combinedUsers = [...this.forumUsers, ...this.selectedUsers()]
-      .filter((user, index, self) => self.findIndex(u => u.id === user.id) === index); // ✅ Remove duplicates
-  
-    this.updatedForumUsers.emit(combinedUsers);
-    console.log('Updated forum users:', combinedUsers);
-  }
+  updateForumUsers() {
+    this.combinedUsers = [...this.forumUsers, ...this.selectedUsers()]
 
-  clearSearchFilter() {
-    this.searchControl.setValue('');
+    this.updatedForumUsers.emit(this.combinedUsers);
+    console.log('Updated forum users:', this.combinedUsers);
+    this.cdr.detectChanges();
   }
 }
-
-
-
-/*
-export class ForumUserChipComponent {
-  @Input({required: true}) forumUserNames!: string[];
-  @Input({required: true}) allUserNames!: string[];
-  @Output() updatedForumUserNames = new EventEmitter<string[]>();
-
-  searchControl = new FormControl('');
-
-  // Chip variables
-  readonly separatorKeysCodes: number[] = [ENTER, COMMA];
-  readonly currentUser = model('');
-  readonly actualUserNames = signal<string[]>([]); // Initialize as an empty array
-
-  //readonly allUsers = this.allUserNames;
-  readonly filteredUsers = computed(() => {
-    const currentUser = this.currentUser().toLowerCase();
-    return currentUser
-      ? this.allUserNames.filter(
-        (user) =>
-          user.toLowerCase().includes(currentUser) &&
-          !this.actualUserNames().includes(user) // Exclude already selected users
-      )
-      : this.allUserNames.filter(
-        (user) => !this.actualUserNames().includes(user)
-      ); // Exclude already selected users
-  });
-
-  readonly announcer = inject(LiveAnnouncer);
-
-  ngOnChanges() {
-    if (this.forumUserNames) {
-      this.actualUserNames.set(this.forumUserNames);
-    }
-  }
-
-  add(event: MatChipInputEvent): void {
-    const value = (event.value || '').trim();
-
-    if (value && this.filteredUsers().includes(value)) {
-      this.actualUserNames.update((users) => [...users, value]);
-    } else {
-      console.warn('Invalid input or value not in the list.');
-    }
-
-    // Clear the input
-    console.log('Clearing input field');
-    this.currentUser.set('');
-    event.chipInput!.clear(); // Clear the input visually
-  }
-
-  selected(event: MatAutocompleteSelectedEvent): void {
-    const selectedValue = event.option.viewValue;
-
-    if (!this.actualUserNames().includes(selectedValue)) {
-      this.actualUserNames.update((actualUserNames) => [
-        ...actualUserNames,
-        selectedValue,
-      ]);
-    }
-
-    // Clear the input
-    console.log('Clearing input after selection');
-    this.currentUser.set('');
-    event.option.deselect();
-  }
-
-  remove(user: string): void {
-    this.actualUserNames.update((users) => {
-      const index = users.indexOf(user);
-      if (index < 0) {
-        return users;
-      }
-
-      users.splice(index, 1);
-      this.announcer.announce(`Removed ${user}`);
-      return [...users];
-    });
-  }
-
-  // send updated list of forum user names to parent component
-  updateNames() {
-    this.updatedForumUserNames.emit(this.actualUserNames());
-  }
-
-  clearSearchFilter() {
-    this.searchControl.setValue('');
-  }
-}
-*/

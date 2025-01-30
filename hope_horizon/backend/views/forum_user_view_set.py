@@ -22,13 +22,13 @@ class ForumUserViewSet(viewsets.ModelViewSet):
         try:
             forum_user = ForumUser.objects.filter(forum_id=forum, user_id=user).get()
             if not forum_user.is_owner:
-                return Response({"detail": "You are not the owner of the forum"}, status=status.HTTP_403_FORBIDDEN)
+                serializer = self.serializer_class([forum_user], many=True)
+                return Response({"forum_users": serializer.data}, status=status.HTTP_200_OK)
         except ForumUser.DoesNotExist:
             return Response({"detail": "You are not a member of the forum"}, status=status.HTTP_403_FORBIDDEN)
         
-        forum_user_list = ForumUser.objects.filter(forum_id=forum, is_active=True, is_owner=False)
+        forum_user_list = ForumUser.objects.filter(forum_id=forum, is_active=True)
 
-        
         if not forum_user_list.exists():
             serializer = self.serializer_class([forum_user], many=True)  # Owner as a list
         else:
@@ -66,22 +66,36 @@ class ForumUserViewSet(viewsets.ModelViewSet):
                     errors.append({"user_id": new_forum_user_id, "detail": "User is inactive"})
                     continue  # Skip this user and continue with others
 
-                if ForumUser.objects.filter(forum_id=forum, user_id=new_forum_user).exists():
+                existing_forum_user = ForumUser.objects.filter(forum_id=forum, user_id=new_forum_user).first()
+
+
+                if ForumUser.objects.filter(forum_id=forum, user_id=new_forum_user, is_active=True).exists():
                     errors.append({"user_id": new_forum_user_id, "detail": "User already exists in the forum"})
                     continue  # Skip this user and continue with others
+                if existing_forum_user:
+                    if existing_forum_user.is_active:
+                        errors.append({"user_id": new_forum_user_id, "detail": "User already exists in the forum"})
+                    else:
+                        # If user exists but is inactive, reactivate them
+                        existing_forum_user.is_active = True
+                        existing_forum_user.save()
+                        successfully_added.append(new_forum_user_id)
+                        print(f"Reactivated user {new_forum_user_id} in forum {forum.id}")
 
-                # add the user to the forum
-                Notification.objects.create(
-                    is_read=False,
-                    content=f"You have been invited to forum: {forum.name}",
-                    user_id=new_forum_user,  # Notify the blog post owner
-                    forum_id=forum
+                else:
+                    # Add the new user to the forum
+                    Notification.objects.create(
+                        is_read=False,
+                        content=f"You have been invited to forum: {forum.name}",
+                        user_id=new_forum_user,
+                        forum_id=forum
                     )
-                ForumUser.objects.create(forum_id=forum, user_id=new_forum_user, is_owner=False, is_active=True)
-                successfully_added.append(new_forum_user_id)
+                    ForumUser.objects.create(forum_id=forum, user_id=new_forum_user, is_owner=False, is_active=True)
+                    successfully_added.append(new_forum_user_id)
 
             except User.DoesNotExist:
                 errors.append({"user_id": new_forum_user_id, "detail": "User not found"})
+
 
         # Return response based on success/failure cases
         if not errors:  
@@ -97,7 +111,7 @@ class ForumUserViewSet(viewsets.ModelViewSet):
             forum_user = ForumUser.objects.get(pk=pk)
         except ForumUser.DoesNotExist:
             return Response({"detail": "Forum user not found"}, status=status.HTTP_404_NOT_FOUND)
-        if not ForumUser.objects.filter(forum_id=forum_user.forum_id, user_id=request.user, is_owner=True).exists():
+        if not ForumUser.objects.filter(forum_id=forum_user.forum_id, user_id=request.user).exists():
             return Response({"detail": "You are not authorized to delete this forum user"}, status=status.HTTP_403_FORBIDDEN)
         
         forum_user.is_active = False

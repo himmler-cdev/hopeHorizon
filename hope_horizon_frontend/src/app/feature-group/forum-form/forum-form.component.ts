@@ -19,8 +19,7 @@ import { ForumEntity } from '../entity/forum.entity';
 import { MatIcon } from '@angular/material/icon';
 import { ForumUserEntity } from '../entity/fourm-user.entity';
 import { ForumUserService } from '../service/forum-user.service';
-import { MockData } from '../service/mockdata';
-import { ForumUserDto, ForumUserPostDto } from '../dto/forum-user.dto';
+import { ForumUserPostDto } from '../dto/forum-user.dto';
 import { ForumUserChipComponent } from '../forum-user-chip/forum-user-chip.component';
 import { UserService } from '../../feature-user/user.service';
 import { UserEntity } from '../../feature-user/entity/user.entity';
@@ -55,8 +54,10 @@ export class ForumFormComponent implements OnInit {
   allUserNames: string[] = [];
   allUsers: UserEntity[] = [];
   oldForumUsers: ForumUserEntity[] = [];
-  updatedUsers: ForumUserEntity[] = [];
   newForumUsers: UserEntity[] = [];
+  userId = -1;
+  oldForumUsersAsUsers: UserEntity[] = [];
+
 
   constructor(
     private _forumService: ForumService,
@@ -82,7 +83,7 @@ export class ForumFormComponent implements OnInit {
   }
 
   ngOnInit() {
-    //this.forumId = 1;
+    this.userId = this._userService.getUserId();
     this._route.paramMap.subscribe((params) => {
       this.forumId = Number(params.get('id'));
     });
@@ -110,12 +111,12 @@ export class ForumFormComponent implements OnInit {
   loadForumUsers(forumId: number) {
     this._forumUserService.getForumUsers(forumId).subscribe((users) => {
       users.forum_users.map((user) => {
-        if (user.username) {
+        if (user.username && user.id !== this.userId) {
           this.forumUserNames.push(user.username);
           this.oldForumUsers.push(ForumUserEntity.fromDto(user));
         }
       });
-      console.log('Loaded Forum User Names:', this.forumUserNames);
+      //console.log('Loaded Forum User Names:', this.forumUserNames);
     });
   }
 
@@ -130,7 +131,7 @@ export class ForumFormComponent implements OnInit {
         } else {
           this.allUserNames = [];
         }
-        console.log('Loaded All User Names:', this.allUserNames);
+        //console.log('Loaded All User Names:', this.allUserNames);
       },
       (error) => {
         console.error('Error loading users:', error);
@@ -162,27 +163,25 @@ export class ForumFormComponent implements OnInit {
 
     if (this.forumId) {
       this._forumService.updateForum(forumEntity.toDto()).subscribe((forum) => {
-
         if (!forum.id) {
           console.error('Forum ID is undefined. Skipping user assignment.');
           return;
         }
-      
-        console.log('Forum updated successfully with ID:', forum.id);
-        // ✅ Extract usernames from `ForumUserEntity[]`
-        const oldForumUserNames = this.oldForumUsers.map(
-          (forumUser) => forumUser.username
+
+        //console.log('Forum updated successfully with ID:', forum.id);
+        //console.log('Updated ForumUSers:', this.newForumUsers);
+
+        const userIds = [...new Set(this.newForumUsers.map((user) => user.id))];
+
+        const newForumUserDTO = new ForumUserPostDto(
+          this.forumId,
+          userIds
+            .filter((id): id is number => id !== undefined)
+            .filter(
+              (id) =>
+                !this.oldForumUsers.some((oldUser) => oldUser.user_id === id)
+            )
         );
-
-        const updatedForumUserNames = this.updatedUsers.map(
-          (forumUser) => forumUser.username
-        );
-
-        const userIds = [
-          ...new Set(this.newForumUsers.map((user) => user.id)),
-        ];
-
-        const newForumUserDTO = new ForumUserPostDto(this.forumId, userIds.filter((id): id is number => id !== undefined));
 
         // ✅ Extract usernames from `UserEntity[]` (New users to be added)
         const newForumUserNames = [
@@ -191,13 +190,14 @@ export class ForumFormComponent implements OnInit {
 
         const usersToDelete = this.oldForumUsers.filter(
           (forumUser) =>
-            this.updatedUsers.some((updatedUser) => updatedUser.user_id === forumUser.user_id)
+            forumUser.user_id !== this.userId && // Skip the current user
+            !this.updatedForumUsers.some(
+              (updatedUser) => updatedUser.user_id === forumUser.user_id
+            )
         );
         console.log('Old Users:', this.oldForumUsers);
         console.log('Users to Add:', newForumUserNames);
         console.log('Users to Delete:', usersToDelete);
-
-        // ✅ Send API request to create new forum users
 
         if ((newForumUserDTO.users ?? []).length > 0) {
           this._forumUserService.createForumUsers(newForumUserDTO).subscribe({
@@ -222,24 +222,23 @@ export class ForumFormComponent implements OnInit {
             });
         }
 
-        // ✅ Navigate back to the updated forum page
-        this._router.navigate(['/forum/', forum.id]);
+        this._router.navigate(['/forum/']);
       });
     } else {
       this._forumService.createForum(forumEntity.toDto()).subscribe((forum) => {
         // ✅ Ensure new users are unique
-        const userIds = [
-          ...new Set(this.newForumUsers.map((user) => user.id)),
-        ];
+        const userIds = [...new Set(this.newForumUsers.map((user) => user.id))];
 
-        const newForumUserDTO = new ForumUserPostDto(this.forumId, userIds.filter((id): id is number => id !== undefined));
+        const newForumUserDTO = new ForumUserPostDto(
+          this.forumId,
+          userIds.filter((id): id is number => id !== undefined)
+        );
 
         // ✅ Extract usernames from `UserEntity[]` (New users to be added)
         const newForumUserNames = [
           ...new Set(this.newForumUsers.map((user) => user.username)),
         ];
 
-        
         if ((newForumUserDTO.users ?? []).length > 0) {
           this._forumUserService.createForumUsers(newForumUserDTO).subscribe({
             next: () => console.log('New forum users added successfully'),
@@ -249,7 +248,7 @@ export class ForumFormComponent implements OnInit {
           console.log('No new users to add, skipping API call.');
         }
 
-        // ✅ Reset form and navigate
+        // Reset form and navigate
         this.forumFormGroup.reset();
         this._router.navigate(['/forum/']);
       });
@@ -257,20 +256,18 @@ export class ForumFormComponent implements OnInit {
   }
 
   onForumUsersChange(updatedForumUsers: (UserEntity | ForumUserEntity)[]) {
-    // ✅ Separate new users (UserEntity) from existing forum users (ForumUserEntity)
+    // Separate new users (UserEntity) from existing forum users (ForumUserEntity)
     this.newForumUsers = updatedForumUsers.filter(
-      (user): user is UserEntity => !('forum_id' in user) // ✅ UserEntity doesn't have `forum_id`
+      (user): user is UserEntity => !('forum_id' in user) // UserEntity doesn't have `forum_id`
     );
-  
+
     this.updatedForumUsers = updatedForumUsers.filter(
-      (user): user is ForumUserEntity => 'forum_id' in user // ✅ ForumUserEntity has `forum_id`
+      (user): user is ForumUserEntity => 'forum_id' in user // ForumUserEntity has `forum_id`
     );
-  
+
     console.log('New Users:', this.newForumUsers);
     console.log('Existing Forum Users:', this.updatedForumUsers);
   }
-  
-  
 
   protected openDeleteDialog() {
     const dialogRef = this._dialog.open(ConfirmDialogComponent, {
@@ -304,11 +301,6 @@ export class ForumFormComponent implements OnInit {
         this._router.navigate(['/forum']);
       }
     });
-  }
-
-  private _clearForm() {
-    // TODO: Discuss clear strategy with team
-    this.forumFormGroup.reset();
   }
 
   private _deleteForum() {

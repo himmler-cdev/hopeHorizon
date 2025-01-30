@@ -105,6 +105,7 @@ class ForumViewSet(viewsets.ModelViewSet):
         forum_user = ForumUser.objects.filter(user_id=user, forum_id=forum, is_active=True, is_owner=True)
         if not forum_user.exists():
             return Response({"detail": "User not authorized"}, status=status.HTTP_403_FORBIDDEN)
+        ForumUser.objects.filter(forum_id=forum).update(is_active=False)
         forum.is_active = False
         forum.save()
         return Response(status=status.HTTP_204_NO_CONTENT)

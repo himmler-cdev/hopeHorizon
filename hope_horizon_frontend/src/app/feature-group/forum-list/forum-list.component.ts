@@ -81,13 +81,13 @@ export class ForumListComponent {
 
     this.updateFilteredForumList();
 
-    console.log('Forum Users:', this.forumUsersOfUser);
-    console.log('Forum List:', this.forumList);
+    //console.log('Forum Users:', this.forumUsersOfUser);
+    //console.log('Forum List:', this.forumList);
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['forumList'] || changes['forumUsersOfUser']) {
-      console.log('Data changed:', this.forumList, this.forumUsersOfUser);
+      //console.log('Data changed:', this.forumList, this.forumUsersOfUser);
       this.updateFilteredForumList();
       this.cdr.detectChanges(); // ✅ Ensure UI updates
     }
