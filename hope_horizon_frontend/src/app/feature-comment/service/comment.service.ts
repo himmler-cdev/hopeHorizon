@@ -31,8 +31,6 @@ export class CommentService {
   }
 
   deleteComment(comment: CommentDto) {
-    console.log('Deleting comment:', comment);
-    console.log('URL:', `${this.API_URL}${comment.id}/`);
     return this._http.delete(`${this.API_URL}${comment.id}/`);
   }
 }

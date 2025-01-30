@@ -1,16 +1,16 @@
 <mat-card class="comment-section py-2 mat-elevation-z5">
-    <h2 class="ms-3 mb-3">Comments</h2>
+  <h2 class="ms-3 mb-3">Comments</h2>
 
-    <app-comment-form [blogPostId]="blogId" (commentAdded)="onCommentAdded($event)"></app-comment-form>
+  <app-comment-form [blogPostId]="blogId" (commentAdded)="onCommentAdded($event)"></app-comment-form>
 
-    <mat-divider class="mx-3 my-4"></mat-divider>
+  <mat-divider class="mx-3 my-4"></mat-divider>
 
-    <app-comment-list class="mx-3" [comments]="comments" (commentDeleted)="onCommentDeleted($event)"></app-comment-list>
+  <app-comment-list class="mx-3" [comments]="comments" (commentDeleted)="onCommentDeleted($event)"></app-comment-list>
 
-    @if (showLoadMore) {
-        <button mat-button color="primary" class="mx-3 mt-3"
-                (click)="loadComments()">
-            Load More
-        </button>
-    }
+  @if (showLoadMore) {
+    <button mat-button color="primary" class="mx-3 mt-3"
+            (click)="loadComments()">
+      Load More
+    </button>
+  }
 </mat-card>

@@ -1,76 +1,77 @@
 <div class="p-2">
-    <h2 mat-dialog-title>How are you doing today?</h2>
-    <form [formGroup]="statusForm" (ngSubmit)="onConfirm()">
-        <mat-dialog-content class="slider-container">
-            @if(data.trackMood == true) {
-                <div class="slider-wrapper">
-                    <span class="slider-label-left">Very Bad</span>
-                    <mat-slider min="0" max="10" step="1" showTickMarks discrete [displayWith]="formatLabel">
-                        <input matSliderThumb formControlName="moodLevel">
-                    </mat-slider>
-                    <span class="slider-label-right">Very Good</span>
-                </div>
-                <label for="moodLevel">Mood Level</label>
-            }
+  <h2 mat-dialog-title>How are you doing today?</h2>
+  <form [formGroup]="statusForm" (ngSubmit)="onConfirm()">
+    <mat-dialog-content class="slider-container">
+      @if (data.trackMood == true) {
+        <div class="slider-wrapper">
+          <span class="slider-label-left">Very Bad</span>
+          <mat-slider min="0" max="10" step="1" showTickMarks discrete [displayWith]="formatLabel">
+            <input matSliderThumb formControlName="moodLevel">
+          </mat-slider>
+          <span class="slider-label-right">Very Good</span>
+        </div>
+        <label for="moodLevel">Mood Level</label>
+      }
 
-            @if(data.trackEnergyLevel == true) {
-                <div class="slider-wrapper">
-                    <span class="slider-label-left">Very Bad</span>
-                    <mat-slider min="0" max="10" step="1" showTickMarks discrete [displayWith]="formatLabel">
-                        <input matSliderThumb formControlName="energyLevel">
-                    </mat-slider>
-                    <span class="slider-label-right">Very Good</span>
-                </div>
-                <label for="energyLevel">Energy Level</label>
-            }
+      @if (data.trackEnergyLevel == true) {
+        <div class="slider-wrapper">
+          <span class="slider-label-left">Very Bad</span>
+          <mat-slider min="0" max="10" step="1" showTickMarks discrete [displayWith]="formatLabel">
+            <input matSliderThumb formControlName="energyLevel">
+          </mat-slider>
+          <span class="slider-label-right">Very Good</span>
+        </div>
+        <label for="energyLevel">Energy Level</label>
+      }
 
-            @if(data.trackSleepQuality == true) {
-                <div class="slider-wrapper">
-                    <span class="slider-label-left">Very Bad</span>
-                    <mat-slider min="0" max="10" step="1" showTickMarks discrete [displayWith]="formatLabel">
-                        <input matSliderThumb formControlName="sleepQuality">
-                    </mat-slider>
-                    <span class="slider-label-right">Very Good</span>
-                </div>
-                <label for="sleepQuality">Sleep Quality</label>
-            }
+      @if (data.trackSleepQuality == true) {
+        <div class="slider-wrapper">
+          <span class="slider-label-left">Very Bad</span>
+          <mat-slider min="0" max="10" step="1" showTickMarks discrete [displayWith]="formatLabel">
+            <input matSliderThumb formControlName="sleepQuality">
+          </mat-slider>
+          <span class="slider-label-right">Very Good</span>
+        </div>
+        <label for="sleepQuality">Sleep Quality</label>
+      }
 
-            @if(data.trackAnxietyLevel == true) {
-                <div class="slider-wrapper">
-                    <span class="slider-label-left">Very Bad</span>
-                    <mat-slider min="0" max="10" step="1" showTickMarks discrete [displayWith]="formatLabel">
-                        <input matSliderThumb formControlName="anxietyLevel">
-                    </mat-slider>
-                    <span class="slider-label-right">Very Good</span>
-                </div>
-                <label for="anxietyLevel">Anxiety Level</label>
-            }
+      @if (data.trackAnxietyLevel == true) {
+        <div class="slider-wrapper">
+          <span class="slider-label-left">Very Bad</span>
+          <mat-slider min="0" max="10" step="1" showTickMarks discrete [displayWith]="formatLabel">
+            <input matSliderThumb formControlName="anxietyLevel">
+          </mat-slider>
+          <span class="slider-label-right">Very Good</span>
+        </div>
+        <label for="anxietyLevel">Anxiety Level</label>
+      }
 
-            @if(data.trackAppetite == true) {
-                <div class="slider-wrapper">
-                    <span class="slider-label-left">Very Bad</span>
-                    <mat-slider min="0" max="10" step="1" showTickMarks discrete [displayWith]="formatLabel">
-                        <input matSliderThumb formControlName="appetite">
-                    </mat-slider>
-                    <span class="slider-label-right">Very Good</span>
-                </div>
-                <label for="appetite">Appetite</label>
-            }
+      @if (data.trackAppetite == true) {
+        <div class="slider-wrapper">
+          <span class="slider-label-left">Very Bad</span>
+          <mat-slider min="0" max="10" step="1" showTickMarks discrete [displayWith]="formatLabel">
+            <input matSliderThumb formControlName="appetite">
+          </mat-slider>
+          <span class="slider-label-right">Very Good</span>
+        </div>
+        <label for="appetite">Appetite</label>
+      }
 
-            @if(data.trackContent == true) {
-                <div class="slider-wrapper">
-                    <mat-form-field class="w-100" appearance="outline">
-                      <mat-label>Content</mat-label>
-                      <textarea matInput formControlName="content" cdkTextareaAutosize [cdkAutosizeMinRows]="20" spellcheck="false">
+      @if (data.trackContent == true) {
+        <div class="slider-wrapper">
+          <mat-form-field class="w-100" appearance="outline">
+            <mat-label>Content</mat-label>
+            <textarea matInput formControlName="content" cdkTextareaAutosize [cdkAutosizeMinRows]="20"
+                      spellcheck="false">
                       </textarea>
-                    </mat-form-field>
-                  </div>
-                <label for="content">Content</label>
-            }
-        </mat-dialog-content>
-        <mat-dialog-actions>
-            <button mat-raised-button type="button" (click)="onCancel()" cdkFocusInitial>Cancel</button>
-            <button mat-raised-button type="submit">Confirm</button>
-        </mat-dialog-actions>
-    </form>
+          </mat-form-field>
+        </div>
+        <label for="content">Content</label>
+      }
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-raised-button type="button" (click)="onCancel()" cdkFocusInitial>Cancel</button>
+      <button mat-raised-button type="submit">Confirm</button>
+    </mat-dialog-actions>
+  </form>
 </div>

@@ -1,8 +1,8 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { NotificationListComponent } from '../notification-list/notification-list.component';
-import { MatCard } from '@angular/material/card';
-import { NotificationService } from '../service/notification.service';
-import { NotificationEntity } from '../entity/notification.entity';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {NotificationListComponent} from '../notification-list/notification-list.component';
+import {MatCard} from '@angular/material/card';
+import {NotificationService} from '../service/notification.service';
+import {NotificationEntity} from '../entity/notification.entity';
 
 @Component({
   selector: 'app-notification-section',
@@ -14,11 +14,11 @@ import { NotificationEntity } from '../entity/notification.entity';
 export class NotificationSectionComponent implements OnInit {
   notifications: NotificationEntity[] = [];
 
-  constructor(private _notificationService: NotificationService, private cdr: ChangeDetectorRef) {}
+  constructor(private _notificationService: NotificationService, private cdr: ChangeDetectorRef) {
+  }
 
   ngOnInit(): void {
     this.loadNotifications();
-    console.log('Notifications: ', this.notifications);
   }
 
   loadNotifications() {

@@ -1,68 +1,67 @@
 // Main card styling
 .notification-list-card {
-    margin-top: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    background-color: white;
-    padding: 20px;
-    display: flex;
-    width: 100%;
+  margin-top: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  padding: 20px;
+  display: flex;
+  width: 100%;
 }
 
 // Row layout (Text on left, buttons on right)
 .notification-content-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
 }
 
 // Text styling (left side)
 .notification-text {
-    font-size: 1.4rem;
-    font-weight: 500;
-    color: #333;
-    flex-grow: 1; // Pushes buttons to the right
-    text-align: left;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: #333;
+  flex-grow: 1; // Pushes buttons to the right
+  text-align: left;
 }
 
 // Button container (right side)
 .button-group {
-    display: flex;
-    gap: 15px;
+  display: flex;
+  gap: 15px;
 }
 
 // Buttons (modern design)
 .dismiss-button,
 .deny-button {
-    min-width: 150px;
-    padding: 10px 20px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    border-radius: 25px;
-    transition: background-color 0.3s ease, transform 0.2s;
+  min-width: 150px;
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  border-radius: 25px;
+  transition: background-color 0.3s ease, transform 0.2s;
 }
 
 // Dismiss button (Green)
 .dismiss-button {
-    background-color: #4c9a64;
-    color: white;
+  background-color: #4c9a64;
+  color: white;
 
-    &:hover,
-    &:focus {
-      background-color: #3a7a4d;
-      transform: scale(1.05);
-    }
+  &:hover,
+  &:focus {
+    background-color: #3a7a4d;
+    transform: scale(1.05);
+  }
 }
 
 // Deny button (Gray)
 .deny-button {
-    background-color: #5e636e;
-    color: white;
+  background-color: #5e636e;
+  color: white;
 
-    &:hover,
-    &:focus {
-      background-color: #4a4f58;
-      transform: scale(1.05);
-    }
+  &:hover,
+  &:focus {
+    background-color: #4a4f58;
+    transform: scale(1.05);
+  }
 }

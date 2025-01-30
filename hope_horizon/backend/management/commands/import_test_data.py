@@ -100,13 +100,14 @@ def create_users():
         )       
 
 def create_user_statuse():
+    startDateOriginal = datetime.date.today()
     for i in range(1, 6):
         user = models.User.objects.get(username='user{}'.format(i))
         numOfStatuses = random.randint(20, 100)
-        startDate = datetime.date.today()
-        freezer = freeze_time(startDate)
-        freezer.start()
+        startDate = startDateOriginal
+        freezer = freeze_time(startDate)	
         for j in range(1,numOfStatuses):
+            freezer.start()
             models.UserStatus.objects.create(
                 user_id=user,
                 mood=random.randint(0, 10),

@@ -43,7 +43,7 @@ export const routes: Routes = [
   {path: 'forum/:id', component: ForumFormComponent, canActivate: [authGuard]},
   {path: 'forum/create', component: ForumFormComponent, canActivate: [authGuard]},
   {path: 'forum/edit/:id', component: ForumFormComponent, canActivate: [authGuard]},
-  
+
   /**
    * Default route - 404 Not Found - Must be the last route
    */

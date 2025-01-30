@@ -28,8 +28,8 @@
             @if (option.id === forumTypeId && formus.length > 0) {
               <mat-option [value]="option.id">{{ option.type }}</mat-option>
             } @else if (option.id !== forumTypeId) {
-            <mat-option [value]="option.id">{{ option.type }}</mat-option>
-              }
+              <mat-option [value]="option.id">{{ option.type }}</mat-option>
+            }
           }
         </mat-select>
 
@@ -50,7 +50,7 @@
             }
           </mat-select>
 
-          @if (blogFormGroup.controls['forumId']?.hasError('required')) {
+          @if (blogFormGroup.controls['forumId'].hasError('required')) {
             <mat-error>Forum selection is required</mat-error>
           }
         </mat-form-field>
