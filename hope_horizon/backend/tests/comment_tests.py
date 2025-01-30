@@ -29,40 +29,40 @@ class CommentTests(TestCase):
             )
         
         self.user3 = User.objects.create_user(
-            username="moderator",
+            username="testmoderator",
             password="password3",
             user_role_id=UserRole.objects.get(role="Moderator"),
             birthdate="2024-12-12"
             )
-        
+
         self.user4 = User.objects.create_user(
-            username="therapist",
+            username="testtherapist",
             password="password4",
             user_role_id=UserRole.objects.get(role="Therapist"),
             birthdate="2024-12-12"
             )
-        
+
         self.blog_post = BlogPost.objects.create(
             title="Test Blog",
             content="Test Content",
             user_id=self.user,
             blog_post_type_id=BlogPostType.objects.get(type="Public"))
-        
+
         self.blog_post2 = BlogPost.objects.create(
             title="Private Blog",
             content="Test Content",
             user_id=self.user,
             blog_post_type_id=BlogPostType.objects.get(type="Private"))
-        
+
         self.blog_post3 = BlogPost.objects.create(
             title="Protected Blog",
             content="Test Content",
             user_id=self.user,
             blog_post_type_id=BlogPostType.objects.get(type="Protected"))
-            
+
         self.comment = Comment.objects.create(
-            content="Test Comment", 
-            blog_post_id=self.blog_post, 
+            content="Test Comment",
+            blog_post_id=self.blog_post,
             user_id=self.user
         )
 
@@ -96,33 +96,33 @@ class CommentTests(TestCase):
         response = self.client.get(f"/api/comment/{self.comment.id}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["content"], "Test Comment")
-        self.assertEqual(response.data["user_id"], 1)
+        self.assertEqual(response.data["user_id"], self.comment.user_id.id)
 
-    def test_get_comment_moderator(self):
-        # Test if moderator can retrieve other user's comments
+    def test_get_comment_testmoderator(self):
+        # Test if testmoderator can retrieve other user's comments
         self.client.logout()
-        self.client.login(username="moderator", password="password3")
+        self.client.login(username="testmoderator", password="password3")
         response = self.client.get(f"/api/comment/{self.comment3.id}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_get_comment_moderator_protected(self):
-        # Test if moderator can retrieve other user's protected comments
+    def test_get_comment_testmoderator_protected(self):
+        # Test if testmoderator can retrieve other user's protected comments
         self.client.logout()
-        self.client.login(username="moderator", password="password3")
+        self.client.login(username="testmoderator", password="password3")
         response = self.client.get(f"/api/comment/{self.comment3.id}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_get_comment_therapist(self):
-        # Test if therapist can retrieve other user's comments
+    def test_get_comment_testtherapist(self):
+        # Test if testtherapist can retrieve other user's comments
         self.client.logout()
-        self.client.login(username="therapist", password="password4")
+        self.client.login(username="testtherapist", password="password4")
         response = self.client.get(f"/api/comment/{self.comment.id}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_get_comment_therapist_protected(self):
-        # Test if therapist can retrieve other user's protected comments
+    def test_get_comment_testtherapist_protected(self):
+        # Test if testtherapist can retrieve other user's protected comments
         self.client.logout()
-        self.client.login(username="therapist", password="password4")
+        self.client.login(username="testtherapist", password="password4")
         response = self.client.get(f"/api/comment/{self.comment3.id}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -133,7 +133,7 @@ class CommentTests(TestCase):
 
         response = self.client.get("/api/comment/!/")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    
+
     def test_get_comment_private_blog_post(self):
         # Test retrieving a comment on a private blog post
         self.client.logout()
@@ -147,7 +147,7 @@ class CommentTests(TestCase):
         self.client.login(username="otheruser", password="password2")
         response = self.client.get(f"/api/comment/{self.comment3.id}/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-    
+
     def test_get_comment_not_found(self):
         # Test retrieving a non existant comment
         response = self.client.get("/api/comment/0/")
@@ -167,47 +167,47 @@ class CommentTests(TestCase):
         # Test retrieving comments for a specific blog post
         response = self.client.get(f"/api/comment?blog={self.blog_post.id}&page=0", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["pageInformation"]["actualSize"], 1)
+        self.assertEqual(response.data["pageInformation"]["actual_size"], 1)
         self.assertEqual(len(response.data["comments"]), 1)
         self.assertEqual(response.data["comments"][0]["content"], "Test Comment")
 
-    def test_get_comments_list_moderator(self):
-        # Test if moderator can retrieve comments for other user's blog post
+    def test_get_comments_list_testmoderator(self):
+        # Test if testmoderator can retrieve comments for other user's blog post
         self.client.logout()
-        self.client.login(username="moderator", password="password3")
+        self.client.login(username="testmoderator", password="password3")
         response = self.client.get(f"/api/comment?blog={self.blog_post.id}&page=0", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["pageInformation"]["actualSize"], 1)
-        self.assertEqual(len(response.data["comments"]), 1)
-        self.assertEqual(response.data["comments"][0]["content"], "Test Comment")
-    
-    def test_get_comments_list_therapist(self):
-        # Test if therapist can retrieve comments for other user's blog post
-        self.client.logout()
-        self.client.login(username="therapist", password="password4")
-        response = self.client.get(f"/api/comment?blog={self.blog_post.id}&page=0", follow=True)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["pageInformation"]["actualSize"], 1)
+        self.assertEqual(response.data["pageInformation"]["actual_size"], 1)
         self.assertEqual(len(response.data["comments"]), 1)
         self.assertEqual(response.data["comments"][0]["content"], "Test Comment")
 
-    def test_get_comments_list_moderator_protected(self):
-        # Test if moderator can retrieve comments for other user's protected blog post
+    def test_get_comments_list_testtherapist(self):
+        # Test if testtherapist can retrieve comments for other user's blog post
         self.client.logout()
-        self.client.login(username="moderator", password="password3")
+        self.client.login(username="testtherapist", password="password4")
+        response = self.client.get(f"/api/comment?blog={self.blog_post.id}&page=0", follow=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["pageInformation"]["actual_size"], 1)
+        self.assertEqual(len(response.data["comments"]), 1)
+        self.assertEqual(response.data["comments"][0]["content"], "Test Comment")
+
+    def test_get_comments_list_testmoderator_protected(self):
+        # Test if testmoderator can retrieve comments for other user's protected blog post
+        self.client.logout()
+        self.client.login(username="testmoderator", password="password3")
         response = self.client.get(f"/api/comment?blog={self.blog_post3.id}&page=0", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["pageInformation"]["actualSize"], 1)
+        self.assertEqual(response.data["pageInformation"]["actual_size"], 1)
         self.assertEqual(len(response.data["comments"]), 1)
         self.assertEqual(response.data["comments"][0]["content"], "Protected Comment")
 
-    def test_get_comments_list_therapist_protected(self):
-        # Test if therapist can retrieve comments for other user's protected blog post
+    def test_get_comments_list_testtherapist_protected(self):
+        # Test if testtherapist can retrieve comments for other user's protected blog post
         self.client.logout()
-        self.client.login(username="therapist", password="password4")
+        self.client.login(username="testtherapist", password="password4")
         response = self.client.get(f"/api/comment?blog={self.blog_post3.id}&page=0", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["pageInformation"]["actualSize"], 1)
+        self.assertEqual(response.data["pageInformation"]["actual_size"], 1)
         self.assertEqual(len(response.data["comments"]), 1)
         self.assertEqual(response.data["comments"][0]["content"], "Protected Comment")
 
@@ -228,7 +228,7 @@ class CommentTests(TestCase):
         response = self.client.get(f"/api/comment?blog={self.blog_post.id}&page=1", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["comments"]), 6)
-    
+
     def test_get_comments_list_bad_request(self):
         # Test retrieving comments without blog post ID
         response = self.client.get("/api/comment?page=0", follow=True)
@@ -237,21 +237,21 @@ class CommentTests(TestCase):
         # Test retrieving comments with an invalid blog post ID
         response = self.client.get("/api/comment?blog=notanumber&page=0", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    
+
     def test_get_comments_list_private_blog_post(self):
         # Test retrieving comments for a private blog post
         self.client.logout()
         self.client.login(username="otheruser", password="password2")
         response = self.client.get(f"/api/comment?blog={self.blog_post2.id}&page=0", follow=True)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-    
+
     def test_get_comments_list_protected_blog_post(self):
         # Test retrieving comments for a protected blog post
         self.client.logout()
         self.client.login(username="otheruser", password="password2")
         response = self.client.get(f"/api/comment?blog={self.blog_post3.id}&page=0", follow=True)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-    
+
     def test_get_comments_list_not_found(self):
         # Test retrieving comments for a non existant blog post
         response = self.client.get("/api/comment?blog=9999&page=1", follow=True)
@@ -288,7 +288,7 @@ class CommentTests(TestCase):
         response = self.client.post("/api/comment/", data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["content"], "New Comment")
-        self.assertEqual(response.data["user_id"], 1)
+        self.assertEqual(response.data["user_id"], self.user.id)
 
     def test_create_comment_own_private_blog_post(self):
         # Test creating a comment on own private blog post
@@ -308,10 +308,10 @@ class CommentTests(TestCase):
         response = self.client.post("/api/comment/", data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_create_comment_protected_blog_post_therapist(self):
-        # Test creating a comment on a protected blog post as a therapist
+    def test_create_comment_protected_blog_post_testtherapist(self):
+        # Test creating a comment on a protected blog post as a testtherapist
         self.client.logout()
-        self.client.login(username="therapist", password="password4")
+        self.client.login(username="testtherapist", password="password4")
         data = {
             "blog_post_id": self.blog_post3.id,
             "content": "New Comment"
@@ -325,14 +325,14 @@ class CommentTests(TestCase):
         self.client.login(username="testuser", password="password")
         forum = Forum.objects.create(name="Test Forum", description="Test Description")
         ForumUser.objects.create(user_id=self.user, forum_id=forum, is_owner=True, is_active=True)
-        
-        blogpost5 = BlogPost.objects.create( 
+
+        blogpost5 = BlogPost.objects.create(
             title="Test Blog",
             content="Test Content",
             user_id=self.user,
             blog_post_type_id=BlogPostType.objects.get(type="Public")
             )
-        
+
         blogpost5.forum_id = Forum.objects.get(name="Test Forum")
 
         data = {
@@ -390,7 +390,7 @@ class CommentTests(TestCase):
     #    }
     #   response = self.client.post("/api/comment/", data)
     #    self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-    
+
     #TODO: add notification creation test
 
     ###########################################################################################################
@@ -410,10 +410,10 @@ class CommentTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["content"], "Updated Comment")
 
-    def test_update_comment_moderator(self):
-        # Test if moderator can update other user's comments
+    def test_update_comment_testmoderator(self):
+        # Test if testmoderator can update other user's comments
         self.client.logout()
-        self.client.login(username="moderator", password="password3")
+        self.client.login(username="testmoderator", password="password3")
         data = {"content": "Updated Comment"}
         response = self.client.put(f"/api/comment/{self.comment.id}/", data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -450,7 +450,7 @@ class CommentTests(TestCase):
     ###########################################################################################################
     #                                    Comment "DELETE" method tests                                        #
     ###########################################################################################################
-    
+
     def test_delete_comment_unauthenticated(self):
         # Test deleting comment when unauthenticated
         self.client.logout()
@@ -462,11 +462,11 @@ class CommentTests(TestCase):
         response = self.client.delete(f"/api/comment/{self.comment.id}/")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Comment.objects.filter(id=self.comment.id).exists())
-    
-    def test_delete_comment_moderator(self):
-        # Test if moderator can delete other user's comments
+
+    def test_delete_comment_testmoderator(self):
+        # Test if testmoderator can delete other user's comments
         self.client.logout()
-        self.client.login(username="moderator", password="password3")
+        self.client.login(username="testmoderator", password="password3")
         response = self.client.delete(f"/api/comment/{self.comment.id}/")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
     
