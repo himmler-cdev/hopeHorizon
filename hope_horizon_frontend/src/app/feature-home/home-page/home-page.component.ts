@@ -14,7 +14,26 @@ import {NgxChartsModule} from '@swimlane/ngx-charts';
 import {
   NotificationSectionComponent
 } from "../../feature-notification/notification-section/notification-section.component";
-
+import {MatFormField, MatFormFieldModule, MatHint, MatLabel} from '@angular/material/form-field';
+import {
+  MatDatepicker,
+  MatDatepickerInput,
+  MatDatepickerModule,
+  MatDatepickerToggle,
+  MatDateRangeInput,
+  MatDateRangePicker
+} from '@angular/material/datepicker';
+import {
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn
+} from '@angular/forms';
+import {provideNativeDateAdapter} from '@angular/material/core';
+import {JsonPipe} from '@angular/common';
 
 @Component({
   selector: 'app-home-page',
@@ -24,8 +43,22 @@ import {
     MatButton,
     RouterLink,
     NotificationSectionComponent,
-    NgxChartsModule
+    NgxChartsModule,
+    MatFormField,
+    MatDateRangeInput,
+    ReactiveFormsModule,
+    MatDatepickerToggle,
+    MatDateRangePicker,
+    MatLabel,
+    MatHint,
+    MatDatepicker,
+    MatDatepickerInput,
+    MatFormFieldModule,
+    MatDatepickerModule,
+    FormsModule,
+    JsonPipe
   ],
+  providers: [provideNativeDateAdapter()],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss'
 })
@@ -33,6 +66,13 @@ export class HomePageComponent implements OnInit {
   quote?: QuoteEntity;
   userData: UserStatusEntity[] | undefined = [];
   multiLineData: any[] = [];
+  isTrackerEnabled = true;
+  today = new Date();
+
+  readonly range = new FormGroup({
+    start: new FormControl<Date | null>(null),
+    end: new FormControl<Date | null>(null)
+  });
 
   constructor(
     private _quoteService: QuoteService,
@@ -42,77 +82,99 @@ export class HomePageComponent implements OnInit {
   }
 
   ngOnInit() {
+    const today = new Date();
+    const lastWeek = new Date();
+    lastWeek.setDate(today.getDate() - 7);
+
+    this.range.setValue({
+      start: lastWeek,
+      end: today,
+    });
+
     this._quoteService.getRandomQuote().subscribe((quote) => {
       this.quote = QuoteEntity.fromDto(quote);
     });
 
     this.openStatusDialog();
 
-    this.userData = [
-      new UserStatusEntity(new Date('2023-10-01'), 5, 7, 6, 4, 8, 'Content 1'),
-      new UserStatusEntity(new Date('2023-10-02'), 6, 6, 7, 3, 7, 'Content 2'),
-      new UserStatusEntity(new Date('2023-10-03'), 7, 5, 8, 2, 6, 'Content 3'),
-      new UserStatusEntity(new Date('2023-10-04'), 8, 4, 5, 1, 5, 'Content 4'),
-      new UserStatusEntity(new Date('2023-10-05'), 4, 8, 6, 5, 9, 'Content 5'),
-    ];
+    this.range.valueChanges.subscribe((range) => {
+      if (range.start && range.end) {
+        this.fetchUserStatuses(range.start, range.end);
+      }
+    });
 
-    this._userStatusService.getUserStatus(new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)).subscribe({
+    this.fetchUserStatuses(lastWeek, today);
+  }
+
+  private fetchUserStatuses(fromDate: Date, toDate: Date) {
+    this._userStatusService.getUserStatus(fromDate, toDate).subscribe({
       next: (userStatusesDto) => {
         this.userData = userStatusesDto?.user_statuses?.map(UserStatusEntity.fromDto);
 
-        this._trackerService.getUserTracker().subscribe((tracker) => {
-          const trackerEntity = TrackerEntity.fromDto(tracker);
+        this._trackerService.getUserTracker().subscribe({
+          next: (tracker) => {
+            if (!tracker.is_enabled) {
+              this.isTrackerEnabled = false;
+              return;
+            } else {
+              this.isTrackerEnabled = true;
+            }
 
+            const availableData = [];
 
+            if (tracker.track_mood) {
+              availableData.push({
+                name: 'Mood',
+                series: this.userData?.map((data) => ({
+                  name: data.date,
+                  value: data.mood ?? 0,
+                })),
+              });
+            }
+
+            if (tracker.track_energy_level) {
+              availableData.push({
+                name: 'Energy Level',
+                series: this.userData?.map((data) => ({
+                  name: data.date,
+                  value: data.energyLevel ?? 0,
+                })),
+              });
+            }
+
+            if (tracker.track_sleep_quality) {
+              availableData.push({
+                name: 'Sleep Quality',
+                series: this.userData?.map((data) => ({
+                  name: data.date,
+                  value: data.sleepQuality ?? 0,
+                })),
+              });
+            }
+
+            if (tracker.track_anxiety_level) {
+              availableData.push({
+                name: 'Anxiety Level',
+                series: this.userData?.map((data) => ({
+                  name: data.date,
+                  value: data.anxietyLevel ?? 0,
+                })),
+              });
+            }
+
+            if (tracker.track_appetite) {
+              availableData.push({
+                name: 'Appetite',
+                series: this.userData?.map((data) => ({
+                  name: data.date,
+                  value: data.appetite ?? 0,
+                })),
+              });
+            }
+
+            this.multiLineData = availableData;
+          },
         });
-
-        this.multiLineData = [
-          {
-            name: 'Mood',
-            series: this.userData?.map((data) => {
-              return {
-                name: data.date,
-                value: data.mood,
-              };
-            }),
-          },
-          {
-            name: 'Energy Level',
-            series: this.userData?.map((data) => {
-              return {
-                name: data.date,
-                value: data.energyLevel,
-              };
-            }),
-          },
-          {
-            name: 'Sleep Quality',
-            series: this.userData?.map((data) => {
-              return {
-                name: data.date,
-                value: data.sleepQuality,
-              };
-            }),
-          },
-          {
-            name: 'Anxiety Level',
-            series: this.userData?.map((data) => {
-              return {
-                name: data.date,
-                value: data.anxietyLevel,
-              };
-            }),
-          },
-          {
-            name: 'Appetite',
-            series: this.userData?.map((data) => {
-              return {
-                name: data.date,
-                value: data.appetite,
-              };
-            }),
-          },
-        ];
       }
     });
   }

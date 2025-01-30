@@ -19,7 +19,6 @@ export class NotificationSectionComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadNotifications();
-    console.log('Notifications: ', this.notifications);
   }
 
   loadNotifications() {
