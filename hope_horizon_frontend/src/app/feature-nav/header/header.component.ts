@@ -13,6 +13,7 @@ import { TrackerService } from '../../feature-settings/tracker-service';
 import { UserDialogComponent } from '../../feature-settings/user-dialog/user-dialog.component';
 import { UserDto } from '../../feature-user/dto/user.dto';
 import { UserEntity } from '../../feature-user/entity/user.entity';
+import { TrackerEntity } from '../../feature-settings/entity/tracker.entity';
 
 @Component({
   selector: 'app-header',
@@ -61,11 +62,11 @@ export class HeaderComponent {
     this.trackerService.getUserTracker().subscribe({
       next: (tracker) => {
         const dialogRef = this._dialog.open(TrackerDialogComponent, {
-          data: tracker,
+          data: TrackerEntity.fromDto(tracker),
         });
-        dialogRef.afterClosed().subscribe((result) => {
+        dialogRef.afterClosed().subscribe((result: TrackerEntity) => {
           if (result) {
-            this.trackerService.updateUserTracker(result).subscribe({});
+            this.trackerService.updateUserTracker(result.toDto()).subscribe({});
           }
         });
       },

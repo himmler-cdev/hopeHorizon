@@ -47,7 +47,7 @@ export class UserService {
   loginCallback(username: string, accessToken: string): void {
     this.isLoggedInSignal.set(true);
     localStorage.setItem('access_token', accessToken);
-    this.router.navigate(['blog-list']);
+    this.router.navigate(['home']);
     this._http.get<UserDto>(`/api/user/${username}`).subscribe({
       next: (user) => {
         this.loggedInUser = UserEntity.fromDto(user);
