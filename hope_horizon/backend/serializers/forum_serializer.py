@@ -11,3 +11,13 @@ class ForumSerializer(serializers.ModelSerializer):
             "name": {"required": True},
             "description": {"required": True},
         }
+
+    def validate_name(self, value):
+        if self.instance:  
+            if Forum.objects.filter(name=value).exclude(id=self.instance.id).exists():
+                raise serializers.ValidationError("Forum with this name already exists.")
+        else: 
+            if Forum.objects.filter(name=value).exists():
+                raise serializers.ValidationError("Forum with this name already exists.")
+        
+        return value

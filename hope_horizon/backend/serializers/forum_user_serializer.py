@@ -5,7 +5,7 @@ class ForumUserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user_id.username', read_only=True)
     class Meta:
         model = ForumUser
-        fields = ["id", "user_id", "username"]
+        fields = ["id", "user_id", "username", "forum_id", "is_owner"]
         read_only_fields = ["id"]
 
     def to_representation(self, instance):

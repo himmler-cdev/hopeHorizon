@@ -1,0 +1,43 @@
+<!-- Search, Filter and Create -->
+<div class="d-flex flex-row search-filter">
+  <div class="search-bar">
+    <mat-form-field class="w-100" appearance="outline">
+      <mat-label>Search for a Forum ...</mat-label>
+      <input matInput [formControl]="searchControl"/>
+      @if (searchControl.value === '') {
+        <mat-icon matSuffix class="me-1">search</mat-icon>
+      } @else {
+        <button mat-icon-button matSuffix class="me-1" (click)="clearSearchFilter()">
+          <mat-icon>clear</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+  </div>
+  @if (showFilter) {
+    <div class="dropdown">
+      <mat-form-field class="w-100" appearance="outline">
+        <mat-select [formControl]="filterControl" placeholder="Select an Option">
+          @for (option of filterOptions; track $index) {
+            <mat-option value="{{ option }}">{{ option }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+  }
+  <div class="add-new-forum mb-3">
+    <button mat-raised-button color="primary" class="w-100 new-forum-button mat-elevation-z3"
+            routerLink="/forum/create">
+      Add New Forum
+    </button>
+  </div>
+</div>
+
+<!-- Forms -->
+@for (forum of filteredForumList; track $index) {
+  @for (forumUser of forumUsersOfUser; track $index) {
+    @if (forumUser.forum_id === forum.id) {
+      <app-forum-list-card [forum]="forum" [forumUser]="forumUser"
+                           (forumUserLeft)="handleForumUserLeft($event)"></app-forum-list-card>
+    }
+  }
+}

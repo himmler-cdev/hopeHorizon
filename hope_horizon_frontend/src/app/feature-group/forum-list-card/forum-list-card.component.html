@@ -1,0 +1,25 @@
+<mat-card class="mat-elevation-z3 card d-flex flex-column" (click)="openJournal()">
+  <div class="d-flex justify-content-between align-items-center flex-grow-1">
+    <div>
+      <mat-card-header>
+        <mat-card-title class="fw-bold">{{ forum.name }}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="card-content">
+        <p>{{ forum.description }}</p>
+      </mat-card-content>
+    </div>
+    @if (forumUser.is_owner) {
+      <div class="d-flex align-items-center">
+        <button mat-icon-button class="me-2" (click)="openForum()">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </div>
+    } @else {
+      <div class="d-flex align-items-center">
+        <button mat-icon-button class="me-2" (click)="leaveForum()">
+          <mat-icon>exit_to_app</mat-icon>
+        </button>
+      </div>
+    }
+  </div>
+</mat-card>

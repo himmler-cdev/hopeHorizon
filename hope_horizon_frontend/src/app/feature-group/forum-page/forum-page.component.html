@@ -1,0 +1,10 @@
+<div class="mx-2">
+  <app-forum-list
+    [forumUsersOfUser]="forumUsersOfUser"
+    [forumList]="forumList"
+    [showFilter]="true"
+    [filterOptions]="filterOptions"
+    [userId]="loggedInUser.id ?? 0"
+    (forumUserLeft)="handleForumUserLeft($event)"
+  ></app-forum-list>
+</div>

@@ -5,6 +5,7 @@ import {JwtHelperService} from '@auth0/angular-jwt';
 import {Observable} from 'rxjs';
 import {UserEntity} from './entity/user.entity';
 import {UserDto} from './dto/user.dto';
+import {map, tap} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -23,7 +24,7 @@ export class UserService {
     if (token) {
       console.log(
         'Token expiration date: ' +
-        this.jwtHelperService.getTokenExpirationDate(token),
+        this.jwtHelperService.getTokenExpirationDate(token)
       );
       const tokenValid = !this.jwtHelperService.isTokenExpired(token);
       this.isLoggedInSignal.set(tokenValid);
@@ -72,5 +73,14 @@ export class UserService {
 
   delete(user: UserEntity): Observable<any> {
     return this._http.delete<any>(`/api/user/${user.id}/`);
+  }
+
+  getAllUsers(): Observable<UserDto[]> {
+    return this._http
+      .get<{ users: UserDto[] }>('/api/user/', { withCredentials: true })
+      .pipe(
+        tap((response) => console.log('API Response:', response)),
+        map((response) => response.users)
+      );
   }
 }

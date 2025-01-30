@@ -1,0 +1,32 @@
+.search-filter {
+  gap: 2rem;
+  display: flex;
+  margin-top: 10px;
+  align-items: center;
+}
+
+.search-bar {
+  flex: 1 1 auto;
+  margin-right: 0.5rem;
+}
+
+.dropdown {
+  flex: 0 0 20%;
+  margin-right: 0.5rem;
+  min-width: 200px;
+}
+
+.add-new-forum {
+  flex: 0 0 10%;
+}
+
+.new-forum-button {
+  background-color: #4c9a64;
+  color: white;
+  min-width: 200px;
+
+  &:hover,
+  &:focus {
+    background-color: #3a7a4d;
+  }
+}
