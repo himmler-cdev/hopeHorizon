@@ -7,16 +7,25 @@ import {BlogFeedComponent} from './feature-blog/blog-feed/blog-feed.component';
 import {BlogJournalComponent} from './feature-blog/blog-journal/blog-journal.component';
 import {BlogFormComponent} from './feature-blog/blog-form/blog-form.component';
 import {BlogDetailComponent} from './feature-blog/blog-detail/blog-detail.component';
-import { CommentSectionComponent } from './feature-comment/comment-section/comment-section.component';
+import {NotFoundComponent} from './feature-not-found/not-found/not-found.component';
+import {HomePageComponent} from './feature-home/home-page/home-page.component';
 
 export const routes: Routes = [
   /**
-   * Blog routes
+   * User routes
    */
-  //{ path: '**', redirectTo: '/blog-list' }, // TODO: 404 page
-  {path: '', redirectTo: '/blog-list', pathMatch: 'full'}, // TODO: home page
   {path: 'login', component: UserLoginComponent},
   {path: 'register', component: UserRegisterComponent},
+
+  /**
+   * Home route
+   */
+  {path: '', redirectTo: '/home', pathMatch: 'full'}, // Redirect to home
+  {path: 'home', component: HomePageComponent, canActivate: [authGuard]},
+
+  /**
+   * Blog routes
+   */
   {path: 'blog-list', component: BlogListComponent, canActivate: [authGuard]},
   {path: 'feed', component: BlogFeedComponent, canActivate: [authGuard]},
   {path: 'journal', component: BlogJournalComponent, canActivate: [authGuard]},
@@ -27,4 +36,10 @@ export const routes: Routes = [
   /**
    * TODO: YOUR ROUTES @Kamilo, @David
    */
+
+
+  /**
+   * Default route - 404 Not Found - Must be the last route
+   */
+  {path: '**', component: NotFoundComponent}
 ];

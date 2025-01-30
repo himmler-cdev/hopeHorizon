@@ -8,6 +8,7 @@ import {BlogPostService} from '../service/blog-post.service';
 import {MatButton} from '@angular/material/button';
 import {UserService} from '../../feature-user/user.service';
 import {CdkTextareaAutosize} from '@angular/cdk/text-field';
+import {UserEntity} from '../../feature-user/entity/user.entity';
 
 @Component({
   selector: 'app-blog-detail',
@@ -28,20 +29,19 @@ import {CdkTextareaAutosize} from '@angular/cdk/text-field';
 })
 export class BlogDetailComponent implements OnInit {
   blogPost: BlogPostEntity | null = null;
-  userId = -1;
+  user: UserEntity | null = null;
 
   constructor(private _route: ActivatedRoute, private _blogPostService: BlogPostService, private _userService: UserService) {
   }
 
   ngOnInit() {
     const blogPostId = Number(this._route.snapshot.paramMap.get('id'));
+    this.user = this._userService.getUserDataImmediate();
 
     if (blogPostId) {
       this._blogPostService.getBlogPost(blogPostId).subscribe((blogDto) => {
         this.blogPost = BlogPostEntity.fromDto(blogDto);
       });
     }
-
-    this.userId = this._userService.getUserDataImmediate()?.id || -1;
   }
 }

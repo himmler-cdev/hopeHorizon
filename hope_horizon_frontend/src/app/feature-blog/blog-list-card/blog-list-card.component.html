@@ -2,7 +2,12 @@
   <div class="d-flex justify-content-between align-items-center flex-grow-1">
     <div>
       <mat-card-header>
-        <mat-card-title class="fw-bold">{{ blog.title }}</mat-card-title>
+        <mat-card-title class="fw-bold">
+          <div class="row">
+            {{ blog.title }}
+
+          </div>
+        </mat-card-title>
       </mat-card-header>
       <mat-card-content class="card-content">
         <p>{{ blog.content }}</p>

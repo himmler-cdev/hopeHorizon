@@ -8,6 +8,13 @@
 
 .header-link {
   font-size: 1.15rem;
+  transition: color 0.3s ease, background-color 0.3s ease;
+
+  &:hover,
+  &:focus {
+    background-color: rgba(106, 78, 191, 0.3); /* Slightly stronger purple */
+    text-decoration: none;
+  }
 }
 
 .header-iconSize {

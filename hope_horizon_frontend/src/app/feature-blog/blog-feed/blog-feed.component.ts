@@ -35,12 +35,14 @@ export class BlogFeedComponent implements OnInit {
   }
 
   protected loadBlogPosts() {
-    this._blogPostService.getBlogPosts({
+    const queryParams: any = {
       owned: 'false',
       page: (this.currentPage + 1).toString(),
       page_size: this.pageSize.toString(),
       search: this.searchQuery || ''
-    }).subscribe((response) => {
+    };
+
+    this._blogPostService.getBlogPosts(queryParams).subscribe((response) => {
       this.blogPostList = response.blog_posts.map(BlogPostEntity.fromDto);
       this.blogListLength = response.page_information.total_size;
     });
