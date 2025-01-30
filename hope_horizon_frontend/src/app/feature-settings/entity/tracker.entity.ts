@@ -1,4 +1,4 @@
-import { TrackerDto } from "../dto/tracker.dto";
+import {TrackerDto} from "../dto/tracker.dto";
 
 
 export class TrackerEntity {

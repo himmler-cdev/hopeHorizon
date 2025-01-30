@@ -11,7 +11,7 @@ class BlogPostSerializer(serializers.ModelSerializer):
             "content": {"required": True},
             "blog_post_type_id": {"required": True}
         }
-        read_only_fields = ["id", "date", "user_id", "forum_id"]
+        read_only_fields = ["id", "date", "user_id"]
 
 class BlogPostListSerializer(serializers.Serializer):
     page_information = serializers.SerializerMethodField()

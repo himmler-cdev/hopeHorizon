@@ -1,99 +1,94 @@
-import { Component, OnInit } from '@angular/core';
-import { ForumListComponent } from '../forum-list/forum-list.component';
-import { ForumEntity } from '../entity/forum.entity';
-import { ForumService } from '../service/forum.service';
-import { ForumUserService } from '../service/forum-user.service';
-import { ForumUserEntity } from '../entity/fourm-user.entity';
-import { UserService } from '../../feature-user/user.service';
-import { UserEntity } from '../../feature-user/entity/user.entity';
+import {Component, OnInit} from '@angular/core';
+import {ForumListComponent} from '../forum-list/forum-list.component';
+import {ForumEntity} from '../entity/forum.entity';
+import {ForumService} from '../service/forum.service';
+import {ForumUserService} from '../service/forum-user.service';
+import {ForumUserEntity} from '../entity/fourm-user.entity';
+import {UserService} from '../../feature-user/user.service';
+import {UserEntity} from '../../feature-user/entity/user.entity';
 
 @Component({
-  selector: 'app-forum-page',
-  standalone: true,
-  imports: [ForumListComponent],
-  templateUrl: './forum-page.component.html',
+    selector: 'app-forum-page',
+    standalone: true,
+    imports: [ForumListComponent],
+    templateUrl: './forum-page.component.html',
 })
 export class ForumPageComponent implements OnInit {
-  forumList: ForumEntity[] = [];
-  forumUsersOfUser: ForumUserEntity[] = [];
-  filterOptions = ['owned', 'member', 'all'];
-  loggedInUser = new UserEntity();
+    forumList: ForumEntity[] = [];
+    forumUsersOfUser: ForumUserEntity[] = [];
+    filterOptions = ['all', 'owned', 'member'];
+    loggedInUser = new UserEntity();
 
-  constructor(
-    private _forumService: ForumService,
-    private _forumUserService: ForumUserService,
-    private _userSerivce: UserService
-  ) {}
-
-  ngOnInit() {
-    const userData = this._userSerivce.getUserDataImmediate();
-    if (userData) {
-      this.loggedInUser = userData;
-    } else {
-      console.error('User data is null');
+    constructor(
+        private _forumService: ForumService,
+        private _forumUserService: ForumUserService,
+        private _userService: UserService
+    ) {
     }
-    this.loadForums();
-    //console.log('UserID:', this.loggedInUser.id);
-  }
 
-  loadForums() {
-    this._forumService.getForums(true).subscribe((response) => {
-      this.forumList = response.custom_forums.map((forum) =>
-        ForumEntity.fromDto(forum)
-      );
+    ngOnInit() {
+        const userData = this._userService.getUserDataImmediate();
+        if (userData) {
+            this.loggedInUser = userData;
+        } else {
+            console.error('User data is null');
+        }
+        this.loadForums();
+    }
 
-      // Load forum users for each forum
-      this.forumList.forEach((forum) => {
-        this.loadForumUser(forum.id!);
-      });
-    });
-    //console.log('Forums:', this.forumList);
+    loadForums() {
+        this._forumService.getForums(true).subscribe((response) => {
+            response.custom_forums.forEach((forum) => {
+                this.forumList.push(ForumEntity.fromDto(forum));
+            });
 
-    this._forumService.getForums(false).subscribe((response) => {
-      const additionalForums = response.custom_forums.map((forum) =>
-        ForumEntity.fromDto(forum)
-      );
+            this.forumList.forEach((forum) => {
+                this.loadForumUser(forum.id);
+            });
+        });
 
-      //console.log('Additional Forums:', additionalForums);
+        this._forumService.getForums(false).subscribe((response) => {
+            response.custom_forums.forEach((forum) => {
+                if (!this.forumList.find((f) => f.id === forum.id)) {
+                    this.forumList.push(ForumEntity.fromDto(forum));
+                }
 
-      // Append these forums to the existing list
-      this.forumList = [...this.forumList, ...additionalForums];
+                this.forumList.forEach((forum) => {
+                    this.loadForumUser(forum.id);
+                });
+            });
+        });
+    }
 
-      // Load forum users for each additional forum
-      additionalForums.forEach((forum) => {
-        this.loadForumUser(forum.id!);
-      });
+    loadForumUser(forumId: number | undefined) {
+        if (!forumId) {
+            return;
+        }
 
-      //console.log('Final Forum List:', this.forumList);
-    });
-  }
+        this._forumUserService.getForumUsers(forumId).subscribe(
+            (response) => {
+                // Filter users whose user_id matches this.userId
+                const users = response.forum_users
+                    .map(ForumUserEntity.fromDto)
+                    .filter((user) => user.user_id === this.loggedInUser.id);
 
-  loadForumUser(forumId: number) {
-    this._forumUserService.getForumUsers(forumId).subscribe(
-      (response) => {
-        // Filter users whose user_id matches this.userId
-        const users = response.forum_users
-          .map(ForumUserEntity.fromDto)
-          .filter((user) => user.user_id === this.loggedInUser.id);
-
-        // Append only the filtered users
-        this.forumUsersOfUser = [...this.forumUsersOfUser, ...users];
-
-        //console.log(`Filtered Forum Users for forum ${forumId}:`, users);
-        //console.log('Updated Forum Users list:', this.forumUsersOfUser);
-      },
-      (error) => {
-        console.error(
-          `Error fetching forum users for forum ${forumId}:`,
-          error
+                // Append only the filtered users
+                if (!this.forumUsersOfUser.find((formUser) => formUser.forum_id === forumId)) {
+                    this.forumUsersOfUser = [...this.forumUsersOfUser, ...users];
+                }
+            },
+            (error) => {
+                console.error(
+                    `Error fetching forum users for forum ${forumId}:`,
+                    error
+                );
+            }
         );
-      }
-    );
-  }
+    }
 
-  handleForumUserLeft(forumId: number) {
-    this.forumUsersOfUser = this.forumUsersOfUser.filter(
-      (user) => user.forum_id !== forumId
-    );
-  }
+    handleForumUserLeft(forumId: number) {
+        this.forumUsersOfUser = this.forumUsersOfUser.filter(
+            (user) => user.forum_id !== forumId
+        );
+    }
 }

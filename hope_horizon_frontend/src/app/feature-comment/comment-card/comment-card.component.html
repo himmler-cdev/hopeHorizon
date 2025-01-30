@@ -1,38 +1,38 @@
 <mat-card class="comment-card mb-4 mat-elevation-z4">
-  <mat-card-header>
-    <div class="header-content">
-      <span class="mb-1">{{ displayUsername }}</span>
-      @if (canEditComment()) {
-        <button mat-icon-button color="blue" (click)="startEdit()">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button color="warn" (click)="openDeleteDialog()" [disabled]="isEditing">
-          <mat-icon>delete</mat-icon>
-        </button>
-      }
-    </div>
-  </mat-card-header>
-
-  <mat-card-content>
-    @if (!isEditing) {
-      <div class="comment-content">{{ comment.content }}</div>
-    } @else {
-      <form [formGroup]="editForm" class="m-3">
-        <mat-form-field appearance="outline" class="w-100">
-          <mat-label>Edit your comment</mat-label>
-          <textarea matInput formControlName="content" rows="3"></textarea>
-        </mat-form-field>
-
-        <div class="text-end mt-2">
-          <button mat-raised-button color="warn" class="deny-button me-2" (click)="cancelEdit()">
-            Cancel
-          </button>
-          <button mat-raised-button color="primary" class="save-button" (click)="confirmEdit()"
-                  [disabled]="editForm.invalid">
-            Confirm
-          </button>
+    <mat-card-header>
+        <div class="header-content">
+            <span class="mb-1">{{ displayUsername }}</span>
+            @if (canEditComment()) {
+                <button mat-icon-button color="blue" (click)="startEdit()">
+                    <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="openDeleteDialog()" [disabled]="isEditing">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            }
         </div>
-      </form>
-    }
-  </mat-card-content>
+    </mat-card-header>
+
+    <mat-card-content>
+        @if (!isEditing) {
+            <div class="comment-content">{{ comment.content }}</div>
+        } @else {
+            <form [formGroup]="editForm" class="m-3">
+                <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Edit your comment</mat-label>
+                    <textarea matInput formControlName="content" rows="3"></textarea>
+                </mat-form-field>
+
+                <div class="text-end mt-2">
+                    <button mat-raised-button color="warn" class="deny-button me-2" (click)="cancelEdit()">
+                        Cancel
+                    </button>
+                    <button mat-raised-button color="primary" class="save-button" (click)="confirmEdit()"
+                            [disabled]="editForm.invalid">
+                        Confirm
+                    </button>
+                </div>
+            </form>
+        }
+    </mat-card-content>
 </mat-card>

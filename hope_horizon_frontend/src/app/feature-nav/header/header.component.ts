@@ -1,19 +1,19 @@
-import { Component } from '@angular/core';
-import { MatToolbar } from '@angular/material/toolbar';
-import { MatIcon } from '@angular/material/icon';
-import { MatAnchor, MatButton, MatIconButton } from '@angular/material/button';
-import { NgOptimizedImage } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { MatMenu, MatMenuModule } from '@angular/material/menu';
-import { UserService } from '../../feature-user/user.service';
-import { MatDialog } from '@angular/material/dialog';
-import { ConfirmDialogComponent } from '../../../shared/dialogs/confirm-dialog/confirm-dialog.component';
-import { TrackerDialogComponent } from '../../feature-settings/tracker-dialog/tracker-dialog.component';
-import { TrackerService } from '../../feature-settings/tracker-service';
-import { UserDialogComponent } from '../../feature-settings/user-dialog/user-dialog.component';
-import { UserDto } from '../../feature-user/dto/user.dto';
-import { UserEntity } from '../../feature-user/entity/user.entity';
-import { TrackerEntity } from '../../feature-settings/entity/tracker.entity';
+import {Component} from '@angular/core';
+import {MatToolbar} from '@angular/material/toolbar';
+import {MatIcon} from '@angular/material/icon';
+import {MatAnchor, MatButton, MatIconButton} from '@angular/material/button';
+import {NgOptimizedImage} from '@angular/common';
+import {RouterLink} from '@angular/router';
+import {MatMenu, MatMenuModule} from '@angular/material/menu';
+import {UserService} from '../../feature-user/user.service';
+import {MatDialog} from '@angular/material/dialog';
+import {ConfirmDialogComponent} from '../../../shared/dialogs/confirm-dialog/confirm-dialog.component';
+import {TrackerDialogComponent} from '../../feature-settings/tracker-dialog/tracker-dialog.component';
+import {TrackerService} from '../../feature-settings/tracker-service';
+import {UserDialogComponent} from '../../feature-settings/user-dialog/user-dialog.component';
+import {UserDto} from '../../feature-user/dto/user.dto';
+import {UserEntity} from '../../feature-user/entity/user.entity';
+import {TrackerEntity} from '../../feature-settings/entity/tracker.entity';
 
 @Component({
   selector: 'app-header',
@@ -39,7 +39,8 @@ export class HeaderComponent {
     private userService: UserService,
     private trackerService: TrackerService,
     private _dialog: MatDialog,
-  ) { }
+  ) {
+  }
 
   protected openLogoutDialog() {
     const dialogRef = this._dialog.open(ConfirmDialogComponent, {

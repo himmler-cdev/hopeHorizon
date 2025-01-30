@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/material/card";
 import {MatIcon} from "@angular/material/icon";
-import {MatIconButton} from "@angular/material/button";
+import {MatButton, MatIconButton} from "@angular/material/button";
 import {ForumEntity} from '../entity/forum.entity';
 import {Router} from '@angular/router';
 import {ForumUserEntity} from '../entity/fourm-user.entity';
@@ -18,7 +18,8 @@ import {ConfirmDialogComponent} from '../../../shared/dialogs/confirm-dialog/con
     MatCardHeader,
     MatCardTitle,
     MatIcon,
-    MatIconButton
+    MatIconButton,
+    MatButton
   ],
   templateUrl: './forum-list-card.component.html',
   styleUrl: './forum-list-card.component.scss'
@@ -29,20 +30,20 @@ export class ForumListCardComponent {
 
   @Output() forumUserLeft = new EventEmitter<number>();
 
-
   constructor(private _router: Router, private _forumUserService: ForumUserService, private _dialog: MatDialog) {
   }
 
-  openForum() {
+  openForum(event: Event) {
+    event.stopPropagation();
     this._router.navigate(['/forum/', this.forum.id]);
   }
 
   openJournal() {
-    //TODO: Himmler
-    this._router.navigate(['/journal/']);
+    this._router.navigate(['/journal/'], {queryParams: {type: "forum"}});
   }
 
-  leaveForum() {
+  leaveForum(event: Event) {
+    event.stopPropagation();
     const dialogRef = this._dialog.open(ConfirmDialogComponent, {
       data: {
         title: 'Leave Forum',

@@ -13,8 +13,8 @@ import {MatDialog} from '@angular/material/dialog';
 import {ConfirmDialogComponent} from '../../../shared/dialogs/confirm-dialog/confirm-dialog.component';
 import {Location} from '@angular/common';
 import {CdkTextareaAutosize} from '@angular/cdk/text-field';
-import {UserEntity} from '../../feature-user/entity/user.entity';
-import {UserService} from '../../feature-user/user.service';
+import {ForumService} from '../../feature-group/service/forum.service';
+import {ForumEntity} from '../../feature-group/entity/forum.entity';
 
 @Component({
   selector: 'app-blog-form',
@@ -38,6 +38,11 @@ export class BlogFormComponent implements OnInit {
   blogFormGroup: FormGroup;
   blogPostId: number | undefined = undefined;
   blogPostTypes: BlogPostTypeEntity[] = [];
+  formus: ForumEntity[] = [];
+  isForumTypeSelected = false;
+  forumTypeId: number | undefined;
+
+  private _forumId: number | undefined;
 
   constructor(
     private _blogPostTypeService: BlogPostTypeService,
@@ -45,7 +50,8 @@ export class BlogFormComponent implements OnInit {
     private _router: Router,
     private _dialog: MatDialog,
     private _location: Location,
-    private _route: ActivatedRoute
+    private _route: ActivatedRoute,
+    private _forumService: ForumService
   ) {
     this.blogFormGroup = new FormGroup({
       id: new FormControl(null),
@@ -58,11 +64,8 @@ export class BlogFormComponent implements OnInit {
 
   ngOnInit() {
     this._blogPostTypeService.getBlogPostTypes().subscribe((response) => {
-      response.blog_post_types
-        .filter((blogPostType) => blogPostType.type?.toLowerCase() !== 'forum')
-        .map((blogPostType) => {
-          this.blogPostTypes.push(BlogPostTypeEntity.fromDto(blogPostType));
-        });
+      this.blogPostTypes = response.blog_post_types.map(BlogPostTypeEntity.fromDto);
+      this.forumTypeId = this.blogPostTypes.find(type => type.type === 'Forum')?.id;
     });
 
     this.blogPostId = Number(this._route.snapshot.paramMap.get('id'));
@@ -70,15 +73,41 @@ export class BlogFormComponent implements OnInit {
     if (this.blogPostId) {
       this._blogPostService.getBlogPost(this.blogPostId).subscribe((blogDto) => {
         const blogEntity = BlogPostEntity.fromDto(blogDto);
+
         this.blogFormGroup.patchValue({
           id: blogEntity.id,
           title: blogEntity.title,
           date: blogEntity.date,
           content: blogEntity.content,
-          blogPostTypeId: blogEntity.blogPostTypeId
+          blogPostTypeId: blogEntity.blogPostTypeId,
+          forumId: blogEntity.forumId || null,
         });
+
+        this.isForumTypeSelected = blogEntity.blogPostTypeId === this.forumTypeId;
+        this._forumId = blogEntity.forumId;
+
+        if (this.isForumTypeSelected) {
+          this.isForumTypeSelected = true;
+          this.blogFormGroup.addControl('forumId', new FormControl(null, Validators.required));
+          this.blogFormGroup['controls']['forumId'].setValue(blogEntity.forumId);
+        } else {
+          this.isForumTypeSelected = false;
+          this.blogFormGroup.removeControl('forumId');
+        }
       });
     }
+
+    this._forumService.getForums(true).subscribe((response) => {
+      response.custom_forums.forEach((forum) => {
+        this.formus.push(ForumEntity.fromDto(forum));
+      });
+    });
+
+    this._forumService.getForums(false).subscribe((response) => {
+      response.custom_forums.forEach((forum) => {
+        this.formus.push(ForumEntity.fromDto(forum));
+      });
+    });
   }
 
   private persistForm(): BlogPostEntity {
@@ -100,6 +129,7 @@ export class BlogFormComponent implements OnInit {
     }
 
     const blogPostEntity = this.persistForm();
+    blogPostEntity.forumId = this._forumId;
 
     if (this.blogPostId) {
       this._blogPostService.updateBlogPost(blogPostEntity.toDto()).subscribe((blog) => {
@@ -187,5 +217,20 @@ export class BlogFormComponent implements OnInit {
         this._location.back();
       }
     });
+  }
+
+  protected onTypeChange(event: any) {
+    if (event.value === this.forumTypeId) {
+      this.isForumTypeSelected = true;
+      this.blogFormGroup.addControl('forumId', new FormControl(null, Validators.required));
+
+    } else {
+      this.isForumTypeSelected = false;
+      this.blogFormGroup.removeControl('forumId');
+    }
+  }
+
+  protected onForumTypeChange(event: any) {
+    this._forumId = event.value;
   }
 }

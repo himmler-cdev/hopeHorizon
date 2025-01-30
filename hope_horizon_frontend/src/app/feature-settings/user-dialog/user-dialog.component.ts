@@ -1,13 +1,18 @@
-import { Component, inject } from '@angular/core';
-import { MatButton } from '@angular/material/button';
-import { MatCheckbox } from '@angular/material/checkbox';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
-import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
-import { TrackerEntity } from '../entity/tracker.entity';
-import { UserEntity } from '../../feature-user/entity/user.entity';
-import { UserSettingsDialog } from '../interface/user-settings-dialog.interface';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {Component, inject} from '@angular/core';
+import {MatButton} from '@angular/material/button';
+import {MatCheckbox} from '@angular/material/checkbox';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogActions,
+  MatDialogClose,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle
+} from '@angular/material/dialog';
+import {MatError, MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatInput} from '@angular/material/input';
+import {UserSettingsDialog} from '../interface/user-settings-dialog.interface';
+import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 
 @Component({
   selector: 'app-tracker-dialog',
@@ -38,7 +43,7 @@ export class UserDialogComponent {
     this.updateForm = new FormGroup({
       username: new FormControl('', [Validators.required]),
       email: new FormControl('', [Validators.required, Validators.email]),
-      deactivate : new FormControl('', [Validators.required]),
+      deactivate: new FormControl('', [Validators.required]),
     });
     this.updateForm.setValue({
       username: this.data.user.username,

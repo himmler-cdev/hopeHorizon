@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {MatCard, MatCardContent} from '@angular/material/card';
 import {RouterLink} from '@angular/router';
 import {MatButton} from '@angular/material/button';

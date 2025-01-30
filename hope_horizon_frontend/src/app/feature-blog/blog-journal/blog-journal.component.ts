@@ -2,10 +2,10 @@ import {Component, OnInit} from '@angular/core';
 import {BlogListComponent} from '../blog-list/blog-list.component';
 import {BlogPostEntity} from '../entity/blog-post.entity';
 import {BlogPostService} from '../service/blog-post.service';
-import {BlogPostTypeService} from '../service/blog-post-type.service';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {UserEntity} from '../../feature-user/entity/user.entity';
 import {UserService} from '../../feature-user/user.service';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-blog-journal',
@@ -25,13 +25,17 @@ export class BlogJournalComponent implements OnInit {
   searchQuery: string | null = '';
   selectedFilter: number | null = null;
   user: UserEntity | null = null;
+  isForumSelected = false;
 
-  constructor(private _blogPostService: BlogPostService, private _blogPostTypeService: BlogPostTypeService, private _userService: UserService) {
+  constructor(private _blogPostService: BlogPostService, private _userService: UserService, private _route: ActivatedRoute) {
   }
 
   ngOnInit() {
     this.user = this._userService.getUserDataImmediate();
-    this.loadBlogPosts();
+    this._route.queryParams.subscribe(params => {
+      this.isForumSelected = params['type'] === 'forum';
+      this.loadBlogPosts();
+    });
   }
 
   protected loadBlogPosts() {
