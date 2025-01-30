@@ -33,10 +33,16 @@ export class UserLoginComponent {
 
   onLogin() {
     if (this.loginForm.valid) {
-      let res = this.userService.login(this.loginForm.value)
-      if (!res) {
-        this.errorMessage = 'Invalid username or password';
-      }
+      const userData = this.loginForm.value;
+      this.userService.login(userData).subscribe({
+        next: (res: any) => {
+          this.userService.loginCallback(userData.username, res.access);
+        },
+        error: (err) => {
+          console.error(err);
+          this.errorMessage = 'Invalid username or password';
+        },
+      });
     } else {
       this.errorMessage = '';
     }
@@ -52,7 +58,6 @@ export class UserLoginComponent {
               return controlName.toLocaleUpperCase() + ' is required';
             case 'email':
               return 'Please enter a valid email address';
-            // Add more cases as needed for other validators
             default:
               return 'Invalid field';
           }

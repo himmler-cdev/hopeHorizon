@@ -26,7 +26,8 @@
   </button>
 
   <mat-menu #menu="matMenu">
-    <button mat-menu-item routerLink="/preferences">Preferences</button>
-    <button mat-menu-item (click)="onLogout()">Logout</button>
+    <button mat-menu-item (click)="openTrackerDialog()">Tracker Settings</button>
+    <button mat-menu-item (click)="openUserDialog()">User Settings</button>
+    <button mat-menu-item (click)="openLogoutDialog()">Logout</button>
   </mat-menu>
 </mat-toolbar>

@@ -21,7 +21,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         return obj.user_role_id.role
 
 
-class UserCreateUpdateSerializer(serializers.ModelSerializer):
+class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["username", "password", "email", "birthdate"]
@@ -38,3 +38,13 @@ class UserCreateUpdateSerializer(serializers.ModelSerializer):
         if len(value) == 0:
             raise serializers.ValidationError("Email cannot be empty")
         return value
+    
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["username", "email", "birthdate"]
+        extra_kwargs = {
+            "username": {"required": True},
+            "email": {"required": True},
+            "birthdate": {"required": True},
+        }

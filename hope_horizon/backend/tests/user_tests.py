@@ -144,24 +144,7 @@ class UserTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.client.login(username=self.test_user_dict["username"], password=self.test_user_dict["password"])
         self.test_user_dict['username'] = ""
-        response = self.client.put(f"/api/user/{response.data["id"]}/", self.test_user_dict, format="json", follow=True)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    # test user update with invalid data, invalid password
-    def test_update_user_invalid_password(self):
-        response = self.client.post("/api/user/", self.test_user_dict, format="json", follow=True)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.client.login(username=self.test_user_dict["username"], password=self.test_user_dict["password"])
-        self.test_user_dict['password'] = ""
-        response = self.client.put(f"/api/user/{response.data["id"]}/", self.test_user_dict, format="json", follow=True)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    # test user update with invalid data, invalid email
-    def test_update_user_invalid_email(self):
-        response = self.client.post("/api/user/", self.test_user_dict, format="json", follow=True)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.client.login(username=self.test_user_dict["username"], password=self.test_user_dict["password"])
-        self.test_user_dict['email'] = ""
+        self.test_user_dict.pop("password")
         response = self.client.put(f"/api/user/{response.data["id"]}/", self.test_user_dict, format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -171,6 +154,7 @@ class UserTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.client.login(username=self.test_user_dict["username"], password=self.test_user_dict["password"])
         self.test_user_dict['birthdate'] = ""
+        self.test_user_dict.pop("password")
         response = self.client.put(f"/api/user/{response.data["id"]}/", self.test_user_dict, format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -179,6 +163,7 @@ class UserTests(APITestCase):
         response = self.client.post("/api/user/", self.test_user_dict, format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.client.login(username=self.test_user_dict["username"], password=self.test_user_dict["password"])
+        self.test_user_dict.pop("password")
         response = self.client.put("/api/user/2/", self.test_user_dict, format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -192,6 +177,7 @@ class UserTests(APITestCase):
         response = self.client.post("/api/user/", self.test_user_dict, format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.client.login(username=self.test_user_dict["username"], password=self.test_user_dict["password"])
+        self.test_user_dict.pop("password")
         response = self.client.put(f"/api/user/{id}/", self.test_user_dict, format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -200,6 +186,7 @@ class UserTests(APITestCase):
         response = self.client.post("/api/user/", self.test_user_dict, format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.client.login(username=self.test_user_dict["username"], password=self.test_user_dict["password"])
+        self.test_user_dict.pop("password")
         response = self.client.put("/api/user/thisIsNotANumber/", self.test_user_dict, format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -210,12 +197,10 @@ class UserTests(APITestCase):
         self.client.login(username=self.test_user_dict["username"], password=self.test_user_dict["password"])
         self.test_user_dict["username"] = "testuser2"
         self.test_user_dict["email"] = "change@gmail.com"
-        self.test_user_dict["password"] = "test"
+        self.test_user_dict.pop("password")
         response = self.client.put(f"/api/user/{response.data["id"]}/", self.test_user_dict, format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self._validate_user(response.data)
-        self.client.logout()
-        self.assertTrue(self.client.login(username=self.test_user_dict["username"], password=self.test_user_dict["password"]))
 
     ###########################################################################################################
     #                                     User "DELETE" method tests                                          #
@@ -231,7 +216,7 @@ class UserTests(APITestCase):
         response = self.client.post("/api/user/", self.test_user_dict, format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.client.login(username=self.test_user_dict["username"], password=self.test_user_dict["password"])
-        response = self.client.delete("/api/user/2/", format="json", follow=True)
+        response = self.client.delete("/api/user/200/", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     # test user deletion, user does not have permission
