@@ -80,7 +80,11 @@ npm install
 
 ## Start server
 ```sh
-ng serve or npm start
+ng serve
+```
+or
+```sh
+npm start
 ```
 
 ## Usage
