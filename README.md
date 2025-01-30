@@ -67,7 +67,8 @@ coverage report -m
 ```
 
 # Frontend
-Switch to correct directory
+
+## Switch to correct directory
 ```sh
 cd hopeHorizon/hope_horizon_frontend
 ```
