@@ -15,8 +15,8 @@ export class CommentService {
     return this._http.get<Readonly<CommentsDto>>(this.API_URL, {params: queryParams});
   }
 
-  getComment(comment: CommentDto) {
-    return this._http.get<Readonly<CommentDto>>(`${this.API_URL}${comment.id}/`);
+  getComment(commentId: number) {
+    return this._http.get<Readonly<CommentDto>>(`${this.API_URL}${commentId}/`);
   }
 
   createComment(comment: CommentDto) {

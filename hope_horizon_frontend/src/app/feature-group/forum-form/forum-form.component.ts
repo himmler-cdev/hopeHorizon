@@ -1,15 +1,14 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, Validators,} from '@angular/forms';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {MatError, MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
 import {MatOption, MatSelect} from '@angular/material/select';
-import {MatButton, MatIconButton} from '@angular/material/button';
+import {MatButton} from '@angular/material/button';
 import {MatDialog} from '@angular/material/dialog';
 import {ConfirmDialogComponent} from '../../../shared/dialogs/confirm-dialog/confirm-dialog.component';
 import {ForumService} from '../service/forum.service';
 import {ForumEntity} from '../entity/forum.entity';
-import {MatIcon} from '@angular/material/icon';
 import {ForumUserEntity} from '../entity/fourm-user.entity';
 import {ForumUserService} from '../service/forum-user.service';
 import {UserService} from '../../feature-user/user.service';
@@ -23,14 +22,11 @@ import {ForumUserPostDto} from '../dto/forum-user.dto';
     ReactiveFormsModule,
     MatFormField,
     MatInput,
-    MatIconButton,
-    MatIcon,
     MatFormField,
     MatSelect,
     MatOption,
     MatLabel,
     MatButton,
-    RouterLink,
     MatError,
   ],
   templateUrl: './forum-form.component.html',
@@ -53,8 +49,7 @@ export class ForumFormComponent implements OnInit {
     private _dialog: MatDialog,
     private _forumUserService: ForumUserService,
     private _userService: UserService,
-    private _route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private _route: ActivatedRoute
   ) {
     this.forumFormGroup = new FormGroup({
       id: new FormControl(null),
@@ -164,6 +159,10 @@ export class ForumFormComponent implements OnInit {
     const forumEntity = this.persistForm();
 
     if (this.forumId) {
+      if (this.userSelectForm.value === null) {
+        this._router.navigate(['/forum']);
+      }
+
       this._forumService.updateForum(forumEntity).subscribe(() => {
         this.userSelectForm.value.map((userId: Number) => {
           const user = this.allUsers.find((user) => user.id === userId);

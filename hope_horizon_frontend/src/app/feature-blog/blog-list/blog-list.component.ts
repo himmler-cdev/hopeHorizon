@@ -1,7 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {BlogPostEntity} from '../entity/blog-post.entity';
-import {DatePipe, NgClass} from '@angular/common';
-import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {BlogListCardComponent} from '../blog-list-card/blog-list-card.component';
@@ -9,7 +7,6 @@ import {MatFormField, MatLabel, MatSuffix} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
 import {MatOption, MatSelect} from '@angular/material/select';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
-import {MatChip} from '@angular/material/chips';
 import {BlogPostTypeEntity} from '../entity/blog-post-type.entity';
 import {RouterLink} from '@angular/router';
 import {BlogPostTypeService} from '../service/blog-post-type.service';
@@ -20,11 +17,6 @@ import {ForumEntity} from '../../feature-group/entity/forum.entity';
   selector: 'app-blog-list',
   standalone: true,
   imports: [
-    DatePipe,
-    MatCard,
-    MatCardTitle,
-    MatCardHeader,
-    MatCardContent,
     MatIconButton,
     MatIcon,
     BlogListCardComponent,
@@ -35,8 +27,6 @@ import {ForumEntity} from '../../feature-group/entity/forum.entity';
     MatLabel,
     MatSuffix,
     ReactiveFormsModule,
-    MatChip,
-    NgClass,
     MatButton,
     RouterLink
   ],
