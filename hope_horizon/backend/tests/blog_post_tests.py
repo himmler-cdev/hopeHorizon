@@ -473,7 +473,7 @@ class BlogPostTests(APITestCase):
     def test_list_blog_post_blog_post_type_no_results(self):
         data = []
         self._push_data_list(data)
-        response = self.client.get("/api/blog-post?blog_post_type_id=3&owned=true&page=1", format="json", follow=True)
+        response = self.client.get("/api/blog-post?blog_post_type_id=4&owned=true&page=1", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 0)
 
@@ -580,7 +580,7 @@ class BlogPostTests(APITestCase):
         response = self.client.post("/api/blog-post/", self.blog_post_obj, format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        response = self.client.get(f"/api/blog-post?forum_name={self.test_forum.name}&owned=true&page=1&blog_post_type_id=3", format="json", follow=True)
+        response = self.client.get(f"/api/blog-post?forum_name={self.test_forum.name}&owned=true&page=1&blog_post_type_id=4", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 1)
         self.assertEqual(response.data["blog_posts"][0]["forum_id"], self.test_forum.id)
@@ -594,7 +594,7 @@ class BlogPostTests(APITestCase):
 
         self.client.logout()
         self.client.login(username="testuser2", password="testpassword")
-        response = self.client.get(f"/api/blog-post?forum_name={self.test_forum.name}&owned=false&page=1&blog_post_type_id=3", format="json", follow=True)
+        response = self.client.get(f"/api/blog-post?forum_name={self.test_forum.name}&owned=false&page=1&blog_post_type_id=4", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 1)
 
@@ -607,7 +607,7 @@ class BlogPostTests(APITestCase):
 
         self.client.logout()
         self.client.login(username="testtherapist", password="testpassword")
-        response = self.client.get(f"/api/blog-post?forum_name={self.test_forum.name}&owned=true&page=1&blog_post_type_id=3", format="json", follow=True)
+        response = self.client.get(f"/api/blog-post?forum_name={self.test_forum.name}&owned=true&page=1&blog_post_type_id=4", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
   
     # Test if all forum blog posts are retrieved when no forum name is provided
@@ -617,7 +617,7 @@ class BlogPostTests(APITestCase):
         response = self.client.post("/api/blog-post/", self.blog_post_obj, format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        response = self.client.get("/api/blog-post?owned=true&page=1&blog_post_type_id=3", format="json", follow=True)
+        response = self.client.get("/api/blog-post?owned=true&page=1&blog_post_type_id=4", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 1)
 
@@ -630,7 +630,7 @@ class BlogPostTests(APITestCase):
 
         self.client.logout()
         self.client.login(username="testuser2", password="testpassword")
-        response = self.client.get("/api/blog-post?owned=false&page=1&blog_post_type_id=3", format="json", follow=True)
+        response = self.client.get("/api/blog-post?owned=false&page=1&blog_post_type_id=4", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 1)
 
@@ -643,7 +643,7 @@ class BlogPostTests(APITestCase):
 
         self.client.logout()
         self.client.login(username="testtherapist", password="testpassword")
-        response = self.client.get("/api/blog-post?owned=true&page=1&blog_post_type_id=3", format="json", follow=True)
+        response = self.client.get("/api/blog-post?owned=true&page=1&blog_post_type_id=4", format="json", follow=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["blog_posts"]), 0)
 
@@ -685,7 +685,7 @@ class BlogPostTests(APITestCase):
             self.assertEqual(item["date"], Date.today().strftime("%Y-%m-%d"))
             self.assertGreaterEqual(item["id"], 1)
             if i + start_index < 5:
-                self.assertEqual(item["blog_post_type_id"], 4)
+                self.assertEqual(item["blog_post_type_id"], 3)
             elif i + start_index < 10:
                 self.assertEqual(item["blog_post_type_id"], 2)
             else:
@@ -702,7 +702,7 @@ class BlogPostTests(APITestCase):
                 "blog_post_type_id": 1
             }
             if i < 5:
-                blog_post_obj["blog_post_type_id"] = 4
+                blog_post_obj["blog_post_type_id"] = 3
             elif i < 10:
                 blog_post_obj["blog_post_type_id"] = 2
 
